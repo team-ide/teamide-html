@@ -13,11 +13,40 @@ export interface HttpResponse {
 export interface Source {
     status: string
     ready: boolean
+
     url: string
     api: string
     filesUrl: string
+
+    columnTypes: Option[]
+    dataTypes: Option[]
+    indexTypes: Option[]
+    modelTypes: Model[]
+    dataPlaces: Option[]
+    databaseTypes: Option[]
+    sqlConditionalOperations: Model[]
+
     session: Session
+
     hasPower(action: string): boolean
+}
+
+/**
+ * @description Model -模型
+ */
+export interface Model {
+    name: string
+    text: string
+    comment: string
+}
+
+/**
+ * @description Option -选项
+ */
+export interface Option {
+    value: string
+    text: string
+    comment: string
 }
 
 /**
@@ -47,15 +76,26 @@ export function newSource(): Source {
     let source: Source = {
         status: null,
         ready: false,
+
         url: null,
         api: null,
         filesUrl: null,
+
+        columnTypes: null,
+        dataTypes: null,
+        indexTypes: null,
+        modelTypes: null,
+        dataPlaces: null,
+        databaseTypes: null,
+        sqlConditionalOperations: null,
+
         session: {
             user: null,
             powers: [],
             JWT: null,
             powerLinks: []
         },
+
         hasPower: (action) => {
             if (this.session == null) {
                 return false;

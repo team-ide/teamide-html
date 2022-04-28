@@ -10,12 +10,15 @@ let formatSourceData = (source: Source, data: Source) => {
     if (data != null) {
         source.api = data.api;
         source.filesUrl = data.filesUrl;
-        // source.columnTypes = data.columnTypes;
-        // source.dataTypes = data.dataTypes;
-        // source.indexTypes = data.indexTypes;
-        // source.modelTypes = data.modelTypes;
-        // source.dataPlaces = data.dataPlaces;
-        // source.databaseTypes = data.databaseTypes;
+
+        source.columnTypes = data.columnTypes;
+        source.dataTypes = data.dataTypes;
+        source.indexTypes = data.indexTypes;
+        source.modelTypes = data.modelTypes;
+        source.dataPlaces = data.dataPlaces;
+        source.databaseTypes = data.databaseTypes;
+        source.sqlConditionalOperations = data.sqlConditionalOperations;
+
         // source.toolboxTypes = data.toolboxTypes;
     } else {
         source.status = "error";
@@ -98,7 +101,7 @@ export class Service {
             origin: location.origin,
             pathname: location.pathname,
         };
-        let response = await http.post('', params)
+        let response = await http.post('data', params)
         formatSourceData(source, response.data)
     }
 
