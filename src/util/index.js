@@ -7,9 +7,96 @@ import keyCode from './keyCode';
 
 
 let util = {};
+
+import style from '../components/style/index.js';
+
+util.addColor = function (color) {
+    if (util.isNotEmpty(color)) {
+        if (color.startsWith("#")) {
+            style.addColor(color);
+            color = color.substring(1);
+        }
+    }
+    return color;
+};
+
+util.install = (app) => {
+    util.app = app;
+    util.$route = app.config.globalProperties.$route;
+    util.$router = app.config.globalProperties.$router;
+    util.getPath = (path) => {
+        if (path == null) {
+            return util.$route.path;
+        }
+        return path;
+    };
+    util.to = (path) => {
+        util.$router.push(path)
+    };
+    app.provide("util", util);
+};
 util.md5 = md5;
 util.jquery = jquery;
 Object.assign(util, keyCode.keyEvent);
+
+
+util.isManagePage = function (path) {
+    path = util.getPath(path);
+    if (path == '/manage' || path.indexOf('/manage/') == 0) {
+        return true;
+    }
+    return false;
+};
+util.isUserPage = function (path) {
+    path = util.getPath(path);
+    if (path == '/user' || path.indexOf('/user/') == 0) {
+        return true;
+    }
+    return false;
+};
+util.isToolboxPage = function (path) {
+    path = util.getPath(path);
+    if (path == '/toolbox' || path.indexOf('/toolbox/') == 0) {
+        return true;
+    }
+    return false;
+};
+util.isApplicationPage = function (path) {
+    path = util.getPath(path);
+    if (path == '/application' || path.indexOf('/application/') == 0) {
+        return true;
+    }
+    return false;
+};
+util.isWorkspacePage = function (path) {
+    path = util.getPath(path);
+    if (path == '/workspace' || path.indexOf('/workspace/') == 0) {
+        return true;
+    }
+    return false;
+};
+util.shouldHeader = function (path) {
+    path = util.getPath(path);
+    return true;
+};
+util.shouldBody = function (path) {
+    path = util.getPath(path);
+    return true;
+};
+util.shouldBodyNav = function (path) {
+    path = util.getPath(path);
+    if (this.isManagePage(path)) {
+        return true;
+    }
+    if (this.isUserPage(path)) {
+        return true;
+    }
+    return false;
+};
+util.shouldFooter = function (path) {
+    path = util.getPath(path);
+    return false;
+};
 
 util.isEmpty = function (arg) {
     if (arg == null || arg == "") {

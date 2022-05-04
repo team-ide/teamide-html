@@ -1,13 +1,75 @@
 <!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" href="/favicon.ico" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Vite App</title>
-  </head>
-  <body>
-    <div id="app"></div>
-    <script type="module" src="/src/main.js"></script>
-  </body>
+<html lang="">
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>Team IDE</title>
+  <link rel="icon" href="static/favicon.png">
+  <style>
+    .app-loading-box {
+      position: fixed;
+      z-index: 10000;
+      left: 0px;
+      top: 0px;
+      width: 100%;
+      height: 100%;
+      background-color: #454a4e;
+      opacity: 1;
+      transition: ease-in-out 300ms;
+    }
+
+    .app-loading-box.hide {
+      /* transform: scale(0); */
+      opacity: 0.0;
+      pointer-events: none;
+    }
+
+    .app-loading {
+      position: relative;
+      padding-top: 300px;
+      text-align: center;
+    }
+
+    .app-loading-img {
+      width: 30px;
+      height: 30px;
+      background-position: center;
+      background-repeat: no-repeat;
+      background-size: cover;
+      margin: 10px auto;
+      background-image: url("static/loading.gif");
+    }
+
+    .app-loading-text {
+      font-size: 15px;
+      font-weight: 600;
+      color: #a2a2a2;
+      letter-spacing: 2px;
+      line-height: 40px;
+    }
+  </style>
+</head>
+
+<body>
+  <noscript>
+    <strong>We're sorry but <%= htmlWebpackPlugin.options.title %> doesn't work properly without JavaScript enabled.
+        Please enable it to continue.</strong>
+  </noscript>
+  <div class="app-loading-box" id="app-loading-box">
+    <div class="app-loading">
+      <div class="app-loading-img" id="app-loading-img">
+
+      </div>
+      <div class="app-loading-text" id="app-loading-text">
+        应用加载中，请稍后...
+      </div>
+    </div>
+  </div>
+  <div id="app"></div>
+  <!-- built files will be auto injected -->
+  <script type="module" src="/src/main.js"></script>
+</body>
+
 </html>

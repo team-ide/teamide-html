@@ -5,6 +5,7 @@ const { resolve } = require("path")
 
 import Components from 'unplugin-vue-components/vite';
 import { AntDesignVueResolver } from 'unplugin-vue-components/resolvers';
+
 // https://vitejs.dev/config/
 export default defineConfig({
   resolve: {
@@ -13,6 +14,7 @@ export default defineConfig({
       "service": resolve(__dirname, "src/service"),
       "type": resolve(__dirname, "src/type"),
       "util": resolve(__dirname, "src/util"),
+      "views": resolve(__dirname, "src/views"),
     },
   },
   server: {

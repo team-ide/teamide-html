@@ -1,13 +1,23 @@
 import { createRouter, createWebHashHistory } from "vue-router";
 
-import Index from "./views/Index.vue";
+import Index from "views/Index.vue";
+import ToolboxPage from "views/toolbox/Page.vue";
 
 const routes = [
-  { path: "/", redirect: "/index" },
+  {
+    path: "/",
+    name: "",
+    component: Index
+  },
   {
     path: "/index",
     name: "index",
     component: Index
+  },
+  {
+    path: "/toolbox",
+    name: "toolbox",
+    component: ToolboxPage
   },
 ]
 

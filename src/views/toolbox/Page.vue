@@ -1,13 +1,16 @@
 <script lang="ts">
 import { defineComponent, reactive, toRefs } from "vue";
 
+import { ToolboxService } from "service";
 export default defineComponent({
   props: ["source"],
   setup() {
     return {};
   },
   methods: {
-    async init() {},
+    async init() {
+      await ToolboxService.init(this.source);
+    },
   },
   mounted() {
     this.init();
@@ -16,13 +19,11 @@ export default defineComponent({
 </script>
 
 <template  >
-  <div class="index-page">Index Page</div>
+  <div class="toolbox-page">Toolbox Page</div>
 </template>
 
 <style>
-.index-page {
-  height: 100%;
-  width: 100%;
-  position: relative;
+.toolbox-page {
+  display: none;
 }
 </style>

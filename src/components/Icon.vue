@@ -2,7 +2,7 @@
 import { defineComponent, reactive, toRefs } from "vue";
 
 export default defineComponent({
-  props: ["source"],
+  props: ["size", "pointer"],
   setup() {
     return {};
   },
@@ -16,13 +16,13 @@ export default defineComponent({
 </script>
 
 <template  >
-  <div class="index-page">Index Page</div>
+  <i
+    class="mdi-icon mdi"
+    :style="{ 'fonts-size': `${size}px`, cursor: pointer ? 'pointer' : 'auto' }"
+  >
+    <slot></slot>
+  </i>
 </template>
 
 <style>
-.index-page {
-  height: 100%;
-  width: 100%;
-  position: relative;
-}
 </style>

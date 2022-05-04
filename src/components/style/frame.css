@@ -1,0 +1,16 @@
+.tm-frame,
+.tm-frame-header,
+.tm-frame-footer,
+.tm-frame-main{
+    flex: 1;
+}
+
+.tm-frame.tm-horizontal,
+.tm-frame-header.tm-horizontal,
+.tm-frame-footer.tm-horizontal,
+.tm-frame-part.tm-horizontal
+{
+    display: flex;
+    flex-direction: row;
+    flex-basis: auto;
+}

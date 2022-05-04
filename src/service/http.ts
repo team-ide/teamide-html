@@ -1,4 +1,5 @@
 import axios, { AxiosRequestConfig, AxiosResponse } from 'axios'
+import util from 'util'
 
 const errorStatusMsg = (status: number) => {
     let message = ''
@@ -58,41 +59,49 @@ const http = axios.create({
 
 // 请求拦截器
 http.interceptors.request.use((config: AxiosRequestConfig) => {
-    //获取token，并将其添加至请求头中
-    let token = localStorage.getItem('team-ide-token')
-    if (token) {
-        config.headers.token = `${token}`;
+    //获取jwt，并将其添加至请求头中
+    let jwt = util.getJWT()
+    if (jwt) {
+        config.headers.jwt = `${jwt}`;
     }
     return config
 }, (error) => {
     // 错误抛到业务代码
     let response = {
-        code: -1,
+        code: "-1",
         msg: '服务器异常，请检查网络或联系管理员！',
         error: error,
     };
-    return Promise.resolve(response)
+    return response
 })
 
 // 响应拦截器
 http.interceptors.response.use((axiosResponse: AxiosResponse) => {
     const status = axiosResponse.status
-    let response = {};
+    let response = {
+        code: "",
+        msg: "",
+        data: null
+    };
     if (status < 200 || status >= 300) {
         // 处理http错误，抛到业务代码
         response = {
-            code: status,
+            code: "" + status,
             msg: errorStatusMsg(status),
+            data: null,
         };
     } else {
         if (typeof axiosResponse.data === 'string') {
             response = {
-                code: 0,
+                code: "0",
                 msg: null,
                 data: axiosResponse.data,
             };
         } else {
             response = axiosResponse.data
+            if (response.code == null) {
+                response.code = "0";
+            }
         }
     }
     return response
@@ -101,7 +110,7 @@ http.interceptors.response.use((axiosResponse: AxiosResponse) => {
         console.log('repeated request: ' + error.message)
     }
     let response = {
-        code: -1,
+        code: "-1",
         msg: '请求超时或服务器异常，请检查网络或联系管理员！',
         error: error,
     };

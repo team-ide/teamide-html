@@ -16,13 +16,17 @@ export default defineComponent({
 </script>
 
 <template  >
-  <div class="index-page">Index Page</div>
+  <div class="error-page">
+    <div class="error-message">对不起，您暂无该功能的权限，请联系管理员！</div>
+  </div>
 </template>
 
 <style>
-.index-page {
-  height: 100%;
-  width: 100%;
-  position: relative;
+.error-message {
+  text-align: center;
+  font-size: 20px;
+  font-weight: 600;
+  color: orange;
+  padding: 30px 0px;
 }
 </style>
