@@ -1,17 +1,22 @@
-import { createRouter, createWebHashHistory } from "vue-router";
+import Vue from 'vue'
+import Router from 'vue-router'
 
-import Index from "./views/Index.vue";
 
-const routes = [
-  { path: "/", redirect: "/index" },
-  {
-    path: "/index",
-    name: "index",
-    component: Index
-  },
-]
+import Index from '@/views/Index'
 
-export const router = createRouter({
-  history: createWebHashHistory(),
-  routes: routes
+// push相同地址 会报错，使用该方式规避
+let push = Router.prototype.push;
+Router.prototype.push = function (location) {
+  return push.call(this, location).catch(e => e);
+};
+
+Vue.use(Router)
+
+export default new Router({
+  routes: [
+    {
+      path: '/',
+      component: Index
+    },
+  ]
 })

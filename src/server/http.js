@@ -1,6 +1,6 @@
 import axios from 'axios';
-import util from "./util";
-import source from "./source";
+import tool from "@/tool/index.js";
+import source from "@/source/index.js";
 
 let axiosConfig = {};
 axiosConfig.timeout = 1000 * 60 * 60;
@@ -12,14 +12,23 @@ axiosInstance.interceptors.request.use(function (config) {
 	// 在发送请求之前做些什么
 	config = config || {};
 	config.headers = config.headers || {};
-	let JWT = util.getJWT();
-	if (util.isNotEmpty(JWT)) {
+	let JWT = tool.getJWT();
+	if (tool.isNotEmpty(JWT)) {
 		config.headers['JWT'] = JWT;
+	}
+	let clientKey = tool.getClientKey();
+	if (tool.isNotEmpty(clientKey)) {
+		config.headers['key1'] = clientKey;
+	}
+	let clientTabKey = tool.getClientTabKey();
+	if (tool.isNotEmpty(clientTabKey)) {
+		config.headers['key2'] = clientTabKey;
 	}
 	return config;
 }, function (error) {
 	// 对请求错误做些什么
-	return Promise.reject(error);
+	// return Promise.reject(error);
+	return Promise.resolve({ code: "-1", msg: error.message })
 });
 
 // 添加响应拦截器
@@ -42,11 +51,13 @@ axiosInstance.interceptors.response.use(function (response) {
 			case "0":
 				return response.data;
 			case "100":
-				util.error('暂无登录信息，请先登录！');
-				source.login.user = null;
+				tool.error('暂无登录信息，请先登录！');
+				if (source.login.user != null) {
+					source.login.user = null;
+				}
 				return response.data;
 			case "101":
-				util.error('暂无权限执行此次操作！');
+				tool.error('暂无权限执行此次操作！');
 				return response.data;
 		}
 	}
@@ -55,7 +66,8 @@ axiosInstance.interceptors.response.use(function (response) {
 	return response.data;
 }, function (error) {
 	// 对响应错误做点什么
-	return Promise.reject(error);
+	// return Promise.reject(error);
+	return Promise.resolve({ code: "-1", msg: error.message })
 });
 
 export default axiosInstance;
