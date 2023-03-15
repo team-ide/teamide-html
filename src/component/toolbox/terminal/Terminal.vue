@@ -323,8 +323,6 @@ export default {
     },
     toSearchSelect(select) {
       this.searchSelect = select;
-      console.log(this.term);
-      console.log(select);
       if (!select) {
         return;
       }
@@ -332,7 +330,6 @@ export default {
       if (!line) {
         return;
       }
-      console.log(line);
       this.term.scrollToLine(select.lineIndex);
       this.term.select(
         select.start,
@@ -649,8 +646,9 @@ export default {
         text = text.replace(/(\r\n|\n|\r|↵)/g, `\n`);
         this.toolboxWorker.showConfirmPaste(
           text,
-          () => {
-            this.worker.sendDataToWS(text);
+          (txt) => {
+            txt = txt.replace(/(\r\n|\n|\r|↵)/g, `\n`);
+            this.worker.sendDataToWS(txt);
             this.onFocus();
             // this.tool.success("粘贴成功");
           },

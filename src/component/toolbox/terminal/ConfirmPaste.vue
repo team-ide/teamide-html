@@ -8,17 +8,13 @@
     :append-to-body="true"
     :visible="showDialog"
     :before-close="hide"
-    width="900px"
+    width="1200px"
     top="40px"
   >
     <div>
-      <el-input
-        type="textarea"
-        v-model="text"
-        :readonly="true"
-        :autosize="{ minRows: 10, maxRows: 25 }"
-      >
-      </el-input>
+      <div style="height: 620px !important">
+        <Editor ref="Editor" :source="source" value="" language="html"></Editor>
+      </div>
     </div>
     <div class="pdt-20">
       <div class="tm-btn bg-green ft-13 mgr-10" @click="doConfirm">确认</div>
@@ -45,10 +41,14 @@ export default {
       this.confirm = confirm;
       this.cancel = cancel;
       this.showDialog = true;
+      this.$nextTick(() => {
+        this.$refs.Editor.setValue(this.text);
+      });
     },
     doConfirm() {
       this.showDialog = false;
-      this.confirm && this.confirm();
+      let txt = this.$refs.Editor.getValue();
+      this.confirm && this.confirm(txt);
     },
     doCancel() {
       this.hide();
