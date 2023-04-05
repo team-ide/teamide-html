@@ -405,7 +405,6 @@ export default {
     },
     async onSequenceChange(openItem, sequence) {
       if (openItem) {
-        console.log(openItem.sequence, sequence);
         let res = await this.server.toolbox.updateOpenSequence({
           openId: openItem.openId,
           sequence: sequence,

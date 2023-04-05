@@ -141,18 +141,23 @@ export default {
     },
     moveEnd(arg) {
       this.isDragging = false;
-      if (arg.newIndex == arg.oldIndex || !this.mainTabs[arg.newIndex]) {
+      let thisObj = this.mainTabs[arg.newIndex];
+      if (arg.newIndex == arg.oldIndex || !thisObj) {
         return;
       }
-      let nowSequence = this.mainTabs[arg.newIndex].sequence;
+      let nowSequence = thisObj.sequence;
       let sequence = 0;
+      let beforeObj = null;
+      let afterObj = null;
       if (arg.newIndex == 0) {
-        if (this.mainTabs[arg.newIndex + 1]) {
-          sequence = this.mainTabs[arg.newIndex + 1].sequence - 1;
+        afterObj = this.mainTabs[arg.newIndex + 1];
+        if (afterObj) {
+          sequence = afterObj.sequence - 1;
         }
       } else if (arg.newIndex > 0) {
-        if (this.mainTabs[arg.newIndex - 1]) {
-          sequence = this.mainTabs[arg.newIndex - 1].sequence + 1;
+        beforeObj = this.mainTabs[arg.newIndex - 1];
+        if (beforeObj) {
+          sequence = beforeObj.sequence + 1;
           if (sequence == nowSequence) {
             if (this.mainTabs[arg.newIndex + 1]) {
               sequence = this.mainTabs[arg.newIndex + 1].sequence - 1;
@@ -160,8 +165,23 @@ export default {
           }
         }
       }
-      if (this.onSequenceChange && this.mainTabs[arg.newIndex]) {
-        this.onSequenceChange(this.mainTabs[arg.newIndex], sequence);
+      if (this.onSequenceChange && (beforeObj || afterObj)) {
+        let idx = this.itemsWorker.items.indexOf(thisObj);
+        if (idx >= 0) {
+          this.itemsWorker.items.splice(idx, 1);
+        }
+        if (beforeObj) {
+          idx = this.itemsWorker.items.indexOf(beforeObj);
+          if (idx >= 0) {
+            this.itemsWorker.items.splice(idx + 1, 0, thisObj);
+          }
+        } else if (afterObj) {
+          idx = this.itemsWorker.items.indexOf(afterObj);
+          if (idx >= 0) {
+            this.itemsWorker.items.splice(idx, 0, thisObj);
+          }
+        }
+        this.onSequenceChange(thisObj, sequence);
       }
     },
     initTabs() {
