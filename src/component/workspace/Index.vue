@@ -311,7 +311,7 @@ export default {
     });
     return {
       mainItemsWorker: mainItemsWorker,
-      showTabGroupTitle: "所有",
+      showTabGroupTitle: "",
       theme: {
         isDark: true,
         backgroundColor: "#383838",

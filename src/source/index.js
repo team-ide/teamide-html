@@ -320,7 +320,7 @@ source.init = (data) => {
     }
 }
 source.showTabGroups = [
-    { isAll: true, name: "所有", select: true },
+    { isAll: true, name: "全部", select: true },
     { isToolboxType: true, name: "终端", value: "terminal", select: false },
     { isToolboxType: true, name: "文件管理器", value: "file-manager", select: false },
     { isToolboxType: true, name: "节点", value: "node", select: false },

@@ -7,6 +7,9 @@ let kafka = {
     topics(param) {
         return http.post('api/kafka/topics', param);
     },
+    topic(param) {
+        return http.post('api/kafka/topic', param);
+    },
     commit(param) {
         return http.post('api/kafka/commit', param);
     },

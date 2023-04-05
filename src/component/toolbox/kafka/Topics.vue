@@ -60,6 +60,11 @@
                 >
                   <div class="data-list-one-text">
                     {{ one.topic }}
+                    <template v-if="one.partitions != null">
+                      <span class="ft-12">
+                        （P:{{ one.partitions.length }}）
+                      </span>
+                    </template>
                   </div>
                 </div>
               </template>
@@ -73,6 +78,18 @@
       :source="source"
       title="主题"
       :onSave="doInsert"
+    ></FormDialog>
+    <FormDialog
+      ref="CommitForm"
+      :source="source"
+      title="主题提交"
+      :onSave="doCommit"
+    ></FormDialog>
+    <FormDialog
+      ref="DeleteRecordForm"
+      :source="source"
+      title="删除记录"
+      :onSave="doDeleteRecord"
     ></FormDialog>
   </div>
 </template>
@@ -139,6 +156,24 @@ export default {
         },
       });
       menus.push({
+        text: "查看主题",
+        onClick: () => {
+          this.showTopic(data);
+        },
+      });
+      menus.push({
+        text: "主题Commit",
+        onClick: () => {
+          this.toCommit(data);
+        },
+      });
+      menus.push({
+        text: "删除记录",
+        onClick: () => {
+          this.toDeleteRecord(data);
+        },
+      });
+      menus.push({
         text: "导入",
         onClick: () => {
           this.toImport(data);
@@ -168,6 +203,17 @@ export default {
       this.tool.warn("功能还未完善，敬请期待！");
       return;
     },
+    async showTopic(topic) {
+      let param = this.toolboxWorker.getWorkParam({});
+      param.topic = topic.topic;
+      param.time = -1;
+      let res = await this.server.kafka.topic(param);
+      if (res.code != 0) {
+        this.tool.error(res.msg);
+      } else {
+        this.tool.showJSONData(res.data);
+      }
+    },
     toInsert() {
       let data = {};
 
@@ -187,6 +233,66 @@ export default {
       let res = await this.server.kafka.createTopic(param);
       if (res.code == 0) {
         await this.loadTopics();
+        return true;
+      } else {
+        this.tool.error(res.msg);
+        return false;
+      }
+    },
+    toCommit(topic) {
+      let data = {
+        topic: topic.topic,
+        partition: 0,
+        offset: 0,
+        groupId: "test-group",
+      };
+
+      this.$refs.CommitForm.show({
+        title: `主题提交`,
+        form: [this.form.toolbox.kafka.commit],
+        data: [data],
+      });
+    },
+    async doCommit(dataList) {
+      let data = dataList[0];
+      let param = this.toolboxWorker.getWorkParam({
+        topic: data.topic,
+        groupId: data.groupId,
+        partition: Number(data.partition),
+        offset: Number(data.offset),
+      });
+      let res = await this.server.kafka.commit(param);
+      if (res.code == 0) {
+        this.tool.success("主题提交成功");
+        return true;
+      } else {
+        this.tool.error(res.msg);
+        return false;
+      }
+    },
+    toDeleteRecord(topic) {
+      let data = {
+        topic: topic.topic,
+        partition: 0,
+        offset: 0,
+      };
+
+      this.$refs.DeleteRecordForm.show({
+        title: `删除记录`,
+        form: [this.form.toolbox.kafka.deleteRecord],
+        data: [data],
+      });
+    },
+    async doDeleteRecord(dataList) {
+      let data = dataList[0];
+      let param = this.toolboxWorker.getWorkParam({
+        topic: data.topic,
+        partition: Number(data.partition),
+        offset: Number(data.offset),
+      });
+      let res = await this.server.kafka.deleteRecords(param);
+      if (res.code == 0) {
+        this.tool.success("记录删除成功");
         return true;
       } else {
         this.tool.error(res.msg);

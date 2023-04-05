@@ -347,7 +347,7 @@ export default {
       this.indexList = [];
       let tableDetail = this.tableDetail;
       tableDetail.columnList.forEach((column, i) => {
-        if (column.default == "") {
+        if (column.default === "") {
           column.default = null;
         }
         if (column.deleted) {

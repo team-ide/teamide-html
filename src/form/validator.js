@@ -122,7 +122,7 @@ let validateFields = function (data, fields, all) {
 // })
 
 let execVIf = function (vIf, data) {
-    if (vIf == null || vIf == "") {
+    if (vIf == null || vIf === "") {
         return true;
     }
     try {
@@ -260,7 +260,7 @@ let validateReset = function (fields) {
 };
 
 let isEmpty = function (arg) {
-    if (arg == null || arg == "") {
+    if (arg == null || arg === "") {
         return true;
     }
     return false;
