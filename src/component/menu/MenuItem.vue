@@ -95,6 +95,7 @@ export default {
 
 .menu-box.menu-mini .menu-item > a {
   line-height: 22px;
+  font-size: 12px;
 }
 .menu-item:hover > a,
 .menu-item:focus > a {

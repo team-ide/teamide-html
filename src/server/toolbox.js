@@ -4,6 +4,9 @@ let toolbox = {
     list(param) {
         return http.post('api/toolbox/list', param);
     },
+    get(param) {
+        return http.post('api/toolbox/get', param);
+    },
     count(param) {
         return http.post('api/toolbox/count', param);
     },
@@ -67,6 +70,9 @@ let toolbox = {
     },
     updateOpenExtend(param) {
         return http.post('api/toolbox/updateOpenExtend', param);
+    },
+    updateOpenSequence(param) {
+        return http.post('api/toolbox/updateOpenSequence', param);
     },
     openTab(param) {
         return http.post('api/toolbox/openTab', param);

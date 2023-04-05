@@ -23,7 +23,59 @@
           @click="tool.showSwitchToolboxContext()"
         >
           工具箱
-          <span class="color-green mgl-2">({{ source.toolboxCount }})</span>
+          <span class="color-green mgl-2"> ({{ source.toolboxCount }}) </span>
+        </div>
+        <div v-if="source.hasPower('toolbox')" class="workspace-header-nav">
+          <el-dropdown
+            trigger="click"
+            class="terminal-dropdown"
+            ref="showTabGroupDropdown"
+          >
+            <span class="el-dropdown-link" style="padding: 5px 0px">
+              <Icon
+                class="color-green ft-14 mdi-eye"
+                style="vertical-align: -1px"
+              >
+              </Icon>
+              <span class="color-green mgl-2 ft-12">
+                {{ showTabGroupTitle }}
+                ({{ mainItemsWorker.showCount }})
+              </span>
+              <i class="el-icon-arrow-down el-icon--right"></i>
+            </span>
+            <el-dropdown-menu slot="dropdown" class="terminal-dropdown-menu">
+              <MenuBox class="menu-mini">
+                <template
+                  v-if="source.showTabGroups && source.showTabGroups.length > 0"
+                >
+                  <template v-for="(one, index) in source.showTabGroups">
+                    <MenuItem :key="index" @click="changeShowTabGroup(one)">
+                      <template v-if="one.select">
+                        <Icon
+                          class="color-green ft-20 mdi-circle-medium"
+                          style=""
+                        >
+                        </Icon>
+                        <span class="color-green">
+                          {{ one.name }}
+                        </span>
+                      </template>
+                      <template v-else>
+                        <Icon
+                          class="color-grey-6 ft-20 mdi-circle-medium"
+                          style=""
+                        >
+                        </Icon>
+                        <span class="color-grey-6">
+                          {{ one.name }}
+                        </span>
+                      </template>
+                    </MenuItem>
+                  </template>
+                </template>
+              </MenuBox>
+            </el-dropdown-menu>
+          </el-dropdown>
         </div>
         <div
           v-if="source.hasPower('node')"
@@ -49,7 +101,7 @@
               终端<i class="el-icon-arrow-down el-icon--right"></i>
             </span>
             <el-dropdown-menu slot="dropdown" class="terminal-dropdown-menu">
-              <MenuBox>
+              <MenuBox class="menu-mini">
                 <MenuItem @click="openTerminal('local')">本地</MenuItem>
                 <template
                   v-if="
@@ -105,7 +157,7 @@
               slot="dropdown"
               class="file-manager-dropdown-menu"
             >
-              <MenuBox>
+              <MenuBox class="menu-mini">
                 <MenuItem @click="openFileManager('local')">本地</MenuItem>
                 <template
                   v-if="
@@ -212,7 +264,12 @@
     </div>
     <div class="workspace-main">
       <div class="workspace-main-tabs-container">
-        <WorkspaceTabs :source="source" :itemsWorker="mainItemsWorker">
+        <WorkspaceTabs
+          ref="WorkspaceTabs"
+          :source="source"
+          :itemsWorker="mainItemsWorker"
+          :onSequenceChange="onSequenceChange"
+        >
         </WorkspaceTabs>
       </div>
       <div class="workspace-main-spans-container">
@@ -235,7 +292,7 @@
     </div>
     <ToolboxContext
       :source="source"
-      :openByToolboxId="openByToolboxId"
+      :openByOption="openByOption"
     ></ToolboxContext>
   </div>
 </template>
@@ -254,6 +311,7 @@ export default {
     });
     return {
       mainItemsWorker: mainItemsWorker,
+      showTabGroupTitle: "所有",
       theme: {
         isDark: true,
         backgroundColor: "#383838",
@@ -270,35 +328,125 @@ export default {
     async initUserData() {
       await this.source.initLoginUserData();
       await this.initOpens();
+      this.initShowTabGroup();
     },
     init() {
       this.initUserData();
     },
+    initShowTabGroup() {
+      var isShowAll = false;
+      var showToolboxTypes = [];
+      var showToolboxGroups = [];
+      let names = [];
+      this.source.showTabGroups.forEach((one) => {
+        if (!one.select) {
+          return;
+        }
+        names.push(one.name);
+        if (one.isAll) {
+          isShowAll = true;
+        } else if (one.isToolboxType) {
+          showToolboxTypes.push(one.value);
+        } else if (one.isToolboxGroup) {
+          showToolboxGroups.push(one.value);
+        }
+      });
+      let showTabGroupTitle = names.join(" | ");
+      if (this.showTabGroupTitle == showTabGroupTitle) {
+        return;
+      }
+      this.showTabGroupTitle = names.join(" | ");
+      this.mainItemsWorker.items.forEach((one) => {
+        if (isShowAll) {
+          one.show = true;
+        } else if (showToolboxTypes.indexOf(one.toolboxType) >= 0) {
+          one.show = true;
+        } else if (showToolboxGroups.indexOf(one.toolboxGroupId) >= 0) {
+          one.show = true;
+        } else {
+          one.show = false;
+        }
+      });
+      this.$refs.WorkspaceTabs.initTabs();
+    },
+    changeShowTabGroup(tabGroup) {
+      this.$refs.showTabGroupDropdown && this.$refs.showTabGroupDropdown.hide();
+      if (tabGroup.isAll) {
+        this.source.showTabGroups.forEach((one) => {
+          if (!one.isAll) {
+            one.select = false;
+          } else {
+            one.select = true;
+          }
+        });
+      } else {
+        tabGroup.select = !tabGroup.select;
+        this.source.showTabGroups.forEach((one) => {
+          if (one.isAll) {
+            one.select = false;
+          }
+        });
+      }
+      let hasSelect = false;
+      this.source.showTabGroups.forEach((one) => {
+        if (one.select) {
+          hasSelect = true;
+        }
+      });
+      if (!hasSelect) {
+        this.source.showTabGroups.forEach((one) => {
+          if (one.isAll) {
+            one.select = true;
+          }
+        });
+      }
+      this.initShowTabGroup();
+      this.tool.hideToolboxContext();
+    },
+    async onSequenceChange(openItem, sequence) {
+      if (openItem) {
+        console.log(openItem.sequence, sequence);
+        let res = await this.server.toolbox.updateOpenSequence({
+          openId: openItem.openId,
+          sequence: sequence,
+        });
+        if (res.code != 0) {
+          this.tool.error(res.msg);
+        }
+      }
+    },
     openNodeContext() {
-      this.tool.openByExtend({
-        toolboxType: "node",
-        type: "node-context",
-        title: "节点",
-        onlyOpenOneKey: "node:node-context",
+      this.tool.openByOption({
+        extend: {
+          toolboxType: "node",
+          type: "node-context",
+          title: "节点",
+          onlyOpenOneKey: "node:node-context",
+        },
       });
     },
     openNodeNetProxyContext() {
-      this.tool.openByExtend({
-        toolboxType: "node",
-        type: "net-proxy-context",
-        title: "网络透传",
-        onlyOpenOneKey: "node:net-proxy-context",
+      this.tool.openByOption({
+        extend: {
+          toolboxType: "node",
+          type: "net-proxy-context",
+          title: "网络透传",
+          onlyOpenOneKey: "node:net-proxy-context",
+        },
       });
     },
     openPage(page, title) {
-      this.tool.openByExtend({
-        toolboxType: "page",
-        page: page,
-        title: title,
-        onlyOpenOneKey: "page:" + page,
+      this.tool.openByOption({
+        extend: {
+          toolboxType: "page",
+          page: page,
+          title: title,
+          onlyOpenOneKey: "page:" + page,
+        },
       });
     },
     openTerminal(place, placeData) {
+      let options = {};
       let extend = {
         toolboxType: "terminal",
         place: place,
@@ -310,6 +458,7 @@ export default {
       } else if (place == "ssh") {
         extend.title = "" + placeData.name;
         extend.placeId = "" + placeData.toolboxId;
+        options.toolboxId = placeData.toolboxId;
       } else if (place == "node") {
         extend.title = "" + placeData.name;
         extend.placeId = "" + placeData.serverId;
@@ -317,10 +466,12 @@ export default {
         this.tool.error("暂不支持该配置作为终端");
         return;
       }
-      this.tool.openByExtend(extend);
+      options.extend = extend;
+      this.tool.openByOption(options);
       this.$refs.terminalDropdown && this.$refs.terminalDropdown.hide();
     },
     openFileManager(place, placeData) {
+      let options = {};
       let extend = {
         toolboxType: "file-manager",
         place: place,
@@ -332,6 +483,7 @@ export default {
       } else if (place == "ssh") {
         extend.title = "" + placeData.name;
         extend.placeId = "" + placeData.toolboxId;
+        options.toolboxId = placeData.toolboxId;
       } else if (place == "node") {
         extend.title = "" + placeData.name;
         extend.placeId = "" + placeData.serverId;
@@ -339,7 +491,8 @@ export default {
         this.tool.error("暂不支持该配置作为文件管理器");
         return;
       }
-      this.tool.openByExtend(extend);
+      options.extend = extend;
+      this.tool.openByOption(options);
       this.$refs.fileManagerDropdown && this.$refs.fileManagerDropdown.hide();
     },
     addMainItem(item, fromItem) {
@@ -352,46 +505,32 @@ export default {
       return this.mainItemsWorker.items || [];
     },
     toMainCopyItem(item) {
-      let extend = item.extend;
-      if (this.tool.isEmpty(item.toolboxId)) {
-        this.openByExtend(extend, item, item.createTime);
-      } else {
-        this.openByToolboxId(item.toolboxId, extend, item, item.createTime);
-      }
-    },
-    async openByToolboxId(toolboxId, extend, fromItem, createTime) {
-      let param = {
-        toolboxId: toolboxId,
-        extend: JSON.stringify(extend || {}),
+      let options = {
+        fromItem: item,
+        sequence: item.sequence,
+        extend: item.extend,
       };
-      if (createTime) {
-        param.createTime = createTime;
+      if (this.tool.isNotEmpty(item.toolboxId)) {
+        options.toolboxId = item.toolboxId;
       }
-      let res = await this.server.toolbox.open(param);
-      if (res.code != 0) {
-        this.tool.error(res.msg);
-      } else {
-        let openData = res.data.open;
-        let item = this.addMainItemByOpen(openData, fromItem);
-        if (item != null) {
-          this.$nextTick(() => {
-            this.toMainActiveItem(item);
-          });
-        }
-      }
+      this.openByOption(options);
     },
-    async openByExtend(extend, fromItem, createTime) {
-      if (
-        extend == null ||
-        Object.keys(extend) == 0 ||
-        this.tool.isEmpty(extend.toolboxType)
-      ) {
-        this.tool.error("根据扩展打开需要配置类型");
-        return;
-      }
-      if (this.tool.isEmpty(extend.title)) {
-        this.tool.error("根据扩展打开需要配置标题");
-        return;
+    async openByOption(options) {
+      options = options || {};
+      let extend = options.extend || {};
+      if (options.toolboxId == null) {
+        if (
+          extend == null ||
+          Object.keys(extend) == 0 ||
+          this.tool.isEmpty(extend.toolboxType)
+        ) {
+          this.tool.error("根据扩展打开需要配置类型");
+          return;
+        }
+        if (this.tool.isEmpty(extend.title)) {
+          this.tool.error("根据扩展打开需要配置标题");
+          return;
+        }
       }
       if (this.tool.isNotEmpty(extend.onlyOpenOneKey)) {
         let items = this.getMainItems() || [];
@@ -413,15 +552,18 @@ export default {
       let param = {
         extend: JSON.stringify(extend || {}),
       };
-      if (createTime) {
-        param.createTime = createTime;
+      if (options.toolboxId) {
+        param.toolboxId = options.toolboxId;
+      }
+      if (options.sequence) {
+        param.sequence = options.sequence;
       }
       let res = await this.server.toolbox.open(param);
       if (res.code != 0) {
         this.tool.error(res.msg);
       } else {
         let openData = res.data.open;
-        let item = this.addMainItemByOpen(openData, fromItem);
+        let item = this.addMainItemByOpen(openData, options.fromItem);
         if (item != null) {
           this.$nextTick(() => {
             this.toMainActiveItem(item);
@@ -439,14 +581,16 @@ export default {
       item.toolboxType = open.toolboxType;
       item.toolboxId = open.toolboxId;
       item.toolboxGroupId = open.toolboxGroupId;
-      item.createTime = open.createTime;
+      item.sequence = open.sequence;
       item.extend = this.tool.getOptionJSON(open.extend);
 
-      if (this.tool.isEmpty(item.title)) {
-        item.name = item.extend.name;
+      if (this.tool.isNotEmpty(item.extend.title)) {
         item.title = item.extend.title;
       }
-      if (this.tool.isEmpty(item.toolboxType)) {
+      if (this.tool.isNotEmpty(item.extend.name)) {
+        item.name = item.extend.name;
+      }
+      if (this.tool.isNotEmpty(item.extend.toolboxType)) {
         item.toolboxType = item.extend.toolboxType;
       }
 
@@ -554,13 +698,13 @@ export default {
   },
   created() {},
   updated() {
-    this.tool.openByExtend = this.openByExtend;
+    this.tool.openByOption = this.openByOption;
     this.tool.openPage = this.openPage;
     this.tool.openTerminal = this.openTerminal;
     this.tool.openFileManager = this.openFileManager;
   },
   mounted() {
-    this.tool.openByExtend = this.openByExtend;
+    this.tool.openByOption = this.openByOption;
     this.tool.openPage = this.openPage;
     this.tool.openTerminal = this.openTerminal;
     this.tool.openFileManager = this.openFileManager;

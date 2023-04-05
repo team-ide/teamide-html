@@ -297,6 +297,20 @@ source.init = (data) => {
                     form.toolbox[one.name][formName] = one.otherForm[formName];
                 }
             }
+            let find = null;
+            source.showTabGroups.forEach(g => {
+                if (g.isToolboxType && g.value == one.name) {
+                    find = g;
+                }
+            })
+            if (!find) {
+                source.showTabGroups.push({
+                    isToolboxType: true,
+                    name: "" + one.text,
+                    value: one.name,
+                    select: false,
+                })
+            }
         });
         tool.setClientKey(data.clientKey)
         tool.setClientTabKey(data.clientTabKey)
@@ -305,7 +319,23 @@ source.init = (data) => {
         source.ready = false;
     }
 }
+source.showTabGroups = [
+    { isAll: true, name: "所有", select: true },
+    { isToolboxType: true, name: "终端", value: "terminal", select: false },
+    { isToolboxType: true, name: "文件管理器", value: "file-manager", select: false },
+    { isToolboxType: true, name: "节点", value: "node", select: false },
+    { isToolboxType: true, name: "页面", value: "page", select: false },
+]
 source.toolboxTypes = [];
+source.getToolboxType = (type) => {
+    let find = null
+    source.toolboxTypes.forEach((one) => {
+        if (one == type || one.name == type) {
+            find = one
+        }
+    })
+    return find;
+}
 source.namePackChars = [
     { value: "", text: "默认" },
     { value: "-", text: "不包装" },

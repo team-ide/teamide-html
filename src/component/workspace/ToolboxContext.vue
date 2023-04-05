@@ -139,10 +139,12 @@
                     @contextmenu="dataContextmenu(toolboxType, toolboxData)"
                     @click="toolboxDataOpen(toolboxData)"
                   >
-                    <span class="toolbox-type-data-text" title="打开">
+                    <span
+                      class="toolbox-type-data-text"
+                      :title="'打开:' + toolboxData.name"
+                    >
                       {{ toolboxData.name }}
                     </span>
-                    <div class="toolbox-type-data-btn-box"></div>
                   </div>
                 </template>
               </template>
@@ -151,6 +153,11 @@
         </template>
       </div>
     </div>
+    <FormDialog
+      ref="ShowToolboxInfo"
+      :source="source"
+      title="查看Toolbox"
+    ></FormDialog>
     <FormDialog
       ref="InsertToolbox"
       :source="source"
@@ -187,7 +194,7 @@
 <script>
 export default {
   components: {},
-  props: ["source", "openByToolboxId"],
+  props: ["source", "openByOption"],
   data() {
     return {
       showBox: false,
@@ -225,7 +232,9 @@ export default {
     hide() {
       this.showBox = false;
     },
-    init() {},
+    init() {
+      this.initToolboxGroups();
+    },
     async initToolboxGroups() {
       let data = {};
       if (this.source.login.user != null) {
@@ -236,6 +245,23 @@ export default {
         data = res.data || {};
       }
       let groups = data.groupList || [];
+      groups.forEach((one) => {
+        let find = null;
+        this.source.showTabGroups.forEach((g) => {
+          if (g.isToolboxGroup && g.value == one.groupId) {
+            find = g;
+          }
+        });
+        if (!find) {
+          this.source.showTabGroups.push({
+            isToolboxGroup: true,
+            name: "" + one.name,
+            value: one.groupId,
+            select: false,
+          });
+        }
+      });
+
       this.toolboxGroups = groups;
     },
     async initData() {
@@ -378,7 +404,10 @@ export default {
         if (toolboxData.toolboxType == "other") {
           extend = this.tool.getOptionJSON(toolboxData.option);
         }
-        this.openByToolboxId(toolboxData.toolboxId, extend);
+        this.openByOption({
+          toolboxId: toolboxData.toolboxId,
+          extend: extend,
+        });
       }
 
       this.hide();
@@ -554,6 +583,27 @@ export default {
       } catch (e) {
         this.tool.warn("不是有效工具箱数据！");
         return;
+      }
+    },
+    async showToolboxInfo(toolboxId) {
+      let res = await this.server.toolbox.get({
+        toolboxId: toolboxId,
+      });
+      if (res.code == 0) {
+        let toolboxData = res.data || {};
+        let toolboxType = this.source.getToolboxType(toolboxData.toolboxType);
+        if (toolboxType == null) {
+          this.tool.warn("工具箱数据丢失！");
+          return;
+        }
+        let optionsJSON = this.tool.getOptionJSON(toolboxData.option);
+        this.$refs.ShowToolboxInfo.show({
+          title: `查看[${toolboxType.text}]工具`,
+          form: [this.form.toolbox, toolboxType.configForm],
+          data: [toolboxData, optionsJSON],
+        });
+      } else {
+        this.tool.error(res.msg);
       }
     },
     toCopy(toolboxType, copy) {
@@ -760,12 +810,14 @@ export default {
     this.tool.showToolboxContext = this.show;
     this.tool.showSwitchToolboxContext = this.showSwitch;
     this.tool.hideToolboxContext = this.hide;
+    this.tool.showToolboxInfo = this.showToolboxInfo;
   },
   mounted() {
     this.init();
     this.tool.showToolboxContext = this.show;
     this.tool.showSwitchToolboxContext = this.showSwitch;
     this.tool.hideToolboxContext = this.hide;
+    this.tool.showToolboxInfo = this.showToolboxInfo;
   },
 };
 </script>
@@ -941,13 +993,5 @@ export default {
 }
 .toolbox-context-box .toolbox-type-data .tm-link {
   padding: 0px;
-}
-.toolbox-context-box .toolbox-type-data-btn-box {
-  display: inline-block;
-  text-align: right;
-  width: 85px;
-}
-.toolbox-context-box .toolbox-type-data-btn-box .tm-link {
-  margin-right: 5px;
 }
 </style>

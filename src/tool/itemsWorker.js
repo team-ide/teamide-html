@@ -3,6 +3,7 @@ const newItemsWorker = function (workerOption) {
     const worker = {
         items: [],
         activeItem: null,
+        showCount: 0,
         getItem(item) {
             if (item == null) {
                 return
@@ -31,6 +32,29 @@ const newItemsWorker = function (workerOption) {
         toCopyItem(item) {
             return workerOption.toCopyItem(item);
         },
+        initItems() {
+            let showCount = 0;
+            this.items.forEach(one => {
+                if (this.show) {
+                    showCount++
+                }
+            })
+            this.showCount = showCount
+        },
+        showItem(item) {
+            let find = worker.getItem(item);
+            if (find) {
+                find.show = true
+            }
+            this.initItems();
+        },
+        hideItem(item) {
+            let find = worker.getItem(item);
+            if (find) {
+                find.show = false
+            }
+            this.initItems();
+        },
         addItem(item, before) {
             let find = worker.getItem(item);
             if (find) {
@@ -54,6 +78,7 @@ const newItemsWorker = function (workerOption) {
             } else {
                 worker.items.push(item)
             }
+            this.initItems();
         },
         toDeleteOtherItem(item) {
             let list = [];
@@ -82,6 +107,7 @@ const newItemsWorker = function (workerOption) {
                     workerOption.onRemoveItem && workerOption.onRemoveItem(one);
                 }
             });
+            this.initItems();
         },
         toRemoveItem(item) {
             let find = worker.getItem(item);
@@ -98,6 +124,7 @@ const newItemsWorker = function (workerOption) {
                 }
                 worker.toActiveItem(worker.items[nextIndex]);
             }
+            this.initItems();
         },
         activeNextItem(item) {
             let find = worker.getItem(item);

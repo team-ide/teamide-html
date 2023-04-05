@@ -23,7 +23,16 @@
         </el-dropdown-menu>
       </el-dropdown>
     </div>
-    <div class="workspace-tabs-body" ref="workspaceTabsBody">
+    <draggable
+      class="workspace-tabs-body"
+      ref="workspaceTabsBody"
+      v-bind="dragOptions"
+      tag="div"
+      v-model="mainTabs"
+      @start="isDragging = true"
+      @end="moveEnd"
+      draggable=".workspace-tabs-one"
+    >
       <template v-for="(one, index) in mainTabs">
         <div
           :key="index"
@@ -51,7 +60,7 @@
           </span>
         </div>
       </template>
-    </div>
+    </draggable>
     <div class="workspace-tabs-right">
       <el-dropdown
         v-if="rightTabs.length > 0"
@@ -77,9 +86,10 @@
 </template>
 
 <script>
+import draggable from "vuedraggable";
 export default {
-  components: {},
-  props: ["source", "itemsWorker"],
+  components: { draggable },
+  props: ["source", "itemsWorker", "onSequenceChange"],
   data() {
     return {
       mainTabs: [],
@@ -88,12 +98,30 @@ export default {
       tabsWidth: 0,
       tabHeaderWidthCount: 0,
       tabEditorHeaderWidth: 0,
+      isDragging: false,
+      delayedDragging: false,
     };
   },
   // 计算属性 只有依赖数据发生改变，才会重新进行计算
-  computed: {},
+
+  computed: {
+    dragOptions() {
+      return {
+        disabled: this.onSequenceChange == null,
+      };
+    },
+  },
   // 计算属性 数据变，直接会触发相应的操作
   watch: {
+    isDragging(newValue) {
+      if (newValue) {
+        this.delayedDragging = true;
+        return;
+      }
+      this.$nextTick(() => {
+        this.delayedDragging = false;
+      });
+    },
     "itemsWorker.items"() {
       this.$nextTick(() => {
         this.initTabs();
@@ -111,22 +139,51 @@ export default {
         this.initTabs();
       });
     },
+    moveEnd(arg) {
+      this.isDragging = false;
+      if (arg.newIndex == arg.oldIndex || !this.mainTabs[arg.newIndex]) {
+        return;
+      }
+      let nowSequence = this.mainTabs[arg.newIndex].sequence;
+      let sequence = 0;
+      if (arg.newIndex == 0) {
+        if (this.mainTabs[arg.newIndex + 1]) {
+          sequence = this.mainTabs[arg.newIndex + 1].sequence - 1;
+        }
+      } else if (arg.newIndex > 0) {
+        if (this.mainTabs[arg.newIndex - 1]) {
+          sequence = this.mainTabs[arg.newIndex - 1].sequence + 1;
+          if (sequence == nowSequence) {
+            if (this.mainTabs[arg.newIndex + 1]) {
+              sequence = this.mainTabs[arg.newIndex + 1].sequence - 1;
+            }
+          }
+        }
+      }
+      if (this.onSequenceChange && this.mainTabs[arg.newIndex]) {
+        this.onSequenceChange(this.mainTabs[arg.newIndex], sequence);
+      }
+    },
     initTabs() {
       let leftTabs = [];
       let rightTabs = [];
       let mainTabs = [];
 
+      this.itemsWorker.showCount = 0;
       this.itemsWorker.items.forEach((one) => {
         if (!one.show) {
           return;
         }
+        this.itemsWorker.showCount++;
         mainTabs.push(one);
       });
       this.mainTabs = mainTabs;
 
       this.$nextTick(() => {
         let tabsWidth = this.tool.jQuery(this.$el).width();
-        let workspaceTabsBody = this.tool.jQuery(this.$refs.workspaceTabsBody);
+        let workspaceTabsBody = this.tool.jQuery(
+          this.$refs.workspaceTabsBody.$el || this.$refs.workspaceTabsBody
+        );
         let tabsBodyWidth = workspaceTabsBody.width();
         let tabWidthCount = 0;
         let children = workspaceTabsBody.children();
@@ -212,6 +269,14 @@ export default {
           this.toDeleteTab(tab);
         },
       });
+      if (tab.toolboxId && tab.toolboxId < 9999999910000) {
+        menus.push({
+          text: "查看配置信息",
+          onClick: () => {
+            this.tool.showToolboxInfo(tab.toolboxId);
+          },
+        });
+      }
       menus.push({
         text: "打开新标签",
         onClick: () => {

@@ -216,16 +216,18 @@ export default {
             this.toolboxWorker.toInsertFromNode(data);
           },
         });
-        if (this.tool.openByExtend) {
+        if (this.tool.openByOption) {
           menus.push({
             text: "查看",
             onClick: () => {
-              this.tool.openByExtend({
-                toolboxType: "node",
-                type: "node-info",
-                title: "查看节点-" + data.name,
-                serverId: data.serverId,
-                onlyOpenOneKey: "node:node-info:" + data.serverId,
+              this.tool.openByOption({
+                extend: {
+                  toolboxType: "node",
+                  type: "node-info",
+                  title: "查看节点-" + data.name,
+                  serverId: data.serverId,
+                  onlyOpenOneKey: "node:node-info:" + data.serverId,
+                },
               });
             },
           });
