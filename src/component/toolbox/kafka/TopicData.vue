@@ -35,6 +35,12 @@
                 <el-option label="Long（int64）" value="long"></el-option>
               </el-select>
             </el-form-item>
+            <el-form-item label="拉取数量">
+              <el-input v-model="pullForm.pullSize" style="width: 80px" />
+            </el-form-item>
+            <el-form-item label="拉取时间">
+              <el-input v-model="pullForm.pullTimeout" style="width: 80px" />
+            </el-form-item>
             <el-form-item label="">
               <div class="">
                 <div
@@ -345,6 +351,8 @@ export default {
         let param = this.toolboxWorker.getWorkParam(
           Object.assign({}, this.pullForm)
         );
+        param.pullSize = Number(param.pullSize);
+        param.pullTimeout = Number(param.pullTimeout);
         let res = await this.server.kafka.pull(param);
         if (res.code != 0) {
           this.tool.error(res.msg);
