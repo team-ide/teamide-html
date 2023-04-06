@@ -208,6 +208,9 @@
         >
           日志
         </div>
+        <div class="workspace-header-nav" @click="openPage('tools', '小工具')">
+          小工具
+        </div>
         <div style="flex: 1"></div>
         <template v-if="source.login.user == null">
           <div
