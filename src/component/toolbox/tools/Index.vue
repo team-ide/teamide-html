@@ -1,59 +1,52 @@
 <template>
   <div class="tools-page">
     <tm-layout>
-      <tm-layout width="300px">
+      <tm-layout width="200px">
         <div class="pdlr-10">
-          <div>
-            <div class="tm-link color-green">时间戳</div>
-          </div>
-          <div>
-            <div class="tm-link color-green">crontab</div>
-          </div>
-          <div>
-            <div class="tm-link color-green">JSON</div>
-          </div>
-          <div>
-            <div class="tm-link color-green">Yaml</div>
-          </div>
-          <div>
-            <div class="tm-link color-green">URL编码解码</div>
-          </div>
-          <div>
-            <div class="tm-link color-green">Base64</div>
-          </div>
-          <div>
-            <div class="tm-link color-green">MD5</div>
-          </div>
-          <div>
-            <div class="tm-link color-green">文件hash</div>
-          </div>
-          <div>
-            <div class="tm-link color-green">密码生成</div>
-          </div>
-          <div>
-            <div class="tm-link color-green">随机数</div>
-          </div>
-          <div>
-            <div class="tm-link color-green">随机姓名</div>
-          </div>
-          <div>
-            <div class="tm-link color-green">随机字符串</div>
-          </div>
+          <template v-for="(one, index) in tools">
+            <div :key="index" class="pdtb-5">
+              <div
+                class="tm-link color-green"
+                :class="{ 'tm-disabled': one.disable }"
+                @click="toOpenTab(one)"
+              >
+                {{ one.text }}
+              </div>
+            </div>
+          </template>
         </div>
       </tm-layout>
       <tm-layout-bar right></tm-layout-bar>
-      <tm-layout width="auto">小工具 </tm-layout>
+      <tm-layout width="auto">
+        <Tabs :source="source" :toolboxWorker="toolboxWorker"> </Tabs>
+      </tm-layout>
     </tm-layout>
   </div>
 </template>
 
 
 <script>
+import Tabs from "./Tabs";
+
 export default {
-  components: {},
+  components: { Tabs },
   props: ["source", "toolboxWorker", "extend"],
   data() {
-    return {};
+    return {
+      tools: [
+        { type: "json", text: "JSON", disable: false },
+        { type: "timestamp", text: "时间戳", disable: false },
+        { type: "crontab", text: "Crontab", disable: true },
+        { type: "yaml", text: "Yaml", disable: true },
+        { type: "urlEncode", text: "URL编码解码", disable: true },
+        { type: "base64", text: "Base64", disable: true },
+        { type: "md5", text: "MD5", disable: true },
+        { type: "filehash", text: "文件hash", disable: true },
+        { type: "randomNumber", text: "随机数", disable: true },
+        { type: "randomString", text: "随机字符串", disable: true },
+        { type: "generatePassword", text: "生成密码", disable: true },
+      ],
+    };
   },
   computed: {},
   watch: {},
@@ -61,6 +54,16 @@ export default {
     async init() {},
     refresh() {
       this.$nextTick(() => {});
+    },
+    toOpenTab(options) {
+      let extend = {
+        name: options.text,
+        title: options.text,
+        type: options.type,
+        onlyOpenOneKey: "tools:type:" + options.type,
+      };
+      Object.assign(extend, options);
+      this.toolboxWorker.openTabByExtend(extend);
     },
   },
   created() {},
@@ -74,5 +77,6 @@ export default {
 .tools-page {
   width: 100%;
   height: 100%;
+  user-select: text;
 }
 </style>
