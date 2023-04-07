@@ -51,25 +51,21 @@
               </el-checkbox>
             </el-checkbox-group>
           </el-form-item>
-          <template v-for="(one, index) in tos">
-            <div :key="index">
-              <el-form-item :label="one.toType" class="mgb-5"> </el-form-item>
-              <div style="height: 300px">
-                <Editor
-                  ref="viewEditor"
-                  :source="source"
-                  :language="one.toType"
-                >
-                </Editor>
-              </div>
-              <template v-if="one.error != null">
-                <div class="color-error pdlr-10">
-                  异常： <span>{{ one.error }}</span>
-                </div>
-              </template>
-            </div>
-          </template>
         </el-form>
+        <template v-for="(one, index) in tos">
+          <div :key="index">
+            <div class="pdlr-5 pdb-5">{{ one.toType }}</div>
+            <div style="height: 400px">
+              <Editor ref="viewEditor" :source="source" :language="one.toType">
+              </Editor>
+            </div>
+            <template v-if="one.error != null">
+              <div class="color-error pdlr-10">
+                异常： <span>{{ one.error }}</span>
+              </div>
+            </template>
+          </div>
+        </template>
       </tm-layout>
     </tm-layout>
   </div>
@@ -81,7 +77,7 @@ import jsYaml from "js-yaml";
 
 export default {
   components: {},
-  props: ["source", "toolboxWorker", "extend"],
+  props: ["source", "toolboxWorker", "tabId", "extend", "defaultFormat"],
   data() {
     return {
       from: null,
@@ -101,8 +97,8 @@ export default {
     init() {
       let extend = this.extend || {};
       this.from = extend.from;
-      this.fromType = extend.fromType || "json";
-      this.toTypes = extend.toTypes || ["json", "yaml"];
+      this.fromType = extend.fromType || this.defaultFormat || "json";
+      this.toTypes = extend.toTypes || [this.defaultFormat || "json"];
       this.format();
       this.$refs.Editor.setValue(this.from);
     },
@@ -116,11 +112,11 @@ export default {
       this.change(0);
     },
     change() {
-      let extend = this.extend || {};
-      extend.from = this.from;
-      extend.fromType = this.fromType || "json";
-      extend.toTypes = this.toTypes;
-      this.toolboxWorker.updateExtend(extend);
+      let keyValueMap = this.extend || {};
+      keyValueMap.from = this.from;
+      keyValueMap.fromType = this.fromType || "json";
+      keyValueMap.toTypes = this.toTypes;
+      this.toolboxWorker.updateOpenTabExtend(this.tabId, keyValueMap);
       this.format();
     },
     format() {

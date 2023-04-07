@@ -35,9 +35,9 @@ export default {
     return {
       tools: [
         { type: "json", text: "JSON", disable: false },
+        { type: "yaml", text: "Yaml", disable: false },
         { type: "timestamp", text: "时间戳", disable: false },
         { type: "crontab", text: "Crontab", disable: true },
-        { type: "yaml", text: "Yaml", disable: true },
         { type: "urlEncode", text: "URL编码解码", disable: true },
         { type: "base64", text: "Base64", disable: true },
         { type: "md5", text: "MD5", disable: true },

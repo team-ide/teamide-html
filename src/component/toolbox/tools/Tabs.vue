@@ -13,6 +13,7 @@
               :source="source"
               :toolboxWorker="toolboxWorker"
               :extend="item.extend"
+              :tabId="item.tabId"
             >
             </Timestamp>
           </template>
@@ -21,6 +22,7 @@
               :source="source"
               :toolboxWorker="toolboxWorker"
               :extend="item.extend"
+              :tabId="item.tabId"
             >
             </Crontab>
           </template>
@@ -29,22 +31,27 @@
               :source="source"
               :toolboxWorker="toolboxWorker"
               :extend="item.extend"
+              :tabId="item.tabId"
+              defaultFormat="json"
             >
             </Json>
           </template>
           <template v-else-if="item.extend.type == 'yaml'">
-            <Yaml
+            <Json
               :source="source"
               :toolboxWorker="toolboxWorker"
               :extend="item.extend"
+              :tabId="item.tabId"
+              defaultFormat="yaml"
             >
-            </Yaml>
+            </Json>
           </template>
           <template v-else-if="item.extend.type == 'urlEncode'">
             <UrlEncode
               :source="source"
               :toolboxWorker="toolboxWorker"
               :extend="item.extend"
+              :tabId="item.tabId"
             >
             </UrlEncode>
           </template>
@@ -53,6 +60,7 @@
               :source="source"
               :toolboxWorker="toolboxWorker"
               :extend="item.extend"
+              :tabId="item.tabId"
             >
             </Base64>
           </template>
@@ -61,6 +69,7 @@
               :source="source"
               :toolboxWorker="toolboxWorker"
               :extend="item.extend"
+              :tabId="item.tabId"
             >
             </Md5>
           </template>
@@ -69,6 +78,7 @@
               :source="source"
               :toolboxWorker="toolboxWorker"
               :extend="item.extend"
+              :tabId="item.tabId"
             >
             </Filehash>
           </template>
@@ -77,6 +87,7 @@
               :source="source"
               :toolboxWorker="toolboxWorker"
               :extend="item.extend"
+              :tabId="item.tabId"
             >
             </RandomNumber>
           </template>
@@ -85,6 +96,7 @@
               :source="source"
               :toolboxWorker="toolboxWorker"
               :extend="item.extend"
+              :tabId="item.tabId"
             >
             </RandomString>
           </template>
@@ -93,6 +105,7 @@
               :source="source"
               :toolboxWorker="toolboxWorker"
               :extend="item.extend"
+              :tabId="item.tabId"
             >
             </GeneratePassword>
           </template>
@@ -107,7 +120,6 @@
 import Timestamp from "./Timestamp";
 import Crontab from "./Crontab";
 import Json from "./Json";
-import Yaml from "./Yaml";
 import UrlEncode from "./UrlEncode";
 import Base64 from "./Base64";
 import Filehash from "./Filehash";
@@ -120,7 +132,6 @@ export default {
     Timestamp,
     Crontab,
     Json,
-    Yaml,
     UrlEncode,
     Base64,
     Filehash,
