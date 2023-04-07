@@ -8,11 +8,16 @@
       <el-form-item label="" class="mgb-5">
         <el-input v-model="form.nowDateStr"></el-input>
       </el-form-item>
-      <template v-for="(one, index) in form.nowDateFormats">
-        <el-form-item :key="'nowDateFormats-' + index" label="" class="mgb-5">
-          <el-input :value="one"></el-input>
-        </el-form-item>
-      </template>
+      <el-form-item label="" class="mgb-5">
+        <template v-for="(one, index) in form.nowDateFormats">
+          <el-input
+            :key="'nowDateFormats-' + index"
+            :value="one"
+            style="width: 200px"
+            class="mgr-10"
+          ></el-input>
+        </template>
+      </el-form-item>
       <el-form-item label="毫秒" class="mgb-5">
         <el-input v-model="form.nowDateMillisecond"></el-input>
       </el-form-item>
@@ -37,11 +42,16 @@
       <el-form-item label="" class="mgb-5">
         <el-input v-model="form.dateStr"></el-input>
       </el-form-item>
-      <template v-for="(one, index) in form.dateFormats">
-        <el-form-item :key="'dateFormats-' + index" label="" class="mgb-5">
-          <el-input :value="one"></el-input>
-        </el-form-item>
-      </template>
+      <el-form-item label="" class="mgb-5">
+        <template v-for="(one, index) in form.dateFormats">
+          <el-input
+            :key="'dateFormats-' + index"
+            :value="one"
+            style="width: 200px"
+            class="mgr-10"
+          ></el-input>
+        </template>
+      </el-form-item>
       <el-form-item label="毫秒" class="mgb-5">
         <el-input v-model="form.dateMillisecond"></el-input>
       </el-form-item>
