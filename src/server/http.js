@@ -51,13 +51,13 @@ axiosInstance.interceptors.response.use(function (response) {
 			case "0":
 				return response.data;
 			case "100":
-				tool.error('暂无登录信息，请先登录！');
+				// tool.error('暂无登录信息，请先登录！');
 				if (source.login.user != null) {
 					source.login.user = null;
 				}
 				return response.data;
 			case "101":
-				tool.error('暂无权限执行此次操作！');
+				// tool.error('暂无权限执行此次操作！');
 				return response.data;
 		}
 	}

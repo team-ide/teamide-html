@@ -12,6 +12,7 @@ source.api = null;
 source.filesUrl = null;
 source.hasNewVersion = false;
 source.isServer = true;
+source.setting = {};
 
 source.header = {
     title: "Team · IDE",
@@ -287,6 +288,7 @@ source.init = (data) => {
         source.filesUrl = data.filesUrl;
         source.isServer = data.isServer;
         source.quickCommandTypes = data.quickCommandTypes;
+        source.setting = data.setting || {};
         source.databaseTypes = data.databaseTypes || [];
         source.sqlConditionalOperations = data.sqlConditionalOperations;
         source.toolboxTypes = data.toolboxTypes || [];

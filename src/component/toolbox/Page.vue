@@ -22,6 +22,13 @@
           :extend="extend"
         ></Tools>
       </template>
+      <template v-else-if="extend.page == 'setting'">
+        <Setting
+          :source="source"
+          :toolboxWorker="toolboxWorker"
+          :extend="extend"
+        ></Setting>
+      </template>
     </template>
   </div>
 </template>
@@ -31,9 +38,10 @@
 import UserCenter from "./user/Center";
 import Logger from "./logger/Log";
 import Tools from "./tools/Index";
+import Setting from "./setting/Index";
 
 export default {
-  components: { UserCenter, Logger, Tools },
+  components: { UserCenter, Logger, Tools, Setting },
   props: ["source", "toolboxWorker", "extend"],
   data() {
     return {};

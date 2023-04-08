@@ -76,6 +76,11 @@ let server = {
         })
         listenOnEventList[event] = newList
     },
+    setting: {
+        save(param) {
+            return http.post('api/setting/save', param || {},);
+        },
+    }
 };
 var listenStartInt = false
 const listenStart = async (errorCount) => {

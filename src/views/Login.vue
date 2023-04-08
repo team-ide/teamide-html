@@ -61,7 +61,21 @@
             </div>
           </div>
           <div
-            v-if="source.hasPower('register')"
+            v-if="
+              source.hasPower('login') && source.setting.loginAnonymousEnable
+            "
+            class="pdtb-10 text-right ft-18"
+          >
+            允许匿名登录，
+            <div
+              class="tm-link color-orange-7 mgt--1"
+              @click="doAnonymousLogin()"
+            >
+              匿名登录
+            </div>
+          </div>
+          <div
+            v-if="source.hasPower('register') && source.setting.registerEnable"
             class="pdtb-10 text-right ft-13"
           >
             没有账号？
@@ -139,6 +153,24 @@ export default {
     },
   },
   methods: {
+    doAnonymousLogin() {
+      this.server
+        .login({
+          anonymous: true,
+        })
+        .then((res) => {
+          if (res.code == 0) {
+            this.tool.setJWT(res.data);
+            this.tool.success("匿名登录成功！");
+            this.tool.initSession();
+            setTimeout(() => {
+              this.tool.hideLogin();
+            }, 300);
+          } else {
+            this.tool.error(res.msg);
+          }
+        });
+    },
     doLogin() {
       this.loginBtnDisabled = true;
       this.loginForm.validate(this.loginData).then((res) => {

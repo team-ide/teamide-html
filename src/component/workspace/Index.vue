@@ -102,7 +102,12 @@
             </span>
             <el-dropdown-menu slot="dropdown" class="terminal-dropdown-menu">
               <MenuBox class="menu-mini">
-                <MenuItem @click="openTerminal('local')">本地</MenuItem>
+                <template v-if="source.setting.terminalLocalEnable">
+                  <MenuItem @click="openTerminal('local')">本地</MenuItem>
+                </template>
+                <template v-else>
+                  <MenuItem :disabled="true">未开启本地</MenuItem>
+                </template>
                 <template
                   v-if="
                     source.sshToolboxList && source.sshToolboxList.length > 0
@@ -125,7 +130,13 @@
                     </MenuSubBox>
                   </MenuItem>
                 </template>
-                <template v-if="source.nodeList && source.nodeList.length > 0">
+                <template
+                  v-if="
+                    source.nodeList &&
+                    source.nodeList.length > 0 &&
+                    source.setting.terminalNodeEnable
+                  "
+                >
                   <MenuItem>
                     节点
                     <MenuSubBox slot="MenuSubBox">
@@ -158,7 +169,12 @@
               class="file-manager-dropdown-menu"
             >
               <MenuBox class="menu-mini">
-                <MenuItem @click="openFileManager('local')">本地</MenuItem>
+                <template v-if="source.setting.fileManagerLocalEnable">
+                  <MenuItem @click="openFileManager('local')">本地</MenuItem>
+                </template>
+                <template v-else>
+                  <MenuItem :disabled="true">未开启本地</MenuItem>
+                </template>
                 <template
                   v-if="
                     source.sshToolboxList && source.sshToolboxList.length > 0
@@ -181,7 +197,13 @@
                     </MenuSubBox>
                   </MenuItem>
                 </template>
-                <template v-if="source.nodeList && source.nodeList.length > 0">
+                <template
+                  v-if="
+                    source.nodeList &&
+                    source.nodeList.length > 0 &&
+                    source.setting.fileManagerNodeEnable
+                  "
+                >
                   <MenuItem>
                     节点
                     <MenuSubBox slot="MenuSubBox">
@@ -208,8 +230,19 @@
         >
           日志
         </div>
-        <div class="workspace-header-nav" @click="openPage('tools', '小工具')">
+        <div
+          v-if="source.hasPower('tools')"
+          class="workspace-header-nav"
+          @click="openPage('tools', '小工具')"
+        >
           小工具
+        </div>
+        <div
+          v-if="source.hasPower('setting')"
+          class="workspace-header-nav"
+          @click="openPage('setting', '系统设置')"
+        >
+          系统设置
         </div>
         <div style="flex: 1"></div>
         <template v-if="source.login.user == null">
@@ -222,7 +255,7 @@
           </div>
           <div
             class="workspace-header-nav"
-            v-if="source.hasPower('register')"
+            v-if="source.hasPower('register') && source.setting.registerEnable"
             @click="tool.toRegister()"
           >
             注 册
