@@ -26,6 +26,10 @@ export default {
       form: {
         value: null,
         valueMd5: null,
+        md5: null,
+        md5Value: null,
+        thread: 1,
+        timeout: 10, // 10秒
       },
     };
   },
