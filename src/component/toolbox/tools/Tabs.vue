@@ -122,6 +122,7 @@ import Crontab from "./Crontab";
 import Json from "./Json";
 import UrlEncode from "./UrlEncode";
 import Base64 from "./Base64";
+import Md5 from "./Md5";
 import Filehash from "./Filehash";
 import RandomNumber from "./RandomNumber";
 import RandomString from "./RandomString";
@@ -134,6 +135,7 @@ export default {
     Json,
     UrlEncode,
     Base64,
+    Md5,
     Filehash,
     RandomNumber,
     RandomString,

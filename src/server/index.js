@@ -80,7 +80,15 @@ let server = {
         save(param) {
             return http.post('api/setting/save', param || {},);
         },
-    }
+    },
+    tools: {
+        base64(param) {
+            return http.post('api/tools/base64', param || {},);
+        },
+        md5(param) {
+            return http.post('api/tools/md5', param || {},);
+        },
+    },
 };
 var listenStartInt = false
 const listenStart = async (errorCount) => {
