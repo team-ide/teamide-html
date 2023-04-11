@@ -175,7 +175,7 @@ co.formatDate = function (arg, format) {
 		"m+": date.getMinutes(), // minute
 		"s+": date.getSeconds(), // second
 		"q+": Math.floor((date.getMonth() + 3) / 3), // quarter
-		"S+": date.getMilliseconds()
+		"S": date.getMilliseconds()
 	};
 	if (/(y+)/.test(format)) {
 		format = format.replace(RegExp.$1, (date.getFullYear() + "").substr(4 - RegExp.$1.length));

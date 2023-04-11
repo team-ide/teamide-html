@@ -84,8 +84,8 @@ export default {
       },
       error: null,
       formats: [
-        "yyyy-MM-dd hh:mm:ss.SSS",
-        "yyyy/MM/dd hh:mm:ss.SSS",
+        "yyyy-MM-dd hh:mm:ss.S",
+        "yyyy/MM/dd hh:mm:ss.S",
         "yyyy-MM-dd",
         "yyyy/MM/dd",
       ],
