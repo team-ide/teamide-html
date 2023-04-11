@@ -7,12 +7,23 @@
     <div class="default-spans-container">
       <WorkspaceSpans :source="source" :itemsWorker="toolboxWorker.itemsWorker">
         <template v-slot:span="{ item }">
-          <TopicData
-            :source="source"
-            :toolboxWorker="toolboxWorker"
-            :topic="item.extend.topic"
-          >
-          </TopicData>
+          <template v-if="item.extend == null"></template>
+          <template v-else-if="item.extend.type == 'data'">
+            <TopicData
+              :source="source"
+              :toolboxWorker="toolboxWorker"
+              :topic="item.extend.topic"
+            >
+            </TopicData>
+          </template>
+          <template v-else-if="item.extend.type == 'groups'">
+            <Groups
+              :source="source"
+              :toolboxWorker="toolboxWorker"
+              :extend="item.extend"
+            >
+            </Groups>
+          </template>
         </template>
       </WorkspaceSpans>
     </div>
@@ -22,8 +33,9 @@
 
 <script>
 import TopicData from "./TopicData";
+import Groups from "./Groups";
 export default {
-  components: { TopicData },
+  components: { TopicData, Groups },
   props: ["source", "toolboxWorker"],
   data() {
     return {};

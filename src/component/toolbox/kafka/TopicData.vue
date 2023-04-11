@@ -53,6 +53,9 @@
                 <div class="tm-btn tm-btn-sm bg-green ft-13" @click="toPush">
                   新增
                 </div>
+                <div class="tm-btn tm-btn-sm bg-grey ft-13" @click="showGroup">
+                  查看消费组
+                </div>
               </div>
             </el-form-item>
           </el-form>
@@ -362,6 +365,47 @@ export default {
         this.dataList = dataList;
       } catch (error) {}
       this.dataListLoading = false;
+    },
+    async showGroup() {
+      let data = {
+        topic: this.pullForm.topic,
+        groupId: this.pullForm.groupId,
+        time: -1,
+      };
+      let param = this.toolboxWorker.getWorkParam(data);
+      let res = await this.server.kafka.topic(param);
+      if (res.code != 0) {
+        this.tool.error(res.msg);
+      }
+      let topicInfo = res.data;
+      let groupInfo = {
+        topic: data.topic,
+        groupId: data.groupId,
+      };
+      res = await this.server.kafka.group.describe(param);
+      if (res.code == 0) {
+        Object.assign(groupInfo, res.data);
+      } else {
+        this.tool.error(res.msg);
+      }
+      if (topicInfo && topicInfo.partitions) {
+        let partitions = [];
+
+        topicInfo.partitions.forEach((one) => {
+          partitions.push(one.partition);
+        });
+        param = this.toolboxWorker.getWorkParam({
+          groupId: data.groupId,
+        });
+        param.topicPartitions = {};
+        param.topicPartitions[topicInfo.topic] = partitions;
+        res = await this.server.kafka.group.offsets(param);
+        if (res.code != 0) {
+          this.tool.error(res.msg);
+        }
+        groupInfo.offsets = res.data;
+      }
+      this.tool.showJSONData(groupInfo);
     },
   },
   created() {},

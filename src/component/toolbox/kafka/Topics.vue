@@ -26,6 +26,9 @@
               >
                 信息
               </div>
+              <div class="tm-btn tm-btn-xs bg-orange" @click="openGroups()">
+                组
+              </div>
             </el-form-item>
           </el-form>
         </tm-layout>
@@ -134,6 +137,22 @@ export default {
     rowDbClick(data) {
       this.toOpenTopic(data);
     },
+    openGroups(data) {
+      let extend = {
+        type: "groups",
+      };
+      if (data) {
+        extend.name = data.topic + "组";
+        extend.title = data.topic + "组";
+        extend.topic = data.topic;
+        extend.onlyOpenOneKey = "kafka:topic:" + data.topic + ":groups";
+      } else {
+        extend.name = "组";
+        extend.title = "组";
+        extend.onlyOpenOneKey = "kafka:groups";
+      }
+      this.toolboxWorker.openTabByExtend(extend);
+    },
     toOpenTopic(data) {
       let extend = {
         name: data.topic,
@@ -153,6 +172,12 @@ export default {
         text: "数据",
         onClick: () => {
           this.toOpenTopic(data);
+        },
+      });
+      menus.push({
+        text: "组",
+        onClick: () => {
+          this.openGroups(data);
         },
       });
       menus.push({
@@ -211,7 +236,27 @@ export default {
       if (res.code != 0) {
         this.tool.error(res.msg);
       } else {
-        this.tool.showJSONData(res.data);
+        let data = res.data || {};
+        res = await this.server.kafka.topicDescribe(param);
+        if (res.code != 0) {
+          this.tool.error(res.msg);
+        } else {
+          let topicDescribe = res.data || {};
+          let partitions = topicDescribe.partitions || [];
+          delete topicDescribe.partitions;
+          data.partitions = data.partitions || [];
+          data.partitions.forEach((one) => {
+            let find = null;
+            partitions.forEach((f) => {
+              if (f.ID == one.partition || f.id == one.partition) {
+                find = f;
+              }
+            });
+            Object.assign(one, find);
+          });
+          Object.assign(data, topicDescribe);
+          this.tool.showJSONData(data);
+        }
       }
     },
     toInsert() {
