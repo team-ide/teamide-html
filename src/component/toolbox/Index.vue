@@ -81,6 +81,14 @@
         >
         </TerminalEditor>
       </template>
+      <template v-else-if="toolboxType == 'thrift'">
+        <ThriftEditor
+          :source="source"
+          :extend="extend"
+          :toolboxWorker="toolboxWorker"
+        >
+        </ThriftEditor>
+      </template>
       <template v-else-if="toolboxType == 'page'">
         <Page :source="source" :extend="extend" :toolboxWorker="toolboxWorker">
         </Page>
@@ -97,6 +105,7 @@ import NodeEditor from "./node/Index.vue";
 import FileManagerEditor from "./file-manager/Index.vue";
 import TerminalEditor from "./terminal/Index.vue";
 import toolboxWorker_ from "./toolboxWorker.js";
+import ThriftEditor from "./thrift/Index.vue";
 
 export default {
   components: {
@@ -104,6 +113,7 @@ export default {
     NodeEditor,
     FileManagerEditor,
     TerminalEditor,
+    ThriftEditor,
   },
   props: ["source", "extend", "toolboxType", "toolboxId", "openId"],
   data() {
