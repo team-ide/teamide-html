@@ -284,6 +284,14 @@ tool.formatSize = function (data, name, sizeName, sizeUnitName) {
         data[sizeUnitName] = "B";
     }
 };
+tool.formatTimeStr = function (v) {
+    let data = {
+        useTime: v,
+    }
+
+    tool.formatTime(data, "useTime", "useTimeValue", "useTimeUnit");
+    return data["useTimeValue"] + "" + data["useTimeUnit"]
+};
 tool.formatTime = function (data, name, timeName, timeUnitName) {
     data[name] = data[name] || 0;
     let sizeMap = [

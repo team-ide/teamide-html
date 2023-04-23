@@ -17,10 +17,95 @@
             </div>
           </template>
         </tm-layout>
-        <tm-layout height="40px">
+        <tm-layout height="120px">
           <div class="pdlr-10">
             <div class="tm-btn tm-btn-sm bg-green-6" @click="toInvoke">
               执行
+            </div>
+            <div v-if="result != null" class="mgt-10 ft-12">
+              <div v-if="result.start > 0">
+                开始时间：
+                <span class="color-green pdlr-5">
+                  {{
+                    tool.formatDate(
+                      new Date(result.start),
+                      "yyyy-MM-dd hh:mm:ss"
+                    )
+                  }}
+                </span>
+                结束时间：
+                <span class="color-green pdlr-5">
+                  {{
+                    tool.formatDate(new Date(result.end), "yyyy-MM-dd hh:mm:ss")
+                  }}
+                </span>
+                总耗时：
+                <span class="color-green pdlr-5">
+                  {{ tool.formatTimeStr(result.end - result.start) }}
+                </span>
+                <template v-if="result.writeStart > 0 && result.readStart > 0">
+                  执行耗时：
+                  <span class="color-green pdlr-5">
+                    {{
+                      tool.formatTimeStr(result.readStart - result.writeStart)
+                    }}
+                  </span>
+                </template>
+              </div>
+              <div v-if="result.writeStart > 0">
+                写入开始时间：
+                <span class="color-green pdlr-5">
+                  {{
+                    tool.formatDate(
+                      new Date(result.writeStart),
+                      "yyyy-MM-dd hh:mm:ss"
+                    )
+                  }}
+                </span>
+                写入结束时间：
+                <span class="color-green pdlr-5">
+                  {{
+                    tool.formatDate(
+                      new Date(result.writeEnd),
+                      "yyyy-MM-dd hh:mm:ss"
+                    )
+                  }}
+                </span>
+                写入耗时：
+                <span class="color-green pdlr-5">
+                  {{ tool.formatTimeStr(result.writeEnd - result.writeStart) }}
+                </span>
+              </div>
+              <div v-if="result.readStart > 0">
+                读取开始时间：
+                <span class="color-green pdlr-5">
+                  {{
+                    tool.formatDate(
+                      new Date(result.readStart),
+                      "yyyy-MM-dd hh:mm:ss"
+                    )
+                  }}
+                </span>
+                读取结束时间：
+                <span class="color-green pdlr-5">
+                  {{
+                    tool.formatDate(
+                      new Date(result.readEnd),
+                      "yyyy-MM-dd hh:mm:ss"
+                    )
+                  }}
+                </span>
+                读取耗时：
+                <span class="color-green pdlr-5">
+                  {{ tool.formatTimeStr(result.readEnd - result.readStart) }}
+                </span>
+              </div>
+
+              <template v-if="tool.isNotEmpty(result.error)">
+                <div class="mgt-5 color-error">
+                  异常： <span>{{ result.error }}</span>
+                </div>
+              </template>
             </div>
           </div>
         </tm-layout>
@@ -37,7 +122,7 @@
 import { append } from "@antv/x6/lib/util/dom/elem";
 export default {
   components: {},
-  props: ["source", "toolboxWorker", "extend"],
+  props: ["source", "toolboxWorker", "extend", "tabId"],
   data() {
     return {
       ready: false,
@@ -48,6 +133,7 @@ export default {
       structCache: null,
       argForm: null,
       serverAddress: "127.0.0.1:10001",
+      result: null,
     };
   },
   computed: {},
@@ -56,13 +142,29 @@ export default {
     async init() {
       await this.refresh();
       this.ready = true;
+
+      let extend = this.extend || {};
+      let argData = extend.argData || {};
+      let argFields = this.argFields || [];
+      this.$nextTick(() => {
+        let editors = this.$refs.argEditor;
+        argFields.forEach((one, index) => {
+          if (typeof argData[one.name] == "string") {
+            let v = argData[one.name] || "";
+            let editor = editors[index] || editors;
+            editor.setValue && editor.setValue(v);
+          }
+        });
+      });
     },
     async refresh() {
       let extend = this.extend || {};
       this.relativePath = extend.relativePath;
       this.serviceName = extend.serviceName;
       this.methodName = extend.methodName;
+      this.serverAddress = extend.serverAddress;
       await this.loadData();
+
       // this.initArgForm();
     },
     initArgForm() {
@@ -93,9 +195,11 @@ export default {
       let argFields = this.argFields || [];
       let editors = this.$refs.argEditor;
       var args = [];
+      let argData = {};
       argFields.forEach((one, index) => {
         let editor = editors[index] || editors;
         let v = editor.getValue();
+        argData[one.name] = v;
         if (this.tool.isNotEmpty(v)) {
           let json = this.tool.stringToJSON(v);
           if (json != null) {
@@ -106,6 +210,7 @@ export default {
         }
         args.push(v);
       });
+      this.saveExtend(argData);
       let param = this.toolboxWorker.getWorkParam({
         relativePath: this.relativePath,
         serviceName: this.serviceName,
@@ -115,17 +220,25 @@ export default {
       });
 
       let res = await this.server.thrift.invokeByServerAddress(param);
-      let out = res.data;
+      let result = res.data || {};
+      result.error = null;
       if (res.code != 0) {
-        out = res.msg;
+        result.error = res.msg;
         this.tool.error(res.msg);
       }
+      this.result = result;
       if (this.$refs.resultEditor) {
-        if (typeof out == "object") {
-          out = JSON.stringify(out);
+        if (typeof result.result == "object") {
+          result.result = JSON.stringify(result.result);
         }
-        this.$refs.resultEditor.setValue(out);
+        this.$refs.resultEditor.setValue(result.result);
       }
+    },
+    async saveExtend(argData) {
+      let keyValueMap = {};
+      keyValueMap.serverAddress = this.serverAddress;
+      keyValueMap.argData = argData;
+      await this.toolboxWorker.updateOpenTabExtend(this.tabId, keyValueMap);
     },
     async loadData() {
       let param = this.toolboxWorker.getWorkParam({
