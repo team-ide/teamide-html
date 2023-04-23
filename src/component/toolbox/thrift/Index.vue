@@ -4,7 +4,7 @@
       <tm-layout height="100%">
         <tm-layout width="400px" class="">
           <Services
-            ref="Indexes"
+            ref="Services"
             :source="source"
             :toolboxWorker="toolboxWorker"
             :extend="extend"

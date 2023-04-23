@@ -37,6 +37,7 @@ export default {
   watch: {},
   methods: {
     init() {},
+    refresh() {},
   },
   created() {},
   mounted() {

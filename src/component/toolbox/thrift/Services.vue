@@ -5,6 +5,12 @@
         <tm-layout height="50px">
           <div class="pdlr-10 pdt-5">
             <div class="tm-btn tm-btn-xs bg-grey-6" @click="reload">刷新</div>
+            <div class="tm-btn tm-btn-xs bg-grey-6" @click="expandAll">
+              展开所有
+            </div>
+            <div class="tm-btn tm-btn-xs bg-grey-6" @click="collapseAll">
+              收起所有
+            </div>
             <div class="color-orange ft-12 pdt-5">双击展开目录或打开方法</div>
           </div>
         </tm-layout>
@@ -89,6 +95,21 @@ export default {
         }
       }
     },
+    expandAll() {
+      this.$refs.tree.$children.forEach((one) => {
+        if (!one.node.expanded) {
+          // one.node.expand();
+          one.node.expanded = true;
+        }
+      });
+    },
+    collapseAll() {
+      this.$refs.tree.$children.forEach((one) => {
+        if (one.node.expanded) {
+          one.node.expanded = false;
+        }
+      });
+    },
     nodeDbClick(node) {
       if (!node.isLeaf) {
         if (node.expanded) {
@@ -127,10 +148,12 @@ export default {
         one.key = one.relativePath + "-" + one.name;
         one.methods = one.methods || [];
         one.leaf = false;
+        one.searchText = one.name;
         one.methods.forEach((method) => {
           method.key = one.key + "-" + method.name;
           method.relativePath = one.relativePath;
           method.serviceName = one.name;
+          method.searchText = method.name + "." + one.name;
           method.leaf = true;
         });
       });

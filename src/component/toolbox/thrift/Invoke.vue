@@ -3,14 +3,28 @@
     <template v-if="ready">
       <tm-layout height="100%">
         <tm-layout height="400px" class="app-scroll-bar">
+          <div class="pdlr-10 pdtb-5">
+            文件:
+            <span class="color-green pdr-10">
+              {{ relativePath }}
+            </span>
+            服务:
+            <span class="color-green pdr-10">
+              {{ serviceName }}
+            </span>
+            方法:
+            <span class="color-green pdr-10">
+              {{ methodName }}
+            </span>
+          </div>
           <el-form class="pdt-10 pdlr-10" size="mini" inline>
             <el-form-item label="服务地址（127.0.0.1:10001" class="mgb-5">
               <el-input v-model="serverAddress" />
             </el-form-item>
           </el-form>
           <template v-for="(argField, index) in argFields">
-            <div :key="'arg-' + index" class="ft-12 pd-10">
-              参数：{{ argField.num }}:{{ argField.name }}
+            <div :key="'arg-' + index" class="ft-12 pdlr-10 pdtb-5">
+              参数:{{ argField.num }}:{{ argField.name }}
             </div>
             <div :key="'editor-' + index" style="height: 200px">
               <Editor ref="argEditor" :source="source" language="json"></Editor>
@@ -18,13 +32,13 @@
           </template>
         </tm-layout>
         <tm-layout height="120px">
-          <div class="pdlr-10">
+          <div class="pdlr-10 pdt-5">
             <div class="tm-btn tm-btn-sm bg-green-6" @click="toInvoke">
               执行
             </div>
             <div v-if="result != null" class="mgt-10 ft-12">
               <div v-if="result.start > 0">
-                开始时间：
+                开始时间:
                 <span class="color-green pdlr-5">
                   {{
                     tool.formatDate(
@@ -33,7 +47,7 @@
                     )
                   }}
                 </span>
-                结束时间：
+                结束时间:
                 <span class="color-green pdlr-5">
                   {{
                     tool.formatDate(
@@ -42,19 +56,19 @@
                     )
                   }}
                 </span>
-                总耗时：
+                总耗时:
                 <span class="color-green pdlr-5">
                   {{ tool.formatTimeStr(result.end - result.start) }}
                 </span>
                 <template v-if="result.writeEnd > 0 && result.readStart > 0">
-                  执行耗时：
+                  执行耗时:
                   <span class="color-green pdlr-5">
                     {{ tool.formatTimeStr(result.readStart - result.writeEnd) }}
                   </span>
                 </template>
               </div>
               <div v-if="result.writeStart > 0">
-                写入开始时间：
+                写入开始时间:
                 <span class="color-green pdlr-5">
                   {{
                     tool.formatDate(
@@ -63,7 +77,7 @@
                     )
                   }}
                 </span>
-                写入结束时间：
+                写入结束时间:
                 <span class="color-green pdlr-5">
                   {{
                     tool.formatDate(
@@ -72,13 +86,13 @@
                     )
                   }}
                 </span>
-                写入耗时：
+                写入耗时:
                 <span class="color-green pdlr-5">
                   {{ tool.formatTimeStr(result.writeEnd - result.writeStart) }}
                 </span>
               </div>
               <div v-if="result.readStart > 0">
-                读取开始时间：
+                读取开始时间:
                 <span class="color-green pdlr-5">
                   {{
                     tool.formatDate(
@@ -87,7 +101,7 @@
                     )
                   }}
                 </span>
-                读取结束时间：
+                读取结束时间:
                 <span class="color-green pdlr-5">
                   {{
                     tool.formatDate(
@@ -96,7 +110,7 @@
                     )
                   }}
                 </span>
-                读取耗时：
+                读取耗时:
                 <span class="color-green pdlr-5">
                   {{ tool.formatTimeStr(result.readEnd - result.readStart) }}
                 </span>
@@ -104,7 +118,7 @@
 
               <template v-if="tool.isNotEmpty(result.error)">
                 <div class="mgt-5 color-error">
-                  异常： <span>{{ result.error }}</span>
+                  异常: <span>{{ result.error }}</span>
                 </div>
               </template>
             </div>
