@@ -2,7 +2,7 @@
   <div class="toolbox-thrift-editor">
     <template v-if="ready">
       <tm-layout height="100%">
-        <tm-layout width="400px" class="">
+        <tm-layout width="300px" class="">
           <Services
             ref="Services"
             :source="source"

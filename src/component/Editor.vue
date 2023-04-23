@@ -4,7 +4,15 @@
 
 <script>
 export default {
-  props: ["source", "language", "readonly", "value", "change", "onContextMenu"],
+  props: [
+    "source",
+    "language",
+    "readonly",
+    "value",
+    "change",
+    "onContextMenu",
+    "lineNumbers",
+  ],
   components: {},
   data() {
     return {
@@ -76,12 +84,17 @@ export default {
           language = iniLanguage;
         }
       }
+      let lineNumbers = "on";
+      if (this.lineNumbers !== null) {
+        lineNumbers = this.lineNumbers;
+      }
       this.monacoInstance = monaco.editor.create(this.$refs.editor, {
         theme: "vs-dark", //官方自带三种主题vs, hc-black, or vs-dark
         minimap: { enabled: false }, // 缩略导航
         value: this.value || "", //编辑器初始显示文字
         language: language.id,
         selectOnLineNumbers: true, //显示行号
+        lineNumbers: lineNumbers, //显示行号
         roundedSelection: false,
         readOnly: this.readonly, // 只读
         cursorStyle: "line", //光标样式

@@ -29,7 +29,11 @@
               :expand-on-click-node="false"
               :filter-node-method="filterNode"
             >
-              <span class="toolbox-editor-tree-span" slot-scope="{ data }">
+              <span
+                class="toolbox-editor-tree-span"
+                slot-scope="{ data }"
+                :title="data.searchText"
+              >
                 <span>{{ data.name }}</span>
                 <div class="toolbox-editor-tree-btn-group"></div>
               </span>
@@ -153,7 +157,7 @@ export default {
           method.key = one.key + "-" + method.name;
           method.relativePath = one.relativePath;
           method.serviceName = one.name;
-          method.searchText = method.name + "." + one.name;
+          method.searchText = one.name + "." + method.name;
           method.leaf = true;
         });
       });
