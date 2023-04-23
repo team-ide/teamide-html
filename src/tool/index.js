@@ -226,9 +226,17 @@ tool.getCookie = function (cname) {
     }
     return "";
 }
+var JSONbig = require("json-bigint");
 tool.stringToJSON = function (value) {
+    var JSONbigString = JSONbig({});
     let data = null;
     if (tool.isNotEmpty(value)) {
+        try {
+            data = JSONbigString.parse(value);
+            return data
+        } catch (e) {
+
+        }
         try {
             data = JSON.parse(value);
         } catch (error) {

@@ -29,26 +29,27 @@
                   {{
                     tool.formatDate(
                       new Date(result.start),
-                      "yyyy-MM-dd hh:mm:ss"
+                      "yyyy-MM-dd hh:mm:ss.S"
                     )
                   }}
                 </span>
                 结束时间：
                 <span class="color-green pdlr-5">
                   {{
-                    tool.formatDate(new Date(result.end), "yyyy-MM-dd hh:mm:ss")
+                    tool.formatDate(
+                      new Date(result.end),
+                      "yyyy-MM-dd hh:mm:ss.S"
+                    )
                   }}
                 </span>
                 总耗时：
                 <span class="color-green pdlr-5">
                   {{ tool.formatTimeStr(result.end - result.start) }}
                 </span>
-                <template v-if="result.writeStart > 0 && result.readStart > 0">
+                <template v-if="result.writeEnd > 0 && result.readStart > 0">
                   执行耗时：
                   <span class="color-green pdlr-5">
-                    {{
-                      tool.formatTimeStr(result.readStart - result.writeStart)
-                    }}
+                    {{ tool.formatTimeStr(result.readStart - result.writeEnd) }}
                   </span>
                 </template>
               </div>
@@ -58,7 +59,7 @@
                   {{
                     tool.formatDate(
                       new Date(result.writeStart),
-                      "yyyy-MM-dd hh:mm:ss"
+                      "yyyy-MM-dd hh:mm:ss.S"
                     )
                   }}
                 </span>
@@ -67,7 +68,7 @@
                   {{
                     tool.formatDate(
                       new Date(result.writeEnd),
-                      "yyyy-MM-dd hh:mm:ss"
+                      "yyyy-MM-dd hh:mm:ss.S"
                     )
                   }}
                 </span>
@@ -82,7 +83,7 @@
                   {{
                     tool.formatDate(
                       new Date(result.readStart),
-                      "yyyy-MM-dd hh:mm:ss"
+                      "yyyy-MM-dd hh:mm:ss.S"
                     )
                   }}
                 </span>
@@ -91,7 +92,7 @@
                   {{
                     tool.formatDate(
                       new Date(result.readEnd),
-                      "yyyy-MM-dd hh:mm:ss"
+                      "yyyy-MM-dd hh:mm:ss.S"
                     )
                   }}
                 </span>
@@ -119,7 +120,6 @@
 
 
 <script>
-import { append } from "@antv/x6/lib/util/dom/elem";
 export default {
   components: {},
   props: ["source", "toolboxWorker", "extend", "tabId"],
