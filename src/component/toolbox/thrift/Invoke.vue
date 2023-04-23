@@ -200,14 +200,6 @@ export default {
         let editor = editors[index] || editors;
         let v = editor.getValue();
         argData[one.name] = v;
-        if (this.tool.isNotEmpty(v)) {
-          let json = this.tool.stringToJSON(v);
-          if (json != null) {
-            v = json;
-          }
-        } else {
-          v = null;
-        }
         args.push(v);
       });
       this.saveExtend(argData);
