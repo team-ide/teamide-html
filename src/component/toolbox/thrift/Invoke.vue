@@ -25,11 +25,6 @@
               <el-switch v-model="test.open" />
             </el-form-item>
             <template v-if="test.open">
-              <el-form-item label="" class="mgb-5">
-                <span class="color-orange ft-12 pdlr-10"
-                  >性能测试功能暂未完善</span
-                >
-              </el-form-item>
               <el-form-item label="并发线程" class="mgb-5">
                 <el-input v-model="test.worker" style="width: 80px" />
               </el-form-item>
@@ -46,6 +41,9 @@
             <el-form-item label="" class="mgb-5">
               <div class="tm-btn tm-btn-sm bg-green-6" @click="toInvoke">
                 执行
+              </div>
+              <div class="tm-btn tm-btn-sm bg-green-6" @click="toInvokeReports">
+                测试记录
               </div>
             </el-form-item>
           </el-form>
@@ -235,6 +233,17 @@ export default {
 
       // this.initArgForm();
     },
+    toInvokeReports() {
+      let extend = {
+        name: this.serviceName + "." + this.methodName + "测试记录",
+        title: this.serviceName + "." + this.methodName + "测试记录",
+        type: "invokeReports",
+        relativePath: this.relativePath,
+        serviceName: this.serviceName,
+        methodName: this.methodName,
+      };
+      this.toolboxWorker.openTabByExtend(extend);
+    },
     initArgForm() {
       let argForm = {
         fields: [],
@@ -278,6 +287,13 @@ export default {
         args: args,
         serverAddress: this.serverAddress,
       });
+      param.isTest = this.test.open;
+      if (param.isTest) {
+        param.worker = Number(this.test.worker);
+        param.duration = Number(this.test.duration);
+        param.frequency = Number(this.test.frequency);
+        param.timeout = Number(this.test.timeout);
+      }
 
       let res = await this.server.thrift.invokeByServerAddress(param);
       let result = res.data || {};

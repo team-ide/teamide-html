@@ -10,6 +10,18 @@ let thrift = {
     invokeByServerAddress(param) {
         return http.post('api/thrift/invokeByServerAddress', param);
     },
+    invokeReports(param) {
+        return http.post('api/thrift/invokeReports', param);
+    },
+    invokeStop(param) {
+        return http.post('api/thrift/invokeStop', param);
+    },
+    invokeInfo(param) {
+        return http.post('api/thrift/invokeInfo', param);
+    },
+    invokeRemove(param) {
+        return http.post('api/thrift/invokeRemove', param);
+    },
     close(param) {
         return http.post('api/thrift/close', param);
     },

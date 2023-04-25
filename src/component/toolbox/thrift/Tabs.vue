@@ -8,7 +8,7 @@
       <WorkspaceSpans :source="source" :itemsWorker="toolboxWorker.itemsWorker">
         <template v-slot:span="{ item }">
           <template v-if="item.extend == null"> </template>
-          <template v-if="item.extend.type == 'invoke'">
+          <template v-else-if="item.extend.type == 'invoke'">
             <Invoke
               :source="source"
               :toolboxWorker="toolboxWorker"
@@ -16,6 +16,15 @@
               :tabId="item.tabId"
             >
             </Invoke>
+          </template>
+          <template v-else-if="item.extend.type == 'invokeReports'">
+            <InvokeReports
+              :source="source"
+              :toolboxWorker="toolboxWorker"
+              :extend="item.extend"
+              :tabId="item.tabId"
+            >
+            </InvokeReports>
           </template>
         </template>
       </WorkspaceSpans>
@@ -26,9 +35,10 @@
 
 <script>
 import Invoke from "./Invoke";
+import InvokeReports from "./InvokeReports";
 
 export default {
-  components: { Invoke },
+  components: { Invoke, InvokeReports },
   props: ["source", "toolboxWorker"],
   data() {
     return {};
