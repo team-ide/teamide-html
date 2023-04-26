@@ -192,8 +192,8 @@ export default {
       test: {
         open: false,
         worker: 10, // 并发数
-        duration: 10, // 执行时长 分钟
-        frequency: 0, // 任务执行次数，和执行时间互斥，只能一个生效，优先级高于执行时间
+        duration: 0, // 执行时长 分钟
+        frequency: 10, // 任务执行次数，和执行时间互斥，只能一个生效，优先级高于执行时间
         timeout: 1000, // 超时时间
         info: null,
       },

@@ -27,67 +27,152 @@
         </tm-layout>
         <tm-layout-bar bottom></tm-layout-bar>
         <tm-layout height="auto">
-          <el-table
-            :data="reports"
-            :border="true"
-            style="width: 100%"
-            height="100%"
-            size="mini"
-          >
-            <el-table-column label="任务时间" prop="startTime">
-              <template slot-scope="scope">
-                <div class="">
-                  <div>
-                    开始时间:
-                    <span class="color-green pdlr-5">
-                      {{
-                        tool.formatDate(
-                          new Date(scope.row.startTime),
-                          "yyyy-MM-dd hh:mm:ss.S"
-                        )
-                      }}
-                    </span>
-                  </div>
-                  <div>
-                    结束时间:
-                    <span class="color-green pdlr-5">
-                      {{
-                        tool.formatDate(
-                          new Date(scope.row.endTime),
-                          "yyyy-MM-dd hh:mm:ss.S"
-                        )
-                      }}
-                    </span>
-                  </div>
+          <template v-for="(group, index) in groupList">
+            <div :key="index">
+              <div v-if="group.request != null" class="pd-10 ft-12">
+                <div>
+                  并发线程:
+                  <span class="color-green pdlr-5">
+                    {{ group.request.worker }}
+                  </span>
+                  执行时间(分钟):
+                  <span class="color-green pdlr-5">
+                    {{ group.request.duration }}
+                  </span>
+                  执行次数:
+                  <span class="color-green pdlr-5">
+                    {{ group.request.frequency }}
+                  </span>
+                  接和响应超时时间(毫秒):
+                  <span class="color-green pdlr-5">
+                    {{ group.request.timeout }}
+                  </span>
                 </div>
-              </template>
-            </el-table-column>
-            <el-table-column label="总记录" prop="count"> </el-table-column>
-            <el-table-column label="成功" prop="successCount">
-            </el-table-column>
-            <el-table-column label="失败" prop="errorCount"> </el-table-column>
-            <el-table-column label="执行时长(毫秒)" prop="total">
-            </el-table-column>
-            <el-table-column label="总用时(毫秒)" prop="use"> </el-table-column>
-            <el-table-column label="平均(毫秒)" prop="avg"> </el-table-column>
-            <el-table-column label="Min(毫秒)" prop="min"> </el-table-column>
-            <el-table-column label="Max(毫秒)" prop="max"> </el-table-column>
-            <el-table-column label="TPS" prop="tps"> </el-table-column>
-            <el-table-column label="T50(毫秒)" prop="t50"> </el-table-column>
-            <el-table-column label="T80(毫秒)" prop="t80"> </el-table-column>
-            <el-table-column label="T90(毫秒)" prop="t90"> </el-table-column>
-            <el-table-column label="T99(毫秒)" prop="t99"> </el-table-column>
-          </el-table>
+                <div
+                  v-for="(arg, index) in group.request.args"
+                  :key="'arg-' + index"
+                >
+                  入参 {{ index + 1 }}:
+                  <span class="color-green pdl-5">
+                    {{ arg }}
+                  </span>
+                </div>
+              </div>
+              <el-table :data="group.reports" style="width: 100%" size="mini">
+                <el-table-column label="">
+                  <template slot-scope="scope">
+                    {{ scope.$index + 1 }}
+                  </template>
+                </el-table-column>
+                <el-table-column
+                  label="任务时间"
+                  prop="startTime"
+                  width="200px"
+                >
+                  <template slot-scope="scope">
+                    <div class="">
+                      <div>
+                        开始:
+                        <span class="color-green pdl-5">
+                          {{
+                            tool.formatDate(
+                              new Date(scope.row.startTime / 1000000),
+                              "yyyy-MM-dd hh:mm:ss.S"
+                            )
+                          }}
+                        </span>
+                      </div>
+                      <div>
+                        结束:
+                        <span class="color-green pdl-5">
+                          {{
+                            tool.formatDate(
+                              new Date(scope.row.endTime / 1000000),
+                              "yyyy-MM-dd hh:mm:ss.S"
+                            )
+                          }}
+                        </span>
+                      </div>
+                    </div>
+                  </template>
+                </el-table-column>
+                <el-table-column label="总记录" prop="count"> </el-table-column>
+                <el-table-column label="成功" prop="successCount">
+                </el-table-column>
+                <el-table-column label="失败" prop="errorCount">
+                </el-table-column>
+                <el-table-column label="执行用时" prop="total">
+                  <template slot-scope="scope">
+                    {{ tool.formatTimeStr(Number(scope.row.total)) }}
+                  </template>
+                </el-table-column>
+                <el-table-column label="累计用时" prop="use">
+                  <template slot-scope="scope">
+                    {{ tool.formatTimeStr(Number(scope.row.use)) }}
+                  </template>
+                </el-table-column>
+                <el-table-column label="Avg" prop="avg" width="60px">
+                </el-table-column>
+                <el-table-column label="Min" prop="min" width="60px">
+                </el-table-column>
+                <el-table-column label="Max" prop="max" width="60px">
+                </el-table-column>
+                <el-table-column label="TPS" prop="tps" width="60px">
+                </el-table-column>
+                <el-table-column label="T50" prop="t50" width="60px">
+                </el-table-column>
+                <el-table-column label="T90" prop="t90" width="60px">
+                </el-table-column>
+                <el-table-column label="T99" prop="t99" width="60px">
+                </el-table-column>
+                <el-table-column label="操作" fixed="right" width="220px">
+                  <template slot-scope="scope">
+                    <div
+                      class="tm-link color-grey mglr-5"
+                      @click="tool.showJSONData(scope.row)"
+                    >
+                      元数据
+                    </div>
+                    <div
+                      class="tm-link color-green mglr-5"
+                      @click="toShowChart(scope.row)"
+                    >
+                      图表
+                    </div>
+                    <div
+                      class="tm-link color-grey mglr-5"
+                      @click="toDownloadInvokeRecords(scope.row)"
+                    >
+                      下载执行记录
+                    </div>
+                    <div
+                      class="tm-link color-red mglr-5"
+                      @click="toDelete(scope.row)"
+                    >
+                      删除
+                    </div>
+                  </template>
+                </el-table-column>
+              </el-table>
+            </div>
+          </template>
         </tm-layout>
       </tm-layout>
     </template>
+    <ReportChartDialog
+      ref="ReportChartDialog"
+      :source="source"
+      :toolboxWorker="toolboxWorker"
+    ></ReportChartDialog>
   </div>
 </template>
 
 
 <script>
+import ReportChartDialog from "./ReportChartDialog";
+
 export default {
-  components: {},
+  components: { ReportChartDialog },
   props: ["source", "toolboxWorker", "extend"],
   data() {
     return {
@@ -95,7 +180,7 @@ export default {
       relativePath: null,
       serviceName: null,
       methodName: null,
-      reports: [],
+      groupList: [],
     };
   },
   computed: {},
@@ -112,6 +197,47 @@ export default {
       this.methodName = extend.methodName;
       await this.loadData();
     },
+    toShowChart(data) {
+      let param = Object.assign(
+        {
+          relativePath: this.relativePath,
+          serviceName: this.serviceName,
+          methodName: this.methodName,
+        },
+        data
+      );
+
+      this.$refs.ReportChartDialog.show(param);
+    },
+    toDownloadInvokeRecords(data) {
+      let url = this.source.api + "thrift/downloadRecords?";
+      url = this.tool.appendUrlBaseParam(url);
+      url += "&taskRelativePath=" + encodeURIComponent(data.taskRelativePath);
+      url += "&serviceName=" + encodeURIComponent(this.serviceName);
+      url += "&methodName=" + encodeURIComponent(this.methodName);
+      window.location.href = url;
+    },
+    toDelete(data) {
+      let msg = "删除该记录将无法恢复，确认删除？";
+      this.tool
+        .confirm(msg)
+        .then(async () => {
+          let param = this.toolboxWorker.getWorkParam({
+            relativePath: this.relativePath,
+            serviceName: this.serviceName,
+            methodName: this.methodName,
+            taskKey: data.taskKey,
+          });
+          let res = await this.server.thrift.invokeReportDelete(param);
+          if (res.code != 0) {
+            this.tool.error(res.msg);
+          } else {
+            this.tool.success("删除成功");
+            this.refresh();
+          }
+        })
+        .catch((e) => {});
+    },
     async loadData() {
       let param = this.toolboxWorker.getWorkParam({
         relativePath: this.relativePath,
@@ -124,17 +250,28 @@ export default {
         this.tool.error(res.msg);
       }
       let list = res.data || [];
-      let reports = [];
+      let groupList = [];
+      let groupCache = {};
+
       list.forEach((one, index) => {
         if (one["metric"] == null) {
           return;
         }
-        let report = Object.assign({}, one["metric"]);
-        report.task = one["task"];
-        report.taskKey = one["taskKey"];
-        reports.push(report);
+        let group = groupCache[one.requestMd5];
+
+        if (group == null) {
+          group = {
+            reports: [],
+            request: one.request,
+          };
+          groupCache[one.requestMd5] = group;
+          groupList.push(group);
+        }
+        let report = Object.assign(one, one["metric"]);
+        delete report["metric"];
+        group.reports.push(report);
       });
-      this.reports = reports;
+      this.groupList = groupList;
     },
   },
   created() {},

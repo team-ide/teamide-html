@@ -19,8 +19,11 @@ let thrift = {
     invokeInfo(param) {
         return http.post('api/thrift/invokeInfo', param);
     },
-    invokeRemove(param) {
-        return http.post('api/thrift/invokeRemove', param);
+    invokeReportDelete(param) {
+        return http.post('api/thrift/invokeReportDelete', param);
+    },
+    invokeMetric(param) {
+        return http.post('api/thrift/invokeMetric', param);
     },
     close(param) {
         return http.post('api/thrift/close', param);
