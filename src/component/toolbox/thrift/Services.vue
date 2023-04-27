@@ -70,7 +70,6 @@ export default {
   },
   methods: {
     init() {
-      this.toolboxWorker.getMethod = this.getMethod;
       this.ready = true;
       this.loadContext();
     },
@@ -83,7 +82,8 @@ export default {
     filterNode(value, data) {
       if (!value) return true;
       return (
-        data.name && data.name.toLowerCase().indexOf(value.toLowerCase()) !== -1
+        data.searchText &&
+        data.searchText.toLowerCase().indexOf(value.toLowerCase()) !== -1
       );
     },
     nodeClick(data, node) {
@@ -162,16 +162,6 @@ export default {
         });
       });
       this.serviceList = serviceList;
-    },
-    async getMethod(indexName) {
-      let param = this.toolboxWorker.getWorkParam({
-        indexName: indexName,
-      });
-      let res = await this.server.elasticsearch.getMapping(param);
-      if (res.code != 0) {
-        this.tool.error(res.msg);
-      }
-      return res.data || {};
     },
   },
   created() {},

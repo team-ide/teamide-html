@@ -59,7 +59,7 @@
                 </div>
               </div>
               <el-table :data="group.reports" style="width: 100%" size="mini">
-                <el-table-column label="">
+                <el-table-column label="" width="40px">
                   <template slot-scope="scope">
                     {{ scope.$index + 1 }}
                   </template>
@@ -67,12 +67,11 @@
                 <el-table-column
                   label="任务时间"
                   prop="startTime"
-                  width="200px"
+                  width="160px"
                 >
                   <template slot-scope="scope">
                     <div class="">
                       <div>
-                        开始:
                         <span class="color-green pdl-5">
                           {{
                             tool.formatDate(
@@ -82,8 +81,8 @@
                           }}
                         </span>
                       </div>
+                      -
                       <div>
-                        结束:
                         <span class="color-green pdl-5">
                           {{
                             tool.formatDate(
@@ -96,10 +95,24 @@
                     </div>
                   </template>
                 </el-table-column>
-                <el-table-column label="总记录" prop="count"> </el-table-column>
-                <el-table-column label="成功" prop="successCount">
-                </el-table-column>
-                <el-table-column label="失败" prop="errorCount">
+                <el-table-column
+                  label="总/成功/失败"
+                  prop="count"
+                  width="120px"
+                >
+                  <template slot-scope="scope">
+                    <div class="">
+                      {{ scope.row.count }}
+                      <br />
+                      <span class="color-green">
+                        {{ scope.row.successCount }}
+                      </span>
+                      <br />
+                      <span class="color-red">
+                        {{ scope.row.errorCount }}
+                      </span>
+                    </div>
+                  </template>
                 </el-table-column>
                 <el-table-column label="执行用时" prop="total">
                   <template slot-scope="scope">
@@ -111,13 +124,13 @@
                     {{ tool.formatTimeStr(Number(scope.row.use)) }}
                   </template>
                 </el-table-column>
+                <el-table-column label="TPS" prop="tps" width="60px">
+                </el-table-column>
                 <el-table-column label="Avg" prop="avg" width="60px">
                 </el-table-column>
                 <el-table-column label="Min" prop="min" width="60px">
                 </el-table-column>
                 <el-table-column label="Max" prop="max" width="60px">
-                </el-table-column>
-                <el-table-column label="TPS" prop="tps" width="60px">
                 </el-table-column>
                 <el-table-column label="T50" prop="t50" width="60px">
                 </el-table-column>
@@ -125,7 +138,7 @@
                 </el-table-column>
                 <el-table-column label="T99" prop="t99" width="60px">
                 </el-table-column>
-                <el-table-column label="操作" fixed="right" width="220px">
+                <el-table-column label="操作" fixed="right" width="120px">
                   <template slot-scope="scope">
                     <div
                       class="tm-link color-grey mglr-5"
@@ -139,12 +152,14 @@
                     >
                       图表
                     </div>
+                    <br />
                     <div
                       class="tm-link color-grey mglr-5"
                       @click="toDownloadInvokeRecords(scope.row)"
                     >
                       下载执行记录
                     </div>
+                    <br />
                     <div
                       class="tm-link color-red mglr-5"
                       @click="toDelete(scope.row)"
