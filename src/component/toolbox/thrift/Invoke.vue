@@ -22,27 +22,27 @@
               <el-input v-model="serverAddress" />
             </el-form-item>
             <el-form-item label="性能测试" class="mgb-5">
-              <el-switch v-model="test.open" />
+              <el-switch v-model="testOpen" />
             </el-form-item>
-            <template v-if="test.open">
+            <template v-if="testOpen">
               <el-form-item label="并发线程" class="mgb-5">
-                <el-input v-model="test.worker" style="width: 80px" />
+                <el-input v-model="worker" style="width: 80px" />
               </el-form-item>
               <el-form-item label="执行时间(分钟)" class="mgb-5">
-                <el-input v-model="test.duration" style="width: 80px" />
+                <el-input v-model="duration" style="width: 80px" />
               </el-form-item>
               <el-form-item label="执行次数(优先级高于执行时间)" class="mgb-5">
-                <el-input v-model="test.frequency" style="width: 80px" />
+                <el-input v-model="frequency" style="width: 80px" />
               </el-form-item>
               <el-form-item label="连接和响应超时时间(毫秒)" class="mgb-5">
-                <el-input v-model="test.timeout" style="width: 80px" />
+                <el-input v-model="timeout" style="width: 80px" />
               </el-form-item>
             </template>
             <el-form-item label="" class="mgb-5">
               <div class="tm-btn tm-btn-sm bg-green-6" @click="toInvoke">
-                执行
+                执行 | 性能测试
               </div>
-              <div class="tm-btn tm-btn-sm bg-green-6" @click="toInvokeReports">
+              <div class="tm-btn tm-btn-sm bg-grey-6" @click="toInvokeReports">
                 测试记录
               </div>
             </el-form-item>
@@ -189,24 +189,32 @@ export default {
       argForm: null,
       serverAddress: "127.0.0.1:10001",
       result: null,
-      test: {
-        open: false,
-        worker: 10, // 并发数
-        duration: 0, // 执行时长 分钟
-        frequency: 10, // 任务执行次数，和执行时间互斥，只能一个生效，优先级高于执行时间
-        timeout: 1000, // 超时时间
-        info: null,
-      },
+      testOpen: false,
+      worker: 10, // 并发数
+      duration: 0, // 执行时长 分钟
+      frequency: 10, // 任务执行次数，和执行时间互斥，只能一个生效，优先级高于执行时间
+      timeout: 5000, // 超时时间
     };
   },
   computed: {},
   watch: {},
   methods: {
     async init() {
+      let extend = this.extend || {};
+      this.relativePath = extend.relativePath;
+      this.serviceName = extend.serviceName;
+      this.methodName = extend.methodName;
+      this.serverAddress = extend.serverAddress || "127.0.0.1:10001";
+      if (extend.testOpen != null) {
+        this.testOpen = extend.testOpen;
+      }
+      this.worker = extend.worker || 10;
+      this.duration = extend.duration || 0;
+      this.frequency = extend.frequency || 10;
+      this.timeout = extend.timeout || 5000;
       await this.refresh();
       this.ready = true;
 
-      let extend = this.extend || {};
       let argData = extend.argData || {};
       let argFields = this.argFields || [];
       this.$nextTick(() => {
@@ -224,11 +232,6 @@ export default {
       });
     },
     async refresh() {
-      let extend = this.extend || {};
-      this.relativePath = extend.relativePath;
-      this.serviceName = extend.serviceName;
-      this.methodName = extend.methodName;
-      this.serverAddress = extend.serverAddress || "127.0.0.1:10001";
       await this.loadData();
 
       // this.initArgForm();
@@ -287,12 +290,12 @@ export default {
         args: args,
         serverAddress: this.serverAddress,
       });
-      param.isTest = this.test.open;
+      param.isTest = this.testOpen;
       if (param.isTest) {
-        param.worker = Number(this.test.worker);
-        param.duration = Number(this.test.duration);
-        param.frequency = Number(this.test.frequency);
-        param.timeout = Number(this.test.timeout);
+        param.worker = Number(this.worker);
+        param.duration = Number(this.duration);
+        param.frequency = Number(this.frequency);
+        param.timeout = Number(this.timeout);
       }
 
       let res = await this.server.thrift.invokeByServerAddress(param);
@@ -314,6 +317,12 @@ export default {
       let keyValueMap = {};
       keyValueMap.serverAddress = this.serverAddress;
       keyValueMap.argData = argData;
+      keyValueMap.testOpen = this.testOpen;
+      keyValueMap.worker = this.worker;
+      keyValueMap.duration = this.duration;
+      keyValueMap.frequency = this.frequency;
+      keyValueMap.timeout = this.timeout;
+
       await this.toolboxWorker.updateOpenTabExtend(this.tabId, keyValueMap);
     },
     async loadData() {
