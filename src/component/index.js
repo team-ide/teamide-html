@@ -21,6 +21,10 @@ Vue.component('AlertBox', AlertBox);
 
 import JSONDataDialog from './dialog/JSONDataDialog.vue'
 Vue.component('JSONDataDialog', JSONDataDialog);
+import MarkdownDialog from './dialog/MarkdownDialog.vue'
+Vue.component('MarkdownDialog', MarkdownDialog);
+import MarkdownViewDialog from './dialog/MarkdownViewDialog.vue'
+Vue.component('MarkdownViewDialog', MarkdownViewDialog);
 
 import TextDialog from './dialog/TextDialog.vue'
 Vue.component('TextDialog', TextDialog);

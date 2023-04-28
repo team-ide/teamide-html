@@ -22,6 +22,9 @@
               <div class="tm-btn tm-btn-sm bg-green-6" @click="refresh">
                 刷新
               </div>
+              <div class="tm-btn tm-btn-sm bg-grey-6" @click="toShowMarkdown">
+                导出Markdown
+              </div>
             </el-form-item>
           </el-form>
         </tm-layout>
@@ -252,6 +255,20 @@ export default {
           }
         })
         .catch((e) => {});
+    },
+    async toShowMarkdown() {
+      let param = this.toolboxWorker.getWorkParam({
+        relativePath: this.relativePath,
+        serviceName: this.serviceName,
+        methodName: this.methodName,
+      });
+
+      let res = await this.server.thrift.invokeMarkdown(param);
+      if (res.code != 0) {
+        this.tool.error(res.msg);
+      } else {
+        this.tool.showMarkdown(res.data);
+      }
     },
     async loadData() {
       let param = this.toolboxWorker.getWorkParam({

@@ -33,6 +33,11 @@
     </template>
     <Contextmenu :contextmenu="contextmenu" ref="Contextmenu"></Contextmenu>
     <JSONDataDialog ref="JSONDataDialog" :source="source"></JSONDataDialog>
+    <MarkdownDialog ref="MarkdownDialog" :source="source"></MarkdownDialog>
+    <MarkdownViewDialog
+      ref="MarkdownViewDialog"
+      :source="source"
+    ></MarkdownViewDialog>
     <TextDialog ref="TextDialog" :source="source"></TextDialog>
     <div class="editor-for-copy" ref="editorForCopy"></div>
   </div>
@@ -69,6 +74,8 @@ export default {
     init() {
       this.tool.showJSONData = this.$refs.JSONDataDialog.show;
       this.tool.showText = this.$refs.TextDialog.show;
+      this.tool.showMarkdown = this.$refs.MarkdownDialog.show;
+      this.tool.showMarkdownView = this.$refs.MarkdownViewDialog.show;
 
       window.onMonacoLoad(() => {
         let monaco = window.monaco;

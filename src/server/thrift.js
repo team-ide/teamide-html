@@ -25,6 +25,9 @@ let thrift = {
     invokeMetric(param) {
         return http.post('api/thrift/invokeMetric', param);
     },
+    invokeMarkdown(param) {
+        return http.post('api/thrift/invokeMarkdown', param);
+    },
     close(param) {
         return http.post('api/thrift/close', param);
     },

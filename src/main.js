@@ -26,6 +26,8 @@ import ElementUI from 'element-ui'
 import 'element-ui/lib/theme-chalk/index.css'
 Vue.use(ElementUI)
 
+import 'github-markdown-css/github-markdown.css'
+
 import { } from '@/component'
 
 import tool from '@/tool'
