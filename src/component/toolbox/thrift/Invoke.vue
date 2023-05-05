@@ -286,6 +286,7 @@ export default {
         protocolFactory: this.protocolFactory,
         buffered: this.buffered,
         framed: this.framed,
+        timeout: Number(this.timeout),
       };
       this.toolboxWorker.openTabByExtend(extend);
     },
@@ -334,6 +335,7 @@ export default {
         protocolFactory: this.protocolFactory,
         buffered: this.buffered,
         framed: this.framed,
+        timeout: Number(this.timeout),
       });
       param.isTest = this.testOpen;
       if (param.isTest) {
