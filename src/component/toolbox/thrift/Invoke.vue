@@ -21,6 +21,32 @@
             <el-form-item label="服务地址(127.0.0.1:10001)" class="mgb-5">
               <el-input v-model="serverAddress" />
             </el-form-item>
+
+            <el-form-item label="ProtocolFactory类型">
+              <el-select
+                v-model="protocolFactory"
+                placeholder="binary"
+                style="width: 100px"
+              >
+                <el-option
+                  v-for="(one, index) in protocolFactoryTypes"
+                  :key="index"
+                  :value="one.value"
+                  :label="one.text"
+                  :disabled="one.disabled"
+                >
+                </el-option>
+              </el-select>
+            </el-form-item>
+            <el-form-item label="Buffered" class="mgb-5">
+              <el-switch v-model="buffered" />
+            </el-form-item>
+            <el-form-item label="Framed" class="mgb-5">
+              <el-switch v-model="framed" />
+            </el-form-item>
+            <el-form-item label="连接和响应超时时间(毫秒)" class="mgb-5">
+              <el-input v-model="timeout" style="width: 80px" />
+            </el-form-item>
             <el-form-item label="性能测试" class="mgb-5">
               <el-switch v-model="testOpen" />
             </el-form-item>
@@ -33,9 +59,6 @@
               </el-form-item>
               <el-form-item label="执行次数(优先级高于执行时间)" class="mgb-5">
                 <el-input v-model="frequency" style="width: 80px" />
-              </el-form-item>
-              <el-form-item label="连接和响应超时时间(毫秒)" class="mgb-5">
-                <el-input v-model="timeout" style="width: 80px" />
               </el-form-item>
             </template>
             <el-form-item label="" class="mgb-5">
@@ -181,6 +204,12 @@ export default {
   data() {
     return {
       ready: false,
+      protocolFactoryTypes: [
+        { text: "compact", value: "compact" },
+        { text: "simpleJSON", value: "simpleJSON" },
+        { text: "json", value: "json" },
+        { text: "binary", value: "binary" },
+      ],
       relativePath: null,
       serviceName: null,
       methodName: null,
@@ -194,6 +223,9 @@ export default {
       duration: 0, // 执行时长 分钟
       frequency: 10, // 任务执行次数，和执行时间互斥，只能一个生效，优先级高于执行时间
       timeout: 5000, // 超时时间
+      protocolFactory: "binary",
+      buffered: false,
+      framed: true,
     };
   },
   computed: {},
@@ -212,6 +244,13 @@ export default {
       this.duration = extend.duration || 0;
       this.frequency = extend.frequency || 10;
       this.timeout = extend.timeout || 5000;
+      this.protocolFactory = extend.protocolFactory || "binary";
+      if (extend.buffered != null) {
+        this.buffered = extend.buffered;
+      }
+      if (extend.framed != null) {
+        this.framed = extend.framed;
+      }
       await this.refresh();
       this.ready = true;
 

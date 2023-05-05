@@ -46,6 +46,22 @@
                   <span class="color-green pdlr-5">
                     {{ group.request.frequency }}
                   </span>
+                  服务地址:
+                  <span class="color-green pdlr-5">
+                    {{ group.request.serverAddress }}
+                  </span>
+                  ProtocolFactory类型:
+                  <span class="color-green pdlr-5">
+                    {{ group.request.protocolFactory || "binary" }}
+                  </span>
+                  Buffered:
+                  <span class="color-green pdlr-5">
+                    {{ tool.isTrue(group.request.buffered) }}
+                  </span>
+                  Framed:
+                  <span class="color-green pdlr-5">
+                    {{ tool.isTrue(group.request.framed) }}
+                  </span>
                   接和响应超时时间(毫秒):
                   <span class="color-green pdlr-5">
                     {{ group.request.timeout }}
