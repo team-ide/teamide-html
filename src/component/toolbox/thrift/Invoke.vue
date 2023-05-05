@@ -283,6 +283,9 @@ export default {
         relativePath: this.relativePath,
         serviceName: this.serviceName,
         methodName: this.methodName,
+        protocolFactory: this.protocolFactory,
+        buffered: this.buffered,
+        framed: this.framed,
       };
       this.toolboxWorker.openTabByExtend(extend);
     },
@@ -328,6 +331,9 @@ export default {
         methodName: this.methodName,
         args: args,
         serverAddress: this.serverAddress,
+        protocolFactory: this.protocolFactory,
+        buffered: this.buffered,
+        framed: this.framed,
       });
       param.isTest = this.testOpen;
       if (param.isTest) {
