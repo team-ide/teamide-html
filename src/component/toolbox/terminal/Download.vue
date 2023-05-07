@@ -3,7 +3,6 @@
 </template>
 
 <script>
-import Zmodem from "zmodem.js";
 export default {
   components: {},
   props: ["source", "toolboxWorker"],
@@ -19,10 +18,19 @@ export default {
       this.callback = callback;
       this.downloadFile();
     },
+    stop() {
+      if (this.last_xfer) {
+        this.tool.warn("文件下载正在停止");
+        this.last_xfer.skip();
+        this.last_xfer = null;
+        this.callback && this.callback();
+      }
+    },
     downloadFile() {
-      let that = this;
-      that.zsession.on("offer", function (xfer) {
-        function on_form_submit() {
+      this.zsession.on("offer", (xfer) => {
+        try {
+          this.last_xfer = xfer;
+          // console.log("zsession on offer", xfer);
           // if (xfer.get_details().size > 20 * 1024 * 1024 * 1024) {
           //   xfer.skip();
           //   that.tool.warn(`${xfer.get_details().name} 超过 20 G, 无法下载`);
@@ -30,28 +38,39 @@ export default {
           // }
           xfer.startTime = new Date().getTime();
           let FILE_BUFFER = [];
-          xfer.on("input", async (payload) => {
-            that.updateProgress(xfer);
-            await new Promise((resolve, reject) => {
-              FILE_BUFFER.push(new Uint8Array(payload));
-              resolve();
-            });
+          xfer.on("input", (payload) => {
+            // console.log("xfer on input", payload);
+            this.updateProgress(xfer);
+            FILE_BUFFER.push(new Uint8Array(payload));
+          });
+          xfer.on("complete", (arg) => {
+            // console.log("xfer on complete", arg);
           });
 
-          xfer.accept().then(() => {
-            that.saveFile(xfer, FILE_BUFFER);
-            that.term.write("\r\n");
-          }, console.error.bind(console));
+          xfer
+            .accept()
+            .then(
+              (arg) => {
+                // console.log("xfer.accept then 1:", arg);
+                this.last_xfer = null;
+                this.saveFile(xfer, FILE_BUFFER);
+                this.term.write("\r\n");
+              },
+              (arg) => {
+                // console.log("xfer.accept then 2:", arg);
+              }
+            )
+            .catch((err) => {
+              console.log("xfer.accept err", err);
+            });
+        } catch (e) {
+          this.stop();
         }
-        on_form_submit();
       });
-      let promise = new Promise((res) => {
-        that.zsession.on("session_end", () => {
-          res();
-        });
+      this.zsession.on("session_end", () => {
+        this.stop();
       });
-      that.zsession.start();
-      return promise;
+      this.zsession.start();
     },
     bytesHuman(bytes, precision) {
       if (!/^([-+])?|(\.\d+)(\d+(\.\d+)?|(\d+\.)|Infinity)$/.test(bytes)) {
@@ -130,10 +149,7 @@ export default {
     },
   },
   created() {},
-  mounted() {
-    this.toolboxWorker.showDownload = this.show;
-    this.toolboxWorker.hideDownload = this.show;
-  },
+  mounted() {},
 };
 </script>
 

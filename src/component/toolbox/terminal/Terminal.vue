@@ -127,8 +127,13 @@
         </div>
       </div>
     </template>
-    <Download :source="source" :toolboxWorker="toolboxWorker"></Download>
+    <Download
+      ref="Download"
+      :source="source"
+      :toolboxWorker="toolboxWorker"
+    ></Download>
     <Upload
+      ref="Upload"
       :source="source"
       :toolboxWorker="toolboxWorker"
       :worker="worker"
@@ -137,6 +142,21 @@
       :source="source"
       :toolboxWorker="toolboxWorker"
     ></ConfirmPaste>
+    <!--   -->
+    <div
+      v-if="worker.isDownloading"
+      class="color-orange-2 ft-13"
+      style="position: relative; bottom: 70px; width: 300px; margin: 0px auto"
+    >
+      有文件正在下载，可以使用`Ctrl+C`停止
+    </div>
+    <div
+      v-if="worker.isUploading"
+      class="color-orange-2 ft-13"
+      style="position: relative; bottom: 70px; width: 300px; margin: 0px auto"
+    >
+      有文件正在上传，可以使用`Ctrl+C`停止
+    </div>
   </div>
 </template>
 
@@ -531,23 +551,28 @@ export default {
           this.worker.isDownloading = false;
           if (zsession.type === "receive") {
             this.worker.isDownloading = true;
-            this.toolboxWorker.showDownload(zsession, this.term, () => {
+            this.$refs.Download.show(zsession, this.term, () => {
+              this.worker.isDownloading = false;
               this.onFocus();
             });
           } else {
             this.worker.isUploading = true;
-            this.toolboxWorker.showUpload(zsession, this.term, () => {
+            this.$refs.Upload.show(zsession, this.term, () => {
+              this.worker.isUploading = false;
               this.onFocus();
             });
           }
-          zsession.on("session_end", () => {
+          zsession.on("session_end", (arg) => {
+            // console.log("zsession session_end", arg);
             this.worker.isUploading = false;
             this.worker.isDownloading = false;
             delete this.last_session;
           });
         },
         // 撤回
-        on_retract: () => {},
+        on_retract: () => {
+          console.log("on_retract 撤回");
+        },
         sender: async (octets) => {
           await worker.uploadSocketSend(octets);
         },
@@ -624,6 +649,13 @@ export default {
           // this.tool.success("复制成功");
         } else {
           this.tool.warn("复制失败，请允许访问剪贴板！");
+        }
+      } else {
+        if (this.worker.isDownloading) {
+          this.$refs.Download.stop();
+        }
+        if (this.worker.isUploading) {
+          this.$refs.Upload.stop();
         }
       }
     },

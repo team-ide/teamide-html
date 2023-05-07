@@ -56,6 +56,7 @@ export default {
       this.term = term;
       this.callback = callback;
       this.showDialog = true;
+      this.callStopped = false;
     },
     hide() {
       if (!this.isFileSelect) {
@@ -63,7 +64,14 @@ export default {
         //   .confirm("是否取消上传？")
         //   .then(async () => {
         this.showDialog = false;
-        this.onCancel && this.onCancel();
+
+        this.term.write("\r\n取消上传\r\n");
+        this.tool.warn("取消上传");
+        // zsession 每 5s 发送一个 ZACK 包，5s 后会出现提示最后一个包是 ”ZACK“ 无法正常关闭
+        // 这里直接设置 _last_header_name 为 ZRINIT，就可以强制关闭了
+        this.zsession._last_header_name = "ZRINIT";
+        this.zsession.close();
+        // this.toolboxWorker.writeEvent("shell cancel upload file");
         // })
         // .catch((e) => {});
       } else {
@@ -75,14 +83,17 @@ export default {
       this.tool.success("文件上传完成");
       this.callback && this.callback();
     },
-    onCancel() {
-      this.term.write("\r\n取消上传\r\n");
-      this.tool.warn("取消上传");
-      // zsession 每 5s 发送一个 ZACK 包，5s 后会出现提示最后一个包是 ”ZACK“ 无法正常关闭
-      // 这里直接设置 _last_header_name 为 ZRINIT，就可以强制关闭了
-      this.zsession._last_header_name = "ZRINIT";
-      this.zsession.close();
-      // this.toolboxWorker.writeEvent("shell cancel upload file");
+    async stop() {
+      if (this.callStopped) {
+        return;
+      }
+      this.callStopped = true;
+      try {
+        await this.zsession.close();
+      } catch (e) {}
+      this.term.write("\r\n停止上传\r\n");
+      this.tool.warn("停止上传");
+      this.callback && this.callback();
     },
     toClickUpload() {
       this.$refs["input-for-upload"].value = null;
@@ -229,6 +240,9 @@ export default {
       return res;
     },
     updateProgress(xfer) {
+      if (this.callStopped) {
+        return;
+      }
       let detail = xfer.get_details();
       let name = detail.name;
       let total = detail.size;
@@ -271,6 +285,7 @@ export default {
       );
     },
     send_block_files(session, files, options) {
+      let that = this;
       if (!options) options = {};
 
       //Populate the batch in reverse order to simplify sending
@@ -338,6 +353,13 @@ export default {
             }
             var piece;
             reader.onload = async function reader_onload(e) {
+              if (that.callStopped) {
+                xfer.end().then(function () {
+                  // that.term.write("\r\n停止上传\r\n");
+                  res(promise_callback());
+                });
+                return;
+              }
               fileLoaded += e.total;
               if (fileLoaded < fileSize) {
                 if (e.target.result) {
@@ -379,10 +401,7 @@ export default {
     },
   },
   created() {},
-  mounted() {
-    this.toolboxWorker.showUpload = this.show;
-    this.toolboxWorker.hideUpload = this.show;
-  },
+  mounted() {},
 };
 </script>
 
