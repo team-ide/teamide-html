@@ -100,7 +100,7 @@ let model = {
     ],
 };
 
-
+var sshToolboxOptions = []
 let toolbox = {
     fields: [
         {
@@ -446,4 +446,5 @@ export default {
     model,
     toolbox,
     node,
+    sshToolboxOptions,
 };

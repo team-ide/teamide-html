@@ -379,13 +379,21 @@ source.initUserToolboxSSHList = async () => {
         }
         data = res.data || {};
     }
-
+    form.sshToolboxOptions.splice(0, form.sshToolboxOptions.length)
     let toolboxList = data.toolboxList || [];
 
     var sshToolboxList = [];
     toolboxList.forEach((one) => {
         if (one.toolboxType == "ssh") {
             sshToolboxList.push(one);
+            var text = one.name
+            if (one.comment != null && one.comment != "") {
+                text += "(" + one.comment + ")"
+            }
+            form.sshToolboxOptions.push({
+                text: text,
+                value: one.toolboxId,
+            })
         }
     });
     source.sshToolboxList = sshToolboxList;

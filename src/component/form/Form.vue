@@ -26,7 +26,8 @@
                 filterable
               >
                 <el-option
-                  v-for="(one, index) in field.options"
+                  v-for="(one, index) in field.options ||
+                  form[field.optionsName]"
                   :key="index"
                   :value="one.value"
                   :label="one.text"
