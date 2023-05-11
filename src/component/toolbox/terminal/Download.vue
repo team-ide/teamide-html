@@ -17,6 +17,10 @@ export default {
       this.term = term;
       this.callback = callback;
       this.downloadFile();
+      //**B00000000000000
+      //zsentry consume error:Error: Unhandled header: ZRQINIT
+      //rz waiting to receive.**B0100000023be50
+//zsentry consume error:Error: Unhandled header: ZRINIT
     },
     stop() {
       if (this.last_xfer) {
