@@ -439,6 +439,8 @@ export default {
         this.zsentry.consume(data);
       } catch (e) {
         try {
+          this.worker.isUploading = false;
+          this.worker.isDownloading = false;
           if (this.last_session) {
             this.last_session.close();
           }
@@ -539,11 +541,13 @@ export default {
     NewSentry() {
       let worker = this.worker;
       return new Zmodem.Sentry({
-        //发送终端
+        // 发送终端
+        // 发送的处理程序 到终端对象的流量。接收可迭代对象（例如，数组）包含八位字节数。
         to_terminal: (octets) => {
           this.term.write(octets);
         },
         // 属于 Zmodem 相关流
+        // 处理程序检测事件。接收新的检测对象。
         on_detect: (detection) => {
           let zsession = detection.confirm();
           this.last_session = zsession;
@@ -555,7 +559,7 @@ export default {
               this.worker.isDownloading = false;
               this.onFocus();
             });
-          } else {
+          } else if (zsession.type === "send") {
             this.worker.isUploading = true;
             this.$refs.Upload.show(zsession, this.term, () => {
               this.worker.isUploading = false;
@@ -570,9 +574,11 @@ export default {
           });
         },
         // 撤回
+        // 于收回的处理程序事件。不接收任何输入
         on_retract: () => {
           console.log("on_retract 撤回");
         },
+        // 将流量发送到的处理程序对等方。例如，如果您的应用程序使用 WebSocket 进行通信到对等方，使用它将数据发送到 WebSocket 实例。
         sender: async (octets) => {
           await worker.uploadSocketSend(octets);
         },

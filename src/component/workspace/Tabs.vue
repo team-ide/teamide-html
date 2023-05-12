@@ -289,6 +289,12 @@ export default {
           this.toDeleteTab(tab);
         },
       });
+      menus.push({
+        text: "打开新标签",
+        onClick: () => {
+          this.itemsWorker.toCopyItem(tab);
+        },
+      });
       if (tab.toolboxId && tab.toolboxId < 9999999910000) {
         menus.push({
           text: "查看配置信息",
@@ -297,12 +303,6 @@ export default {
           },
         });
       }
-      menus.push({
-        text: "打开新标签",
-        onClick: () => {
-          this.itemsWorker.toCopyItem(tab);
-        },
-      });
       menus.push({
         text: "选择",
         onClick: () => {
