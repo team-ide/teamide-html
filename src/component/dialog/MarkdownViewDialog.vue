@@ -49,7 +49,6 @@ export default {
       this.title = options.title;
       this.showDialog = true;
       this.$nextTick(() => {
-        console.log(marked);
         // let blog = marked(data);
         this.text = marked.parse(data);
       });

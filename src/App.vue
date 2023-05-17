@@ -38,6 +38,10 @@
       ref="MarkdownViewDialog"
       :source="source"
     ></MarkdownViewDialog>
+    <JavascriptFuncDialog
+      ref="JavascriptFuncDialog"
+      :source="source"
+    ></JavascriptFuncDialog>
     <TextDialog ref="TextDialog" :source="source"></TextDialog>
     <div class="editor-for-copy" ref="editorForCopy"></div>
   </div>
@@ -76,6 +80,7 @@ export default {
       this.tool.showText = this.$refs.TextDialog.show;
       this.tool.showMarkdown = this.$refs.MarkdownDialog.show;
       this.tool.showMarkdownView = this.$refs.MarkdownViewDialog.show;
+      this.tool.showJavascriptFunc = this.$refs.JavascriptFuncDialog.show;
 
       window.onMonacoLoad(() => {
         let monaco = window.monaco;

@@ -71,6 +71,20 @@
             </el-form-item>
           </el-form>
         </tm-layout>
+        <tm-layout height="50px">
+          <div class="color-orange pdlr-10 ft-12 pdt-10">
+            参数可以使用${xx}来使用表达式生成动态参数 如：
+            "${index}"、"xx-${index}"：可以取到当前执行索引，从0开始；
+            “${workerIndex}”：可以取到当前线程索引，从0开始；
+            可以使用表达式、函数等，
+            <a
+              class="tm-linkd color-green tm-pointer"
+              @click="tool.showJavascriptFunc()"
+            >
+              点击查看内置函数
+            </a>
+          </div>
+        </tm-layout>
         <tm-layout height="300px">
           <template v-for="(argField, index) in argFields">
             <tm-layout-bar
@@ -100,6 +114,11 @@
         <tm-layout height="120px" class="app-scroll-bar">
           <div class="pdlr-10 pdt-5">
             <div v-if="result != null" class="mgt-10 ft-12">
+              <template v-if="result.isTest">
+                <div class="color-orange pdlr-5">
+                  性能测试任务已提交，请点击测试记录查看
+                </div>
+              </template>
               <div v-if="result.start > 0">
                 开始时间:
                 <span class="color-green pdlr-5">
@@ -351,8 +370,13 @@ export default {
       if (res.code != 0) {
         result.error = res.msg;
         this.tool.error(res.msg);
+      } else {
+        if (param.isTest) {
+          this.tool.success("性能测试任务已提交，请点击测试记录查看");
+        }
       }
       this.result = result;
+      this.result.isTest = param.isTest;
       if (this.$refs.resultEditor) {
         if (typeof result.result == "object") {
           result.result = JSON.stringify(result.result);

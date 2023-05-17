@@ -83,6 +83,11 @@ let server = {
             return http.post('api/setting/save', param || {},);
         },
     },
+    javascript: {
+        getModules(param) {
+            return http.post('api/javascript/getModules', param || {},);
+        },
+    },
     tools: {
         base64(param) {
             return http.post('api/tools/base64', param || {},);
