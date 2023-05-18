@@ -109,6 +109,15 @@
             >
             </GeneratePassword>
           </template>
+          <template v-else-if="item.extend.type == 'javascript'">
+            <Javascript
+              :source="source"
+              :toolboxWorker="toolboxWorker"
+              :extend="item.extend"
+              :tabId="item.tabId"
+            >
+            </Javascript>
+          </template>
         </template>
       </WorkspaceSpans>
     </div>
@@ -127,6 +136,7 @@ import Filehash from "./Filehash";
 import RandomNumber from "./RandomNumber";
 import RandomString from "./RandomString";
 import GeneratePassword from "./GeneratePassword";
+import Javascript from "./Javascript";
 
 export default {
   components: {
@@ -140,6 +150,7 @@ export default {
     RandomNumber,
     RandomString,
     GeneratePassword,
+    Javascript,
   },
   props: ["source", "toolboxWorker"],
   data() {

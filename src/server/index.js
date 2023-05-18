@@ -87,6 +87,12 @@ let server = {
         getModules(param) {
             return http.post('api/javascript/getModules', param || {},);
         },
+        run(param) {
+            return http.post('api/javascript/run', param || {},);
+        },
+        load(param) {
+            return http.post('api/javascript/load', param || {},);
+        },
     },
     tools: {
         base64(param) {
