@@ -78,7 +78,7 @@
             “${workerIndex}”：可以取到当前线程索引，从0开始；
             可以使用表达式、函数等，
             <a
-              class="tm-linkd color-green tm-pointer"
+              class="tm-link color-green tm-pointer"
               @click="tool.showJavascriptFunc()"
             >
               点击查看内置函数

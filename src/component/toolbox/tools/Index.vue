@@ -61,7 +61,7 @@ export default {
         name: options.text,
         title: options.text,
         type: options.type,
-        onlyOpenOneKey: "tools:type:" + options.type,
+        // onlyOpenOneKey: "tools:type:" + options.type,
       };
       Object.assign(extend, options);
       this.toolboxWorker.openTabByExtend(extend);

@@ -9,6 +9,12 @@
       <tm-layout height="100px">
         <div class="pd-10">
           <div class="tm-btn tm-btn-sm bg-green-6" @click="toInvoke">执行</div>
+          <a
+            class="tm-link color-green tm-pointer mgl-10"
+            @click="tool.showJavascriptFunc()"
+          >
+            点击查看内置函数
+          </a>
         </div>
         <div class="pdlr-10 pdt-5">
           <div v-if="result != null" class="mgt-10 ft-12">

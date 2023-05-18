@@ -53,18 +53,19 @@ export default {
       this.showDialog = false;
     },
     initText() {
-      let text = "";
+      let text = "\n\n";
       text += "# 内置 基础表达式 \n\n";
 
       text += "### 表达式 \n\n";
-      text += "* ${xx} \n";
+      text += "* xx \n";
       text += "  * 获取 `xx` 的值";
 
       text += "\n";
       this.modules.forEach((one) => {
-        if (one.name != "util") {
-          return;
-        }
+        // if (one.name != "util") {
+        //   return;
+        // }
+        text += "\n";
         text += "### " + one.comment + " \n\n";
 
         one.funcList = one.funcList || [];
@@ -73,6 +74,15 @@ export default {
           text += "  * 说明：" + func.comment + " \n";
           text += "\n";
         });
+        if (one.service != null && one.service.funcList) {
+          text +=
+            "### 使用 `" + one.name + ".newService` 新建服务对象 函数 \n\n";
+          one.service.funcList.forEach((func) => {
+            text += "* `" + one.service.name + "." + func.name + "` \n\n";
+            text += "  * 说明：" + func.comment + " \n";
+            text += "\n";
+          });
+        }
       });
       this.text = text;
       this.$refs.Editor.setValue(this.text);
