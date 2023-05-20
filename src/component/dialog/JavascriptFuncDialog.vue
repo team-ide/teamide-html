@@ -18,6 +18,7 @@
           :source="source"
           :value="text"
           language="markdown"
+          lineNumbers="off"
         ></Editor>
       </div>
     </div>
@@ -25,8 +26,6 @@
 </template>
 
 <script>
-import marked from "marked";
-
 export default {
   components: {},
   props: ["source"],
@@ -71,7 +70,10 @@ export default {
         one.funcList = one.funcList || [];
         one.funcList.forEach((func) => {
           text += "* `" + one.name + "." + func.name + "` \n\n";
-          text += "  * 说明：" + func.comment + " \n";
+          text +=
+            "  * " +
+            func.comment.replace(/(\r\n|\n|\r|↵)/g, `\r\n  * `) +
+            " \n";
           text += "\n";
         });
         if (one.service != null && one.service.funcList) {
@@ -79,7 +81,10 @@ export default {
             "### 使用 `" + one.name + ".newService` 新建服务对象 函数 \n\n";
           one.service.funcList.forEach((func) => {
             text += "* `" + one.service.name + "." + func.name + "` \n\n";
-            text += "  * 说明：" + func.comment + " \n";
+            text +=
+              "  * " +
+              func.comment.replace(/(\r\n|\n|\r|↵)/g, `\r\n  * `) +
+              " \n";
             text += "\n";
           });
         }

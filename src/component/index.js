@@ -27,6 +27,8 @@ import MarkdownViewDialog from './dialog/MarkdownViewDialog.vue'
 Vue.component('MarkdownViewDialog', MarkdownViewDialog);
 import JavascriptFuncDialog from './dialog/JavascriptFuncDialog.vue'
 Vue.component('JavascriptFuncDialog', JavascriptFuncDialog);
+import JavascriptExampleDialog from './dialog/JavascriptExampleDialog.vue'
+Vue.component('JavascriptExampleDialog', JavascriptExampleDialog);
 
 import TextDialog from './dialog/TextDialog.vue'
 Vue.component('TextDialog', TextDialog);

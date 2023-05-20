@@ -15,6 +15,12 @@
           >
             点击查看内置函数
           </a>
+          <a
+            class="tm-link color-green tm-pointer mgl-10"
+            @click="tool.showJavascriptExample()"
+          >
+            示例代码
+          </a>
         </div>
         <div class="pdlr-10 pdt-5">
           <div v-if="result != null" class="mgt-10 ft-12">
