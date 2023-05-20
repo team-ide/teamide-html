@@ -145,14 +145,14 @@
     <!--   -->
     <div
       v-if="worker.isDownloading"
-      class="color-orange-2 ft-13"
+      class="color-orange-9 ft-13 text-center"
       style="position: relative; bottom: 70px; width: 300px; margin: 0px auto"
     >
       有文件正在下载，可以使用`Ctrl+C`停止
     </div>
     <div
       v-if="worker.isUploading"
-      class="color-orange-2 ft-13"
+      class="color-orange-9 ft-13 text-center"
       style="position: relative; bottom: 70px; width: 300px; margin: 0px auto"
     >
       有文件正在上传，可以使用`Ctrl+C`停止
@@ -163,9 +163,9 @@
 
 <script>
 import _worker from "./worker.js";
-import "xterm/css/xterm.css";
+import "teamide-xterm/css/xterm.css";
 import Zmodem from "@/component/zmodem.js";
-import { Terminal } from "xterm";
+import { Terminal } from "teamide-xterm";
 import { FitAddon } from "xterm-addon-fit";
 import { SearchAddon } from "xterm-addon-search";
 // import { AttachAddon } from "xterm-addon-attach";
@@ -460,6 +460,7 @@ export default {
       if (this.term != null) {
         this.term.dispose();
       }
+      let box = this.$refs.terminalXtermBox;
 
       this.term = new Terminal({
         // rendererType: "dom",
@@ -483,7 +484,9 @@ export default {
         //   lineHeight: 20,
         // },
       });
-      this.term.open(this.$refs.terminalXtermBox, true);
+      this.term.setBindKeysBefore(this.bindKeysBefore);
+      this.term.setBindKeysAfter(this.bindKeysAfter);
+      this.term.open(box, true);
 
       this.fitAddon = new FitAddon();
       this.term.loadAddon(this.fitAddon);
@@ -504,6 +507,16 @@ export default {
         }
       });
 
+      this.term.attachCustomKeyEventHandler((event) => {
+        if (this.tool.keyIsCtrlV(event)) {
+          return false;
+        }
+        return true;
+      });
+      // this.term.onKey((arg) => {
+      //   console.log(arg);
+      // });
+
       this.zsentry = this.NewSentry();
 
       this.terminal_back_width = this.tool
@@ -513,30 +526,59 @@ export default {
         .jQuery(this.$refs.terminalXtermBoxBack)
         .height();
 
-      this.$refs.terminalXtermBox.addEventListener(
-        "keydown",
-        this.onKeydown,
+      this.changeSizeTimer();
+      this.xtermRows = box.getElementsByClassName("xterm-rows")[0];
+    },
+    bindKeysBefore() {
+      // console.log("bindKeysBefore", this.term.textarea);
+      // this.term.textarea.addEventListener(
+      //   "copy",
+      //   (ev) => {
+      //     ev.stopPropagation();
+      //     if (ev.clipboardData) {
+      //       const text = ev.clipboardData.getData("text/plain");
+      //       console.log("paste:", text);
+      //     }
+      //   },
+      //   true
+      // );
+      this.term.textarea.addEventListener(
+        "paste",
+        this.pasteEventListener,
         true
       );
-      this.$refs.terminalXtermBox.addEventListener(
-        "mouseup",
-        this.onMouseup,
+      this.term.element.addEventListener(
+        "paste",
+        this.pasteEventListener,
         true
       );
-      this.$refs.terminalXtermBox.addEventListener(
-        "mousedown",
-        this.onMousedown,
-        true
-      );
-      this.$refs.terminalXtermBox.addEventListener(
+
+      this.term.element.addEventListener("keydown", this.onKeydown, true);
+      this.term.element.addEventListener("mouseup", this.onMouseup, true);
+      this.term.element.addEventListener("mousedown", this.onMousedown, true);
+      this.term.textarea.addEventListener(
         "contextmenu",
         this.onContextmenu,
         true
       );
-
-      this.changeSizeTimer();
-      this.xtermRows =
-        this.$refs.terminalXtermBox.getElementsByClassName("xterm-rows")[0];
+      this.term.element.addEventListener(
+        "contextmenu",
+        this.onContextmenu,
+        true
+      );
+    },
+    pasteEventListener(ev) {
+      // console.log("pasteEventListener", ev);
+      this.tool.stopEvent();
+      if (ev.clipboardData) {
+        const text = ev.clipboardData.getData("text/plain");
+        this.toPaste(text);
+      } else {
+        this.doEventPaste();
+      }
+    },
+    bindKeysAfter() {
+      // console.log("bindKeysAfter", this.term.textarea);
     },
     NewSentry() {
       let worker = this.worker;
@@ -633,7 +675,8 @@ export default {
           }
         }
         if (this.tool.keyIsCtrlV(e)) {
-          this.doEventPaste();
+          // 已经监听了 粘贴 事件 所以 这里不用调用 粘贴
+          // this.doEventPaste();
         }
       }
     },
@@ -656,6 +699,8 @@ export default {
         } else {
           this.tool.warn("复制失败，请允许访问剪贴板！");
         }
+        this.term.select(0, 0, 0);
+        this.term.focus();
       } else {
         if (this.worker.isDownloading) {
           this.$refs.Download.stop();
@@ -665,8 +710,8 @@ export default {
         }
       }
     },
-    async doEventPaste() {
-      let readResult = await this.tool.readClipboardText();
+    async doEventPaste(options) {
+      let readResult = await this.tool.readClipboardText(options);
       if (readResult.success) {
         if (this.tool.isNotEmpty(readResult.text)) {
           this.tool.stopEvent();
@@ -703,15 +748,21 @@ export default {
     async onMousedown(e) {
       // let event = e || window.event;
       // this.tool.stopEvent(e);
-      // console.log(event);
+      // console.log(event.button);
     },
     async onContextmenu() {
       let copiedText = this.term.getSelection();
       if (this.tool.isNotEmpty(copiedText)) {
-        this.doEventCopy();
+        await this.doEventCopy();
       } else {
-        this.doEventPaste();
+        this.doEventPaste({
+          onClipboardFail: () => {
+            this.tool.warn("剪切板访问失败，请使用`Ctrl + V`粘贴");
+            this.term.focus();
+          },
+        });
       }
+      this.term.focus();
     },
     async onMouseup(e) {},
     changeSizeTimer() {

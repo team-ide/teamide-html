@@ -452,11 +452,15 @@ tool.clipboardWrite = async function (text) {
     });
 };
 
-tool.readClipboardText = function () {
-
+tool.readClipboardText = function (options) {
+    options = options || {}
     return new Promise(function (resolve, reject) {
         let toRead = () => {
             if (navigator.clipboard == null) {
+                if (options.onClipboardFail) {
+                    options.onClipboardFail(resolve)
+                    return
+                }
                 if (tool.showText) {
                     tool.showText("", {
                         title: "请粘贴文案",
@@ -483,6 +487,10 @@ tool.readClipboardText = function () {
                     text: text,
                 })
             }).catch(e => {
+                if (options.onClipboardFail) {
+                    options.onClipboardFail(resolve)
+                    return
+                }
                 if (tool.showText) {
                     tool.showText("", {
                         title: "请粘贴文案",
