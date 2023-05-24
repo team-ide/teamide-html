@@ -3,7 +3,7 @@
     <el-form class="pdt-10 pdlr-10" size="mini" @submit.native.prevent>
       <div class="pd-5 color-grey-1">登录 相关设置</div>
       <el-form-item
-        label="匿名登录（无需账号密码使用系统匿名账号登录）"
+        label="匿名登录（无需账号密码使用系统匿名账号登录，开启后 将自动创建匿名用户 由客户端存放匿名用户ID）"
         class="mgb-5 mglr-10"
       >
         <el-switch
@@ -17,6 +17,17 @@
         <el-switch
           v-model="source.setting.registerEnable"
           @change="toSave('registerEnable')"
+        ></el-switch>
+      </el-form-item>
+
+      <div class="pd-5 color-grey-1">工具箱 相关设置</div>
+      <el-form-item
+        label="开启共享（开启后 所有人可以使用所有工具配置）"
+        class="mgb-5 mglr-10"
+      >
+        <el-switch
+          v-model="source.setting.toolboxShare"
+          @change="toSave('toolboxShare')"
         ></el-switch>
       </el-form-item>
 

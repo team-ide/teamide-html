@@ -154,9 +154,16 @@ export default {
   },
   methods: {
     doAnonymousLogin() {
+      let anonymousUserId = this.tool.getCache("anonymousUserId");
+      if (anonymousUserId != null && anonymousUserId != "") {
+        anonymousUserId = Number(anonymousUserId);
+      } else {
+        anonymousUserId = null;
+      }
       this.server
         .login({
           anonymous: true,
+          anonymousUserId: anonymousUserId,
         })
         .then((res) => {
           if (res.code == 0) {

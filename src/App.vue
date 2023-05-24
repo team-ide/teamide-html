@@ -66,6 +66,14 @@ export default {
   },
   computed: {},
   watch: {
+    "source.ready"() {
+      if (!this.source.ready) {
+        return;
+      }
+      if (this.source.login.user == null) {
+        this.tool.toLogin();
+      }
+    },
     "source.login.user"() {
       if (this.source.login.user == null) {
         if (this.source.login.userId != null) {

@@ -752,7 +752,7 @@ tool.getRandom = function (length) {
 };
 
 tool.getCacheKey = function (key) {
-    return source.ROOT_URL + '-' + key;
+    return source.url + '-' + key;
 };
 
 tool.getCache = function (key) {

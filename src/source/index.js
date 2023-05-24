@@ -489,6 +489,9 @@ source.initSession = (data) => {
         }
         source.powers = data.powers || [];
         tool.setJWT(data.JWT);
+        if (data.isAnonymous && data.user != null) {
+            tool.setCache("anonymousUserId", "" + data.user.userId);
+        }
     } else {
         source.login.user = null;
         source.powers = [];
