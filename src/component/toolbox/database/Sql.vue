@@ -261,12 +261,14 @@ export default {
       this.cleanTab();
       this.addExecuteListTab();
       let selectIndex = 0;
-      this.executeList.forEach((one) => {
+      this.executeList.forEach((one, index) => {
+        one.executeIndex = index;
         if (one.isSelect && one.error == null) {
           one.selectIndex = selectIndex;
           this.addExecuteSelectTab(one);
           selectIndex++;
         }
+        this.addExecuteProfileTab(one);
       });
     },
     addExecuteListTab() {
@@ -283,7 +285,12 @@ export default {
       let title = `第${executeData.selectIndex + 1}条查询结果（${
         executeData.dataList.length
       }条记录）`;
-      let tab = {};
+      let tab = {
+        sql: executeData.sql,
+        error: executeData.error,
+        rowsAffected: executeData.rowsAffected,
+        useTime: executeData.useTime,
+      };
       tab.key = "查询结果-" + this.tool.getNumber();
       tab.title = title;
       tab.name = title;
@@ -292,6 +299,44 @@ export default {
       tab.dataList = executeData.dataList;
       this.addTab(tab);
       this.doActiveTab(tab);
+    },
+    addExecuteProfileTab(executeData) {
+      let profiling = executeData.profiling;
+      if (profiling == null) {
+        return;
+      }
+      let title = `第${executeData.executeIndex + 1}条SQL Profile`;
+      let tab = {
+        sql: executeData.sql,
+        error: executeData.error,
+        rowsAffected: executeData.rowsAffected,
+        useTime: executeData.useTime,
+      };
+      tab.key = "profile-" + this.tool.getNumber();
+      tab.title = title;
+      tab.name = title;
+      tab.isSelect = true;
+
+      let columnList = [];
+      let dataList = [];
+      if (profiling.profilesDataList) {
+        profiling.profilesDataList.forEach((one) => {
+          if (one.Query != executeData.sql) {
+            return;
+          }
+          if (one.profileColumnList) {
+            columnList = one.profileColumnList;
+          }
+          if (one.profileDataList) {
+            one.profileDataList.forEach((data) => {
+              dataList.push(data);
+            });
+          }
+        });
+      }
+      tab.columnList = columnList;
+      tab.dataList = dataList;
+      this.addTab(tab);
     },
     getTab(tab) {
       return this.sqlItemsWorker.getItem(tab);

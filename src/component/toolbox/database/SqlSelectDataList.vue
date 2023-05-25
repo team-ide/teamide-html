@@ -1,6 +1,38 @@
 <template>
   <div class="toolbox-database-sql-data-list">
-    <DataTable ref="DataTable" :source="source"></DataTable>
+    <div style="height: 70px">
+      <div class="sql-execute-one mgb-10 ft-12">
+        <div>
+          <span class="">{{ item.sql }}</span>
+        </div>
+        <template v-if="item.error">
+          <div class="color-orange">
+            执行异常
+            <span class="color-orange pdlr-5">{{ item.error }}</span>
+          </div>
+        </template>
+        <template v-else>
+          <div>
+            <span class="color-green pdr-5"> 执行成功 </span>
+            <template v-if="item.rowsAffected == 0 || item.rowsAffected > 0">
+              <span class="">
+                受影响行数:
+                <span class="color-green pdlr-5">
+                  {{ item.rowsAffected }}
+                </span>
+              </span>
+            </template>
+            <span>
+              耗时:
+              <span class="pdlr-5">{{ item.useTime }}毫秒</span>
+            </span>
+          </div>
+        </template>
+      </div>
+    </div>
+    <div style="height: calc(100% - 70px)">
+      <DataTable ref="DataTable" :source="source"></DataTable>
+    </div>
   </div>
 </template>
 
