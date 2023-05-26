@@ -320,7 +320,9 @@ export default {
           other: context["other"] || [],
         },
       });
+      let groupIdCache = {};
       groups.forEach((one) => {
+        groupIdCache[one.groupId] = one;
         groupList.push({
           groupId: one.groupId,
           name: one.name,
@@ -342,19 +344,26 @@ export default {
           return;
         }
         let list = context[type.name] || [];
-        groupList.forEach((one) => {
+        list.forEach((one) => {
+          if (this.tool.isNotEmpty(one.groupId)) {
+            if (groupIdCache[one.groupId] == null) {
+              one.groupNotFound = true;
+            }
+          }
+        });
+        groupList.forEach((g) => {
           let groupToolboxList = [];
-          list.forEach((tOne) => {
+          list.forEach((t) => {
             if (
-              this.tool.isEmpty(one.groupId) &&
-              this.tool.isEmpty(tOne.groupId)
+              this.tool.isEmpty(g.groupId) &&
+              (this.tool.isEmpty(t.groupId) || t.groupNotFound)
             ) {
-              groupToolboxList.push(tOne);
-            } else if (one.groupId == tOne.groupId) {
-              groupToolboxList.push(tOne);
+              groupToolboxList.push(t);
+            } else if (g.groupId == t.groupId) {
+              groupToolboxList.push(t);
             }
           });
-          one.context[type.name] = groupToolboxList;
+          g.context[type.name] = groupToolboxList;
         });
       });
       this.groupList = groupList;

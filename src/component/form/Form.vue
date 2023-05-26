@@ -35,6 +35,17 @@
                 </el-option>
               </el-select>
             </template>
+            <template v-else-if="field.type == 'radio'">
+              <el-radio-group v-model="formData[field.name]">
+                <el-radio
+                  v-for="(one, index) in field.options ||
+                  form[field.optionsName]"
+                  :key="index"
+                  :label="one.value"
+                  >{{ one.text }}</el-radio
+                >
+              </el-radio-group>
+            </template>
             <template v-else-if="field.type == 'switch'">
               <el-switch v-model="form.name"> </el-switch>
             </template>

@@ -8,7 +8,7 @@
     :append-to-body="true"
     :visible="showDialog"
     :before-close="hide"
-    :width="width || '700px'"
+    :width="width || '900px'"
     top="40px"
   >
     <FormBox

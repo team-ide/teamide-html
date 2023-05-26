@@ -120,6 +120,23 @@ let toolbox = {
             rules: [
             ],
         },
+        {
+            label: "可见性",
+            name: "visibility",
+            type: "radio",
+            options: [
+                { text: "公开（所有人可见、可操作）", value: 1 },
+                { text: "私有（自己可见、可操作", value: 2 },
+            ],
+            defaultValue: 2,
+            rules: [
+                {
+                    required: true,
+                    message: `可见性不能为空!`
+                },
+
+            ],
+        },
     ],
     share: {
         fields: [
