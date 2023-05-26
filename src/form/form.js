@@ -126,7 +126,7 @@ let toolbox = {
             type: "radio",
             options: [
                 { text: "公开（所有人可见、可操作）", value: 1 },
-                { text: "私有（自己可见、可操作", value: 2 },
+                { text: "私有（自己可见、可操作）", value: 2 },
             ],
             defaultValue: 2,
             rules: [
