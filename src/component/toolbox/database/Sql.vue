@@ -321,9 +321,11 @@ export default {
       let dataList = [];
       if (profiling.profilesDataList) {
         profiling.profilesDataList.forEach((one) => {
-          if (one.Query != executeData.sql) {
-            return;
-          }
+          // if (one.Query != executeData.sql) {
+          //   console.log("query:", one.Query);
+          //   console.log("sql:", executeData.sql);
+          //   return;
+          // }
           if (one.profileColumnList) {
             columnList = one.profileColumnList;
           }
