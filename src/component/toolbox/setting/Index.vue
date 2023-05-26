@@ -20,17 +20,6 @@
         ></el-switch>
       </el-form-item>
 
-      <div class="pd-5 color-grey-1">工具箱 相关设置</div>
-      <el-form-item
-        label="开启共享（开启后 所有人可以使用所有工具配置）"
-        class="mgb-5 mglr-10"
-      >
-        <el-switch
-          v-model="source.setting.toolboxShare"
-          @change="toSave('toolboxShare')"
-        ></el-switch>
-      </el-form-item>
-
       <div class="pd-5 color-grey-1">终端 相关设置</div>
       <el-form-item
         label="开启本地终端（允许连接到程序所在服务器终端）"
