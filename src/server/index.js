@@ -98,6 +98,9 @@ let server = {
         base64(param) {
             return http.post('api/tools/base64', param || {},);
         },
+        urlEncode(param) {
+            return http.post('api/tools/urlEncode', param || {},);
+        },
         md5(param) {
             return http.post('api/tools/md5', param || {},);
         },

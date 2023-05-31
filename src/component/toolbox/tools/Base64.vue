@@ -1,6 +1,7 @@
 <template>
   <div class="tools-base64-page">
     <el-form class="pdt-10 pdlr-10" size="mini" @submit.native.prevent>
+      <div class="pd-10 ft-16">编码</div>
       <el-form-item label="输入值" class="mgb-5 mglr-10">
         <el-input
           type="textarea"
@@ -9,20 +10,21 @@
         ></el-input>
       </el-form-item>
 
-      <el-form-item label="值Base64" class="mgb-5 mglr-10">
-        <el-input type="textarea" v-model="form.valueBase64"></el-input>
+      <el-form-item label="输出Base64" class="mgb-5 mglr-10">
+        <el-input type="textarea" v-model="form.valueEncode"></el-input>
       </el-form-item>
 
+      <div class="pd-10 ft-16">解码</div>
       <el-form-item label="输入Base64" class="mgb-5 mglr-10">
         <el-input
           type="textarea"
-          v-model="form.base64"
-          @change="base64Change()"
+          v-model="form.decode"
+          @change="decodeChange()"
         ></el-input>
       </el-form-item>
 
-      <el-form-item label="Base64值" class="mgb-5 mglr-10">
-        <el-input type="textarea" v-model="form.base64Value"></el-input>
+      <el-form-item label="输出值" class="mgb-5 mglr-10">
+        <el-input type="textarea" v-model="form.decodeValue"></el-input>
       </el-form-item>
     </el-form>
   </div>
@@ -37,9 +39,9 @@ export default {
     return {
       form: {
         value: null,
-        valueBase64: null,
-        base64: null,
-        base64Value: null,
+        valueEncode: null,
+        decode: null,
+        decodeValue: null,
       },
     };
   },
@@ -52,17 +54,19 @@ export default {
         value: this.form.value,
       });
       if (res.code == 0) {
-        this.form.valueBase64 = res.data;
+        res.data = res.data || {};
+        this.form.valueEncode = res.data.valueEncode;
       } else {
         this.tool.error(res.msg);
       }
     },
-    async base64Change() {
+    async decodeChange() {
       let res = await this.server.tools.base64({
-        base64: this.form.base64,
+        decode: this.form.decode,
       });
       if (res.code == 0) {
-        this.form.base64Value = res.data;
+        res.data = res.data || {};
+        this.form.decodeValue = res.data.decodeValue;
       } else {
         this.tool.error(res.msg);
       }
