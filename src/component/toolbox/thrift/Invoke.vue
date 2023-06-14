@@ -2,7 +2,7 @@
   <div class="toolbox-thrift-invoke">
     <template v-if="ready">
       <tm-layout height="100%">
-        <tm-layout height="150px">
+        <tm-layout height="200px">
           <div class="pdlr-10 pdtb-5">
             文件:
             <span class="color-green pdr-10">
@@ -47,23 +47,40 @@
             <el-form-item label="连接和响应超时时间(毫秒)" class="mgb-5">
               <el-input v-model="timeout" style="width: 80px" />
             </el-form-item>
-            <el-form-item label="性能测试" class="mgb-5">
-              <el-switch v-model="testOpen" />
-            </el-form-item>
-            <template v-if="testOpen">
-              <el-form-item label="并发线程" class="mgb-5">
-                <el-input v-model="worker" style="width: 80px" />
-              </el-form-item>
-              <el-form-item label="执行时间(分钟)" class="mgb-5">
-                <el-input v-model="duration" style="width: 80px" />
-              </el-form-item>
-              <el-form-item label="执行次数(优先级高于执行时间)" class="mgb-5">
-                <el-input v-model="frequency" style="width: 80px" />
-              </el-form-item>
-            </template>
+
             <el-form-item label="" class="mgb-5">
-              <div class="tm-btn tm-btn-sm bg-green-6" @click="toInvoke">
-                执行 | 性能测试
+              <div
+                class="tm-btn tm-btn-sm bg-green-6"
+                @click="toInvoke({ isTest: false })"
+              >
+                执行一次
+              </div>
+            </el-form-item>
+            <br />
+
+            <el-form-item label="并发线程" class="mgb-5">
+              <el-input v-model="worker" style="width: 80px" />
+            </el-form-item>
+            <el-form-item label="执行时间(分钟)" class="mgb-5">
+              <el-input v-model="duration" style="width: 80px" />
+            </el-form-item>
+            <el-form-item label="执行次数(优先级高于执行时间)" class="mgb-5">
+              <el-input v-model="frequency" style="width: 80px" />
+            </el-form-item>
+            <el-form-item
+              label="统计间隔(秒)"
+              title="统计间隔(每秒统计 输入 1 默认 10 秒)"
+              class="mgb-5"
+            >
+              <el-input v-model="countSecond" style="width: 80px" />
+            </el-form-item>
+
+            <el-form-item label="" class="mgb-5">
+              <div
+                class="tm-btn tm-btn-sm bg-green-6"
+                @click="toInvoke({ isTest: true })"
+              >
+                性能测试
               </div>
               <div class="tm-btn tm-btn-sm bg-grey-6" @click="toInvokeReports">
                 测试记录
@@ -243,11 +260,11 @@ export default {
       argForm: null,
       serverAddress: "127.0.0.1:10001",
       result: null,
-      testOpen: false,
       worker: 10, // 并发数
       duration: 0, // 执行时长 分钟
       frequency: 10, // 任务执行次数，和执行时间互斥，只能一个生效，优先级高于执行时间
       timeout: 5000, // 超时时间
+      countSecond: 10, // 统计间隔秒 如 每秒统计 输入 1 默认 10 秒统计
       protocolFactory: "binary",
       buffered: false,
       framed: true,
@@ -262,13 +279,11 @@ export default {
       this.serviceName = extend.serviceName;
       this.methodName = extend.methodName;
       this.serverAddress = extend.serverAddress || "127.0.0.1:10001";
-      if (extend.testOpen != null) {
-        this.testOpen = extend.testOpen;
-      }
       this.worker = extend.worker || 10;
       this.duration = extend.duration || 0;
       this.frequency = extend.frequency || 10;
       this.timeout = extend.timeout || 5000;
+      this.countSecond = extend.countSecond || 10;
       this.protocolFactory = extend.protocolFactory || "binary";
       if (extend.buffered != null) {
         this.buffered = extend.buffered;
@@ -312,6 +327,7 @@ export default {
         buffered: this.buffered,
         framed: this.framed,
         timeout: Number(this.timeout),
+        countSecond: Number(this.countSecond),
       };
       this.toolboxWorker.openTabByExtend(extend);
     },
@@ -339,7 +355,8 @@ export default {
       field.num = model.num;
     },
     getStructFormByModel(structInclude, structName) {},
-    async toInvoke() {
+    async toInvoke(options) {
+      options = options || {};
       let argFields = this.argFields || [];
       let editors = this.$refs.argEditor;
       var args = [];
@@ -362,12 +379,13 @@ export default {
         framed: this.framed,
         timeout: Number(this.timeout),
       });
-      param.isTest = this.testOpen;
+      param.isTest = options.isTest;
       if (param.isTest) {
         param.worker = Number(this.worker);
         param.duration = Number(this.duration);
         param.frequency = Number(this.frequency);
         param.timeout = Number(this.timeout);
+        param.countSecond = Number(this.countSecond);
       }
 
       let res = await this.server.thrift.invokeByServerAddress(param);
@@ -394,7 +412,6 @@ export default {
       let keyValueMap = {};
       keyValueMap.serverAddress = this.serverAddress;
       keyValueMap.argData = argData;
-      keyValueMap.testOpen = this.testOpen;
       keyValueMap.worker = this.worker;
       keyValueMap.duration = this.duration;
       keyValueMap.frequency = this.frequency;

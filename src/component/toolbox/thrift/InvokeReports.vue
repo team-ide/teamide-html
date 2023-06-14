@@ -102,7 +102,7 @@
                       </div>
                       -
                       <div>
-                        <span class="color-green pdl-5">
+                        <span class="color-green pdl-5" v-if="scope.row.isEnd">
                           {{
                             tool.formatDate(
                               new Date(scope.row.endTime / 1000000),
@@ -110,6 +110,7 @@
                             )
                           }}
                         </span>
+                        <span class="color-green pdl-5" v-else> 执行中 </span>
                       </div>
                     </div>
                   </template>
@@ -179,6 +180,13 @@
                       下载执行记录
                     </div>
                     <br />
+                    <div
+                      class="tm-link color-orange mglr-5"
+                      v-if="!scope.row.isEnd"
+                      @click="toStop(scope.row)"
+                    >
+                      停止
+                    </div>
                     <div
                       class="tm-link color-red mglr-5"
                       @click="toDelete(scope.row)"
@@ -250,6 +258,22 @@ export default {
       url += "&serviceName=" + encodeURIComponent(this.serviceName);
       url += "&methodName=" + encodeURIComponent(this.methodName);
       window.location.href = url;
+    },
+    async toStop(data) {
+      this.tool.warn("任务停止中");
+      let param = this.toolboxWorker.getWorkParam({
+        relativePath: this.relativePath,
+        serviceName: this.serviceName,
+        methodName: this.methodName,
+        taskKey: data.taskKey,
+      });
+      let res = await this.server.thrift.invokeStop(param);
+      if (res.code != 0) {
+        this.tool.error(res.msg);
+      } else {
+        this.tool.success("停止成功");
+        this.refresh();
+      }
     },
     toDelete(data) {
       let msg = "删除该记录将无法恢复，确认删除？";
