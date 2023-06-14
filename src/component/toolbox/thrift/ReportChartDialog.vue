@@ -66,7 +66,6 @@
             :report="report"
             :dataList="dataList"
             :dataListVersion="dataListVersion"
-            :isSecond="isSecond"
           ></ReportChart>
         </div>
       </div>
@@ -87,7 +86,6 @@ export default {
       showDialog: false,
       report: null,
       dataListVersion: 0,
-      isSecond: true,
     };
   },
   watch: {},
@@ -112,13 +110,7 @@ export default {
         serviceName: this.report.serviceName,
         methodName: this.report.methodName,
         taskKey: this.report.taskKey,
-        second: true,
       });
-      if (this.isSecond) {
-        param.second = true;
-      } else {
-        param.minute = true;
-      }
 
       let res = await this.server.thrift.invokeMetric(param);
       if (res.code != 0) {

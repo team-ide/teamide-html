@@ -11,7 +11,7 @@
 <script>
 export default {
   components: {},
-  props: ["dataList", "report", "options", "dataListVersion", "isSecond"],
+  props: ["dataList", "report", "options", "dataListVersion"],
   data() {
     return {};
   },
@@ -94,9 +94,6 @@ export default {
           new Date(one.startTime / 1000000),
           "hh:mm:ss"
         );
-        if (!this.isSecond) {
-          dataMinute = this.tool.formatDate(new Date(one.startTime), "hh:mm");
-        }
         keys.forEach((key) => {
           let sery = seriesMap[key.key];
           if (xAxisData.indexOf(dataMinute) < 0) {
