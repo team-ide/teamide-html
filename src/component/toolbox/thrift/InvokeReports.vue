@@ -33,8 +33,7 @@
               执行用时：单个线程执行用时累计，取最大；（这里的用时是调用接口耗时，去除了额外开销，所以执行用时小于任务执行时间，两者相差越大，则表示额外开销越多）
             </div>
             <div>累计用时：所有执行用时累计</div>
-            <div>TPS：总 / 执行用时</div>
-            <div></div>
+            <div>TPS：总次数 / 执行用时</div>
           </div>
         </tm-layout>
         <tm-layout-bar bottom></tm-layout-bar>
