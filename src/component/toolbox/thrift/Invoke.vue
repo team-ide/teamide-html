@@ -74,6 +74,20 @@
             >
               <el-input v-model="countSecond" style="width: 80px" />
             </el-form-item>
+            <el-form-item
+              label="保存执行记录"
+              title="保存每条执行记录，可下载查看，消耗性能"
+              class="mgb-5"
+            >
+              <el-switch v-model="saveRecords" />
+            </el-form-item>
+            <el-form-item
+              label="统计T99"
+              title="统计 T99 T90 T80等，高并发下 消耗内存将增加"
+              class="mgb-5"
+            >
+              <el-switch v-model="countTop" />
+            </el-form-item>
 
             <el-form-item label="" class="mgb-5">
               <div
@@ -268,6 +282,8 @@ export default {
       protocolFactory: "binary",
       buffered: false,
       framed: true,
+      saveRecords: false, // 保存执行记录
+      countTop: false, // 统计T99
     };
   },
   computed: {},
@@ -290,6 +306,12 @@ export default {
       }
       if (extend.framed != null) {
         this.framed = extend.framed;
+      }
+      if (extend.saveRecords != null) {
+        this.saveRecords = extend.saveRecords;
+      }
+      if (extend.countTop != null) {
+        this.countTop = extend.countTop;
       }
       await this.refresh();
       this.ready = true;
@@ -326,6 +348,8 @@ export default {
         protocolFactory: this.protocolFactory,
         buffered: this.buffered,
         framed: this.framed,
+        saveRecords: this.saveRecords,
+        countTop: this.countTop,
         timeout: Number(this.timeout),
         countSecond: Number(this.countSecond),
       };
@@ -377,6 +401,8 @@ export default {
         protocolFactory: this.protocolFactory,
         buffered: this.buffered,
         framed: this.framed,
+        saveRecords: this.saveRecords,
+        countTop: this.countTop,
         timeout: Number(this.timeout),
       });
       param.isTest = options.isTest;

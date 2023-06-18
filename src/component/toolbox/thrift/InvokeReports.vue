@@ -112,6 +112,15 @@
                         </span>
                         <span class="color-green pdl-5" v-else> 执行中 </span>
                       </div>
+                      -
+                      <div>
+                        <span
+                          class="color-green pdl-5"
+                          v-if="scope.row.total != null"
+                        >
+                          {{ tool.formatTimeStr(Number(scope.row.total)) }}
+                        </span>
+                      </div>
                     </div>
                   </template>
                 </el-table-column>
@@ -136,7 +145,7 @@
                 </el-table-column>
                 <el-table-column label="执行用时" prop="total">
                   <template slot-scope="scope">
-                    {{ tool.formatTimeStr(Number(scope.row.total)) }}
+                    {{ tool.formatTimeStr(Number(scope.row.execute)) }}
                   </template>
                 </el-table-column>
                 <el-table-column label="累计用时" prop="use">
