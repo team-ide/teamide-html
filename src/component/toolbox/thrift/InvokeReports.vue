@@ -2,7 +2,7 @@
   <div class="toolbox-thrift-invoke-reports">
     <template v-if="ready">
       <tm-layout height="100%">
-        <tm-layout height="80px">
+        <tm-layout height="160px">
           <div class="pdlr-10 pdtb-5">
             文件:
             <span class="color-green pdr-10">
@@ -27,6 +27,15 @@
               </div>
             </el-form-item>
           </el-form>
+          <div class="ft-12 color-orange pdlr-10">
+            <div>任务用时：任务的开始时间~结束时间耗时；</div>
+            <div>
+              执行用时：单个线程执行用时累计，取最大；（这里的用时是调用接口耗时，去除了额外开销，所以执行用时小于任务执行时间，两者相差越大，则表示额外开销越多）
+            </div>
+            <div>累计用时：所有执行用时累计</div>
+            <div>TPS：总 / 执行用时</div>
+            <div></div>
+          </div>
         </tm-layout>
         <tm-layout-bar bottom></tm-layout-bar>
         <tm-layout height="auto">
@@ -66,6 +75,14 @@
                   <span class="color-green pdlr-5">
                     {{ group.request.timeout }}
                   </span>
+                  保存执行记录:
+                  <span class="color-green pdlr-5">
+                    {{ tool.isTrue(group.request.saveRecords) }}
+                  </span>
+                  统计T99:
+                  <span class="color-green pdlr-5">
+                    {{ tool.isTrue(group.request.countTop) }}
+                  </span>
                 </div>
                 <div
                   v-for="(arg, index) in group.request.args"
@@ -77,7 +94,12 @@
                   </span>
                 </div>
               </div>
-              <el-table :data="group.reports" style="width: 100%" size="mini">
+              <el-table
+                :data="group.reports"
+                style="width: 100%"
+                :border="true"
+                size="mini"
+              >
                 <el-table-column label="" width="40px">
                   <template slot-scope="scope">
                     {{ scope.$index + 1 }}
@@ -112,15 +134,6 @@
                         </span>
                         <span class="color-green pdl-5" v-else> 执行中 </span>
                       </div>
-                      -
-                      <div>
-                        <span
-                          class="color-green pdl-5"
-                          v-if="scope.row.total != null"
-                        >
-                          {{ tool.formatTimeStr(Number(scope.row.total)) }}
-                        </span>
-                      </div>
                     </div>
                   </template>
                 </el-table-column>
@@ -141,6 +154,11 @@
                         {{ scope.row.errorCount }}
                       </span>
                     </div>
+                  </template>
+                </el-table-column>
+                <el-table-column label="任务用时" prop="total">
+                  <template slot-scope="scope">
+                    {{ tool.formatTimeStr(Number(scope.row.total)) }}
                   </template>
                 </el-table-column>
                 <el-table-column label="执行用时" prop="total">

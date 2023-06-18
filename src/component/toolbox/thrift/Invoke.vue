@@ -442,6 +442,8 @@ export default {
       keyValueMap.duration = this.duration;
       keyValueMap.frequency = this.frequency;
       keyValueMap.timeout = this.timeout;
+      keyValueMap.saveRecords = this.saveRecords;
+      keyValueMap.countTop = this.countTop;
 
       await this.toolboxWorker.updateOpenTabExtend(this.tabId, keyValueMap);
     },

@@ -58,7 +58,7 @@
             </div>
           </div>
         </div>
-        <div class="ft-600 ft-14 color-orange">点击查看耗时较高的调用</div>
+        <!-- <div class="ft-600 ft-14 color-orange">点击查看耗时较高的调用</div> -->
         <div style="width: 100%; height: 700px">
           <ReportChart
             :source="source"
