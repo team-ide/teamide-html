@@ -105,6 +105,7 @@ export default {
         autoIndent: true, //自动布局
         // quickSuggestionsDelay: 500, //代码提示延时
         contextmenu: false,
+        stopRenderingLineAfter: -1, // 一行最大显示字符数，默认 10000 ，-1 表示 一直渲染
       });
       this.monacoInstance.onDidChangeModelContent((e) => {
         if (this.isSetValue) {

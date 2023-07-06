@@ -331,11 +331,11 @@ export default {
         }
         if (one.headers && one.headers.length > 0) {
           one.headers.forEach((data) => {
+            headerValue[data.key] = data.value;
             if (headerColumnNameList.indexOf(data.key) >= 0) {
               return;
             }
             headerColumnNameList.push(data.key);
-            headerValue[data.key] = data.value;
             headerColumnList.push({
               name: data.key,
               checked: true,
