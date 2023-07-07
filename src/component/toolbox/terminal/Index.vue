@@ -22,8 +22,8 @@ export default {
     let extend = this.extend || {};
     return {
       ready: false,
-      place: extend.place,
-      placeId: extend.placeId,
+      place: extend.place || "",
+      placeId: extend.placeId || "",
     };
   },
   computed: {},

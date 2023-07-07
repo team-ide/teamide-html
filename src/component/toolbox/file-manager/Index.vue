@@ -47,8 +47,8 @@ export default {
       this.$nextTick(() => {
         if (this.extend) {
           this.addOne(
-            this.extend.place,
-            this.extend.placeId,
+            this.extend.place || "",
+            this.extend.placeId || "",
             this.extend.openDir
           );
         }

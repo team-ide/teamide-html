@@ -6,8 +6,8 @@ const newWorker = function (workerOption) {
     workerOption = workerOption || {};
     const worker = {
         workerId: workerOption.workerId,
-        place: workerOption.place,
-        placeId: workerOption.placeId,
+        place: workerOption.place || "",
+        placeId: workerOption.placeId || "",
         key: workerOption.key,
         onSocketOpen: workerOption.onSocketOpen,
         onSocketClose: workerOption.onSocketClose,
