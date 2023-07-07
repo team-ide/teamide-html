@@ -65,6 +65,9 @@
           <div class="ft-12 tm-link color-grey mglr-5" @click="openFtpWindow()">
             文件管理器
           </div>
+          <div class="ft-12 tm-link color-grey mglr-5" @click="openLogs()">
+            终端历史记录
+          </div>
         </div>
       </tm-layout>
     </tm-layout>
@@ -142,6 +145,14 @@
       :source="source"
       :toolboxWorker="toolboxWorker"
     ></ConfirmPaste>
+    <template v-if="worker != null">
+      <Logs
+        ref="Logs"
+        :source="source"
+        :toolboxWorker="toolboxWorker"
+        :worker="worker"
+      ></Logs>
+    </template>
     <!--   -->
     <div
       v-if="worker.isDownloading"
@@ -177,9 +188,10 @@ import Progress from "../file-manager/Progress.vue";
 import Download from "./Download.vue";
 import Upload from "./Upload.vue";
 import ConfirmPaste from "./ConfirmPaste.vue";
+import Logs from "./Logs.vue";
 
 export default {
-  components: { FileManager, Progress, Download, Upload, ConfirmPaste },
+  components: { FileManager, Progress, Download, Upload, ConfirmPaste, Logs },
   props: ["source", "toolboxWorker", "place", "placeId", "extend"],
   data() {
     let worker = _worker.newWorker({
@@ -258,6 +270,11 @@ export default {
     toHideSearch() {
       this.showSearch = false;
       this.clearSearch();
+    },
+    openLogs() {
+      this.$refs.Logs.show(() => {
+        this.onFocus();
+      });
     },
     doSearch() {
       try {

@@ -10,6 +10,18 @@ let fileManager = {
     changeSize(param) {
         return http.post('api/terminal/changeSize', param);
     },
+    getLogs(param) {
+        return http.post('api/terminal/getLogs', param);
+    },
+    deleteLog(param) {
+        return http.post('api/terminal/deleteLog', param);
+    },
+    cleanLog(param) {
+        return http.post('api/terminal/cleanLog', param);
+    },
+    downloadLog(param) {
+        return http.post('api/terminal/downloadLog', param);
+    },
 };
 
 

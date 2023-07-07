@@ -195,6 +195,14 @@ const newWorker = function (workerOption) {
             }
             return res.data;
         },
+        async getLogs() {
+            let param = worker.getParam();
+            let res = await server.terminal.getLogs(param);
+            if (res.code != 0) {
+                tool.error(res.msg);
+            }
+            return res.data;
+        },
     };
 
 
