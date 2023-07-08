@@ -6,8 +6,8 @@ const newWorker = function (workerOption) {
     workerOption = workerOption || {};
     const worker = {
         workerId: workerOption.workerId,
-        place: workerOption.place || "",
-        placeId: workerOption.placeId || "",
+        place: workerOption.place,
+        placeId: workerOption.placeId,
         selectPaths: [],
         fileList: null,
         dir: "",

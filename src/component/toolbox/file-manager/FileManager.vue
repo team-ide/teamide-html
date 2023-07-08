@@ -131,8 +131,8 @@ export default {
   data() {
     let fileWorker = _worker.newWorker({
       workerId: this.toolboxWorker.workerId,
-      place: this.place || "",
-      placeId: this.placeId || "",
+      place: this.place,
+      placeId: this.placeId,
       onChangeOpenDir: this.onChangeOpenDir,
     });
     if (this.tool.isNotEmpty(this.openDir)) {

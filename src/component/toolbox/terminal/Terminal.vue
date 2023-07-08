@@ -196,8 +196,8 @@ export default {
   data() {
     let worker = _worker.newWorker({
       workerId: this.toolboxWorker.workerId,
-      place: this.place || "",
-      placeId: this.placeId || "",
+      place: this.place,
+      placeId: this.placeId,
       onSocketOpen: this.onSocketOpen,
       onSocketClose: this.onSocketClose,
       onSocketError: this.onSocketError,
