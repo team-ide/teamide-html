@@ -33,7 +33,7 @@
               执行用时：单个线程执行用时累计，取最大；（这里的用时是调用接口耗时，去除了额外开销，所以执行用时小于任务执行时间，两者相差越大，则表示额外开销越多）
             </div>
             <div>累计用时：所有执行用时累计</div>
-            <div>TPS：总次数 / 执行用时</div>
+            <div>TPS：总次数 / 任务用时</div>
           </div>
         </tm-layout>
         <tm-layout-bar bottom></tm-layout-bar>
@@ -91,6 +91,20 @@
                   <span class="color-green pdl-5">
                     {{ arg }}
                   </span>
+                </div>
+                <div class="pdt-5">
+                  <div
+                    class="tm-link color-green mgr-10"
+                    @click="toShowMarkdown(group.requestMd5)"
+                  >
+                    导出当前组Markdown
+                  </div>
+                  <div
+                    class="tm-link color-red mgr-10"
+                    @click="toDeleteByRequestMd5(group.requestMd5)"
+                  >
+                    删除当前组
+                  </div>
                 </div>
               </div>
               <el-table
@@ -322,11 +336,33 @@ export default {
         })
         .catch((e) => {});
     },
-    async toShowMarkdown() {
+    toDeleteByRequestMd5(requestMd5) {
+      let msg = "删除组下所有执行记录将无法恢复，确认删除？";
+      this.tool
+        .confirm(msg)
+        .then(async () => {
+          let param = this.toolboxWorker.getWorkParam({
+            relativePath: this.relativePath,
+            serviceName: this.serviceName,
+            methodName: this.methodName,
+            requestMd5: requestMd5,
+          });
+          let res = await this.server.thrift.invokeReportDelete(param);
+          if (res.code != 0) {
+            this.tool.error(res.msg);
+          } else {
+            this.tool.success("删除成功");
+            this.refresh();
+          }
+        })
+        .catch((e) => {});
+    },
+    async toShowMarkdown(requestMd5) {
       let param = this.toolboxWorker.getWorkParam({
         relativePath: this.relativePath,
         serviceName: this.serviceName,
         methodName: this.methodName,
+        requestMd5: requestMd5,
       });
 
       let res = await this.server.thrift.invokeMarkdown(param);
@@ -361,6 +397,7 @@ export default {
           group = {
             reports: [],
             request: one.request,
+            requestMd5: one.requestMd5,
           };
           groupCache[one.requestMd5] = group;
           groupList.push(group);
