@@ -174,14 +174,17 @@ export default {
         return;
       }
       this.bindEvented = true;
-      this.$el.addEventListener("keydown", (e) => {
-        this.onKeyDown(e);
-      });
+      this.$el.addEventListener("keydown", this.onKeyDown);
     },
   },
   created() {},
   mounted() {
     this.bindEvent();
+  },
+  beforeDestroy() {
+    this.isDestroyed = true;
+    this.toolboxWorker = null;
+    this.$el.removeEventListener("keydown", this.onKeyDown);
   },
   updated() {},
 };

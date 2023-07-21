@@ -164,6 +164,7 @@ export default {
     if (this.monacoInstance != null) {
       this.monacoInstance.dispose(); //使用完成销毁实例
     }
+    this.monacoInstance = null;
   },
   beforeCreate() {},
 };

@@ -19,7 +19,6 @@ export default {
   props: ["left", "right", "top", "bottom", "color"],
   data() {
     return {
-      co,
       isLayoutBar: true,
       w: null,
       h: null,
@@ -72,9 +71,15 @@ export default {
       this.mouseDowned = true;
     },
     mouseup(event) {
+      if (this.isDestroyed) {
+        return;
+      }
       this.mouseDowned = false;
     },
     mousemove(event) {
+      if (this.isDestroyed) {
+        return;
+      }
       if (!this.mouseDowned) {
         return;
       }
@@ -129,17 +134,17 @@ export default {
         this.w = "100%";
         this.h = this.$parent.barSize;
       }
-      document.addEventListener("mouseup", (event) => {
-        this.mouseup(event);
-      });
-      document.addEventListener("mousemove", (event) => {
-        this.mousemove(event);
-      });
+      document.addEventListener("mouseup", this.mouseup);
+      document.addEventListener("mousemove", this.mousemove);
     },
   },
   mounted() {
     this.init();
   },
-  beforeDestroy() {},
+  beforeDestroy() {
+    document.removeEventListener("mouseup", this.mouseup);
+    document.removeEventListener("mousemove", this.mousemove);
+    this.isDestroyed = true;
+  },
 };
 </script>

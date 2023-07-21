@@ -179,6 +179,8 @@ import Zmodem from "@/component/zmodem.js";
 import { Terminal } from "teamide-xterm";
 import { FitAddon } from "xterm-addon-fit";
 import { SearchAddon } from "xterm-addon-search";
+import { CanvasAddon } from "xterm-addon-canvas";
+
 // import { AttachAddon } from "xterm-addon-attach";
 
 // https://juejin.cn/post/6918911964009725959
@@ -462,6 +464,9 @@ export default {
             this.last_session.close();
           }
         } catch (e) {}
+        if (this.term == null) {
+          return;
+        }
         this.term.write("\r\nzsentry consume error:" + e.toString());
         this.term.write("\r\n关闭当前会话");
         this.zsentry = this.NewSentry();
@@ -480,8 +485,6 @@ export default {
       let box = this.$refs.terminalXtermBox;
 
       this.term = new Terminal({
-        // rendererType: "dom",
-        rendererType: "canvas", //渲染类型
         useStyle: true,
         cursorBlink: true, //光标闪烁
         cursorStyle: "underline", // 光标样式 'block' | 'underline' | 'bar'
@@ -503,10 +506,15 @@ export default {
       });
       this.term.setBindKeysBefore(this.bindKeysBefore);
       this.term.setBindKeysAfter(this.bindKeysAfter);
-      this.term.open(box, true);
 
       this.fitAddon = new FitAddon();
       this.term.loadAddon(this.fitAddon);
+
+      this.canvasAddon = new CanvasAddon();
+      this.term.loadAddon(this.canvasAddon);
+
+      this.term.open(box, true);
+
       this.fitAddon.fit();
 
       this.term.focus();
@@ -544,7 +552,7 @@ export default {
         .height();
 
       this.changeSizeTimer();
-      this.xtermRows = box.getElementsByClassName("xterm-rows")[0];
+      // this.xtermRows = box.getElementsByClassName("xterm-rows")[0];
     },
     bindKeysBefore() {
       // console.log("bindKeysBefore", this.term.textarea);
@@ -559,6 +567,7 @@ export default {
       //   },
       //   true
       // );
+      // console.log(this.term);
       this.term.textarea.addEventListener(
         "paste",
         this.pasteEventListener,
@@ -767,7 +776,9 @@ export default {
       // this.tool.stopEvent(e);
       // console.log(event.button);
     },
-    async onContextmenu() {
+    async onContextmenu(e) {
+      let event = e || window.event;
+      this.tool.stopEvent(event);
       let copiedText = this.term.getSelection();
       if (this.tool.isNotEmpty(copiedText)) {
         await this.doEventCopy();
@@ -782,46 +793,56 @@ export default {
       this.term.focus();
     },
     async onMouseup(e) {},
+    doChangeSize() {
+      // console.log("doChangeSize");
+      this.terminal_back_width = this.tool
+        .jQuery(this.$refs.terminalXtermBoxBack)
+        .width();
+      this.terminal_back_height = this.tool
+        .jQuery(this.$refs.terminalXtermBoxBack)
+        .height();
+      this.tool.jQuery(this.term.element).css({
+        width: parseInt(this.terminal_back_width),
+        height: parseInt(this.terminal_back_height),
+      });
+      this.fitAddon.fit();
+      // console.log(this.term.element);
+
+      if (
+        this.term.cols != this.worker.cols ||
+        this.term.rows != this.worker.rows
+      ) {
+        this.worker.cols = this.term.cols;
+        this.worker.rows = this.term.rows;
+        this.worker.changeSize();
+      }
+    },
     changeSizeTimer() {
-      if (this.isDestroyed) {
+      if (this.isDestroyed || this.changeSizeTimerIng) {
         return;
       }
-      if (
-        this.tool.jQuery(this.$refs.terminalXtermBoxBack).width() !=
-          this.terminal_back_width ||
-        this.tool.jQuery(this.$refs.terminalXtermBoxBack).height() !=
-          this.terminal_back_height
-      ) {
-        this.terminal_back_width = this.tool
-          .jQuery(this.$refs.terminalXtermBoxBack)
-          .width();
-        this.terminal_back_height = this.tool
-          .jQuery(this.$refs.terminalXtermBoxBack)
-          .height();
-        this.tool.jQuery(this.term.element).css({
-          width: parseInt(this.terminal_back_width),
-          height: parseInt(this.terminal_back_height),
-        });
-        this.fitAddon.fit();
-        // console.log(this.term.element);
+      this.changeSizeTimerIng = true;
 
-        if (
-          this.term.cols != this.worker.cols ||
-          this.term.rows != this.worker.rows
-        ) {
-          this.worker.cols = this.term.cols;
-          this.worker.rows = this.term.rows;
-          this.worker.changeSize();
+      this.$nextTick(() => {
+        // console.log("listenResize");
+        try {
+          if (
+            this.tool.jQuery(this.$refs.terminalXtermBoxBack).width() !=
+              this.terminal_back_width ||
+            this.tool.jQuery(this.$refs.terminalXtermBoxBack).height() !=
+              this.terminal_back_height
+          ) {
+            this.doChangeSize();
+          }
+        } catch (e) {
+        } finally {
+          // 窗口尺寸变化时，终端尺寸自适应
+          window.setTimeout(() => {
+            this.changeSizeTimerIng = false;
+            this.changeSizeTimer();
+          }, 100);
         }
-      }
-
-      // window.setTimeout(() => {
-      // 窗口尺寸变化时，终端尺寸自适应
-
-      window.setTimeout(() => {
-        this.changeSizeTimer();
-      }, 200);
-      // }, 100);
+      });
     },
   },
   created() {},
@@ -834,6 +855,8 @@ export default {
     if (this.term != null) {
       this.term.dispose();
     }
+    this.term = null;
+    this.worker = null;
   },
 };
 </script>

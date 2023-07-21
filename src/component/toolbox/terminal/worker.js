@@ -16,8 +16,6 @@ const newWorker = function (workerOption) {
         building: false,
         rows: 40,
         cols: 100,
-        socket: null,
-        uploadSocket: null,
         isUploading: false,
         isDownloading: false,
         init() {

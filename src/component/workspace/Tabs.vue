@@ -246,11 +246,6 @@ export default {
         workspaceTabsBody.scrollLeft(scrollLeft);
       });
     },
-    resize() {
-      this.$nextTick(() => {
-        this.initTabs();
-      });
-    },
     getActiveIndex() {
       return this.mainTabs.indexOf(this.itemsWorker.activeItem);
     },
@@ -330,16 +325,45 @@ export default {
     toDeleteTab(tab) {
       this.itemsWorker.toRemoveItem(tab);
     },
+    doChangeSize() {
+      // console.log("doChangeSize");
+      this.initTabs();
+    },
+    listenResize() {
+      if (this.isDestroyed || this.listenResizeIng) {
+        return;
+      }
+      this.listenResizeIng = true;
+      this.$nextTick(() => {
+        // console.log("listenResize");
+        try {
+          let newElWidth = this.tool.jQuery(this.$el).width();
+          if (this.oldElWidth != newElWidth) {
+            this.oldElWidth = newElWidth;
+            this.doChangeSize();
+          }
+        } catch (e) {
+        } finally {
+          window.setTimeout(() => {
+            this.listenResizeIng = false;
+            this.listenResize();
+          }, 1000);
+        }
+      });
+    },
   },
   // 在实例创建完成后被立即调用
   created() {},
   // el 被新创建的 vm.$el 替换，并挂载到实例上去之后调用
   mounted() {
     this.init();
-    window.addEventListener("resize", this.resize);
+    this.$nextTick(() => {
+      this.oldElWidth = this.tool.jQuery(this.$el).width();
+      this.listenResize();
+    });
   },
   beforeDestroy() {
-    window.removeEventListener("resize", this.resize);
+    this.isDestroyed = true;
   },
 };
 </script>

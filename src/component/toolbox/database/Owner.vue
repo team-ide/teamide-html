@@ -259,6 +259,10 @@ export default {
     nodeContextmenu(event, data, node, nodeView) {
       let menus = [];
       if (data.isOwner || data.isOwnerTables) {
+        let owner = data;
+        if (data.isOwnerTables) {
+          owner = data.owner;
+        }
         menus.push({
           text: "刷新",
           onClick: () => {
@@ -268,17 +272,17 @@ export default {
         menus.push({
           text: "新增表",
           onClick: () => {
-            this.toTableCreate(data);
+            this.toTableCreate(owner);
           },
         });
         menus.push({
           text: "新建SQL查询",
           onClick: () => {
             let extend = {
-              name: "查询[" + data.ownerName + "]库SQL",
-              title: "查询[" + data.ownerName + "]库SQL",
+              name: "查询[" + owner.ownerName + "]库SQL",
+              title: "查询[" + owner.ownerName + "]库SQL",
               type: "sql",
-              ownerName: data.ownerName,
+              ownerName: owner.ownerName,
               executeSQL: "SHOW TABLES;",
             };
             this.toolboxWorker.openTabByExtend(extend);

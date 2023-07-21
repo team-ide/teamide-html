@@ -11,7 +11,6 @@ export default {
   props: ["width", "height", "bar"],
   data() {
     return {
-      co,
       w: "100%",
       h: "100%",
       barSize: "2px",
