@@ -13,8 +13,9 @@
           class="header"
           :class="menu.class"
           :key="index"
-          v-html="menu.header"
-        ></li>
+        >
+          {{ menu.header }}
+        </li>
         <li
           v-else
           class
@@ -25,13 +26,9 @@
           :key="index"
           @click="onClick(menu)"
         >
-          <a
-            class
-            :class="menu.class"
-            :target="menu.target"
-            :href="menu.href"
-            v-html="menu.text"
-          ></a>
+          <a class :class="menu.class" :target="menu.target" :href="menu.href">
+            {{ menu.text }}
+          </a>
           <template v-if="menu.menus != null">
             <ContextmenuMenus
               :menus="menu.menus"

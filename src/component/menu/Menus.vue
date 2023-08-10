@@ -13,8 +13,9 @@
           class="header"
           :class="one.class"
           :key="index"
-          v-html="one.header"
-        ></li>
+        >
+          {{ one.header }}
+        </li>
         <li
           v-else
           class
@@ -25,13 +26,9 @@
           :key="index"
           @click="onClick(one)"
         >
-          <a
-            class
-            :class="one.class"
-            :target="one.target"
-            :href="one.href"
-            v-html="one.text"
-          ></a>
+          <a class :class="one.class" :target="one.target" :href="one.href">
+            {{ one.text }}
+          </a>
           <template v-if="one.menus != null">
             <Menus :menus="one.menus" :isSub="true"></Menus>
           </template>
