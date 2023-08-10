@@ -22,7 +22,7 @@
               <div class="tm-btn tm-btn-sm bg-green-6" @click="refresh">
                 刷新
               </div>
-              <div class="tm-btn tm-btn-sm bg-grey-6" @click="toShowMarkdown">
+              <div class="tm-btn tm-btn-sm bg-grey-6" @click="toShowMarkdown()">
                 导出Markdown
               </div>
             </el-form-item>
@@ -362,7 +362,7 @@ export default {
         relativePath: this.relativePath,
         serviceName: this.serviceName,
         methodName: this.methodName,
-        requestMd5: requestMd5,
+        requestMd5: requestMd5 || "",
       });
 
       let res = await this.server.thrift.invokeMarkdown(param);
