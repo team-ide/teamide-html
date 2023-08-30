@@ -1,11 +1,14 @@
 import http from '@/server/http';
 
-let fileManager = {
+let terminal = {
     close(param) {
         return http.post('api/terminal/close', param);
     },
     key(param) {
         return http.post('api/terminal/key', param);
+    },
+    test(param) {
+        return http.post('api/terminal/test', param);
     },
     changeSize(param) {
         return http.post('api/terminal/changeSize', param);
@@ -25,4 +28,4 @@ let fileManager = {
 };
 
 
-export default fileManager;
+export default terminal;

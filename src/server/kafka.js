@@ -1,6 +1,9 @@
 import http from '@/server/http';
 
 let kafka = {
+    test(param) {
+        return http.post('api/kafka/test', param);
+    },
     info(param) {
         return http.post('api/kafka/info', param);
     },

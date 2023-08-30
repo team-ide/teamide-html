@@ -1,6 +1,9 @@
 import http from '@/server/http';
 
 let database = {
+    test(param) {
+        return http.post('api/database/test', param);
+    },
     info(param) {
         return http.post('api/database/info', param);
     },

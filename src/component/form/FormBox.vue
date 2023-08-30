@@ -20,6 +20,7 @@
       >
         {{ saveText || "保存" }}
       </div>
+      <slot></slot>
     </div>
   </div>
 </template>
@@ -64,13 +65,19 @@ export default {
     async validate() {
       let validateResult = { valid: true };
       for (let i = 0; i < this.formObjectList.length; i++) {
-        let formObject = this.formObjectList[i];
-        validateResult = await formObject.formBuild.validate(
-          formObject.formData
-        );
+        validateResult = await this.validateForm(i);
         if (!validateResult.valid) {
           return validateResult;
         }
+      }
+      return validateResult;
+    },
+    async validateForm(formIndex) {
+      let validateResult = { valid: true };
+      let formObject = this.formObjectList[formIndex];
+      validateResult = await formObject.formBuild.validate(formObject.formData);
+      if (!validateResult.valid) {
+        return validateResult;
       }
       return validateResult;
     },

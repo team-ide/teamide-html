@@ -1,6 +1,9 @@
 import http from '@/server/http';
 
 let zookeeper = {
+    test(param) {
+        return http.post('api/zookeeper/test', param);
+    },
     info(param) {
         return http.post('api/zookeeper/info', param);
     },

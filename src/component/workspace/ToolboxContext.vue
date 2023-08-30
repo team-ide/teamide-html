@@ -163,13 +163,39 @@
       :source="source"
       title="新增Toolbox"
       :onSave="doInsert"
-    ></FormDialog>
+    >
+      <div class="tm-link color-blue-8 ft-14 mgt-10" @click="toTestForInsert()">
+        <span v-if="testing">测试中...</span>
+        <span v-else> 测试 </span>
+      </div>
+      <span
+        class="mgl-10 color-red"
+        v-if="testError != null"
+        style="user-select: text"
+      >
+        异常：{{ testError }}
+      </span>
+      <span class="mgl-10 color-green" v-if="testOk"> 测试成功 </span>
+    </FormDialog>
     <FormDialog
       ref="UpdateToolbox"
       :source="source"
       title="编辑Toolbox"
       :onSave="doUpdate"
-    ></FormDialog>
+    >
+      <div class="tm-link color-blue-8 ft-14 mgt-10" @click="toTestForUpdate()">
+        <span v-if="testing">测试中...</span>
+        <span v-else> 测试 </span>
+      </div>
+      <span
+        class="mgl-10 color-red"
+        v-if="testError != null"
+        style="user-select: text"
+      >
+        异常：{{ testError }}
+      </span>
+      <span class="mgl-10 color-green" v-if="testOk"> 测试成功 </span>
+    </FormDialog>
     <FormDialog
       ref="ShareToolbox"
       :source="source"
@@ -205,6 +231,9 @@ export default {
       toolboxTypes: [],
       toolboxTypeMap: {},
       toolboxGroups: [],
+      testing: false,
+      testError: null,
+      testOk: false,
     };
   },
   // 计算属性 只有依赖数据发生改变，才会重新进行计算
@@ -508,6 +537,9 @@ export default {
       }
     },
     toInsert(toolboxType, selectGroup) {
+      this.testError = null;
+      this.testOk = false;
+
       this.tool.stopEvent();
       let toolboxData = {};
       let optionsJSON = {};
@@ -616,6 +648,9 @@ export default {
       }
     },
     toCopy(toolboxType, copy) {
+      this.testError = null;
+      this.testOk = false;
+
       this.tool.stopEvent();
       let toolboxData = {};
       Object.assign(toolboxData, copy);
@@ -633,6 +668,9 @@ export default {
       });
     },
     toUpdate(toolboxType, toolboxData) {
+      this.testError = null;
+      this.testOk = false;
+
       this.tool.stopEvent();
 
       let optionsJSON = this.tool.getOptionJSON(toolboxData.option);
@@ -739,6 +777,67 @@ export default {
       }
     },
 
+    async toTestForInsert() {
+      this.toTest(
+        this.$refs.InsertToolbox.options.toolboxType,
+        this.$refs.InsertToolbox.$refs.FormBox
+      );
+    },
+    async toTestForUpdate() {
+      this.toTest(
+        this.$refs.UpdateToolbox.options.toolboxType,
+        this.$refs.UpdateToolbox.$refs.FormBox
+      );
+    },
+    async toTest(toolboxType, formBox) {
+      if (this.testing) {
+        this.tool.warn("测试中请稍后！");
+        return;
+      }
+      let validateResult = await formBox.validateForm(1);
+      if (!validateResult.valid) {
+        return;
+      }
+      this.testing = true;
+      this.testError = null;
+      this.testOk = false;
+      try {
+        let dataList = formBox.getDataList();
+        let toolboxData = Object.assign({}, dataList[0]);
+        toolboxData.toolboxToTest = "1";
+        toolboxData.toolboxType = toolboxType.name;
+
+        toolboxData.option = JSON.stringify(dataList[1]);
+        let res = { code: -1, msg: "暂不支持该工具测试" };
+        if (toolboxData.toolboxType == "database") {
+          res = await this.server.database.test(toolboxData);
+        } else if (toolboxData.toolboxType == "redis") {
+          res = await this.server.redis.test(toolboxData);
+        } else if (toolboxData.toolboxType == "zookeeper") {
+          res = await this.server.zookeeper.test(toolboxData);
+        } else if (toolboxData.toolboxType == "elasticsearch") {
+          res = await this.server.elasticsearch.test(toolboxData);
+        } else if (toolboxData.toolboxType == "kafka") {
+          res = await this.server.kafka.test(toolboxData);
+        } else if (toolboxData.toolboxType == "ssh") {
+          res = await this.server.terminal.test(toolboxData);
+        }
+        if (res.code == 0) {
+          this.testOk = true;
+          this.tool.success("测试成功");
+          return true;
+        } else {
+          this.testError = res.msg;
+          this.tool.error("测试失败：" + res.msg);
+          return false;
+        }
+      } catch (e) {
+        this.testError = e.message;
+        this.tool.error("测试失败：" + e.message);
+      } finally {
+        this.testing = false;
+      }
+    },
     toInsertGroup() {
       this.tool.stopEvent();
       let data = {};

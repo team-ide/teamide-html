@@ -18,6 +18,7 @@
       :saveText="saveText"
       :onSuccess="onSuccess"
     >
+      <slot></slot>
     </FormBox>
   </el-dialog>
 </template>
@@ -58,6 +59,7 @@ export default {
     show(options) {
       this.showDialog = true;
       options = options || {};
+      this.options = options;
 
       this.title_ = options.title;
 
