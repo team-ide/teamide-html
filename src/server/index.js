@@ -41,6 +41,9 @@ let server = {
     session(param) {
         return http.post('api/session', param);
     },
+    showPlaintext(param) {
+        return http.post('api/showPlaintext', param);
+    },
     login(param) {
         return http.post('api/login', param,);
     },

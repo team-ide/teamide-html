@@ -24,10 +24,25 @@ let cloneForm = function (form) {
 let buildFormValidator = function (form) {
     let validatorForm = cloneForm(form);
 
-
-    validatorForm.fields.forEach(field => {
+    let colNum = 0;
+    validatorForm.fields.forEach((field, index) => {
         if (isEmpty(field.name)) {
             return;
+        }
+        field.col = field.col || 12;
+        if (field.showPlaintextBtn) {
+            field.showPlaintextBtn = true;
+        } else {
+            field.showPlaintextBtn = false;
+        }
+        field.addClass = "";
+        if (field.col != 12) {
+            colNum += Number(field.col)
+            if (colNum % 12 == 0) {
+                field.addClass = 'pdl-5'
+            } else {
+                field.addClass = 'pdr-5'
+            }
         }
         field.valid = undefined;
         field.required = false;

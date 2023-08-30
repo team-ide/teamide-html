@@ -1,5 +1,5 @@
 <template>
-  <div class="form-box">
+  <div class="form-box tm-row">
     <template v-for="formObject in formObjectList">
       <div :key="formObject.key" class="form-one">
         <Form
@@ -11,10 +11,10 @@
         </Form>
       </div>
     </template>
-    <div class="">
+    <div class="tm-row">
       <div
         v-if="onSave != null"
-        class="tm-btn bg-teal-8 ft-18 pdtb-5 tm-btn-block"
+        class="tm-btn bg-teal-8 ft-18 pdtb-5 tm-btn-block mgt-5"
         :class="{ 'tm-disabled': saveBtnDisabled }"
         @click="doSave"
       >

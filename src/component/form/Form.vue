@@ -4,6 +4,7 @@
     size="mini"
     @submit.native.prevent
     :label-width="`${formBuild.labelWidth}`"
+    class="tm-row component-form-one"
   >
     <template
       v-if="
@@ -15,7 +16,22 @@
     >
       <template v-for="field in formBuild.fields">
         <template v-if="tool.isEmpty(field.vIf) || exec(field.vIf, formData)">
-          <el-form-item :key="`key-${key}-${field.name}`" :label="field.label">
+          <el-form-item
+            :key="`key-${key}-${field.name}`"
+            :class="`mgb-5 col-${field.col} ${field.addClass}`"
+            :label="field.label"
+          >
+            <label class="el-form-item__label" slot="label">
+              {{ field.label }}
+              <template v-if="field.showPlaintextBtn">
+                <div
+                  class="tm-link color-grey mgl-10"
+                  @click="showPlaintext(field, formData[field.name])"
+                >
+                  查看明文
+                </div>
+              </template>
+            </label>
             <template v-if="field.type == 'select'">
               <el-select
                 v-model="formData[field.name]"
@@ -314,6 +330,18 @@ export default {
       let validateResult = await this.form.validate(data || this.formData);
       return validateResult;
     },
+    async showPlaintext(field, text) {
+      let res = await this.server.showPlaintext({
+        text: text,
+      });
+      if (res.code != 0) {
+        this.tool.error(res.msg);
+        return;
+      }
+      this.tool.alert(res.data, {
+        title: "明文查看",
+      });
+    },
     jsonStringChange(bean) {
       let field = bean.field;
       try {
@@ -375,4 +403,14 @@ export default {
 </script>
 
 <style>
+.component-form-one {
+  user-select: text;
+}
+.component-form-one .el-form-item__label {
+  float: none;
+}
+.component-form-one .el-form-item__label::after {
+  content: "";
+  clear: both;
+}
 </style>

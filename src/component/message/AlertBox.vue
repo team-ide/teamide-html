@@ -16,11 +16,11 @@ export default {
   methods: {},
   // 在实例创建完成后被立即调用
   created() {
-    this.tool.alert = (msg, okTitle) => {
+    this.tool.alert = (msg, options) => {
       return new Promise((resolve, reject) => {
-        this.$alert(msg, "提示", {
+        this.$alert(msg, options.title || "提示", {
           dangerouslyUseHTMLString: true,
-          confirmButtonText: okTitle || "确定",
+          confirmButtonText: options.ok || "确定",
           callback: (action) => {
             resolve(action);
           },

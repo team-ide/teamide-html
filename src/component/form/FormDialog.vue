@@ -10,6 +10,7 @@
     :before-close="hide"
     :width="width || '900px'"
     top="40px"
+    style="user-select: text"
   >
     <FormBox
       :source="source"

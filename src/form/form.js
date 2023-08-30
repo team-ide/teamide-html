@@ -106,6 +106,7 @@ let toolbox = {
         {
             label: "名称",
             name: "name",
+            col: 6,
             rules: [
                 {
                     required: true,
@@ -117,6 +118,7 @@ let toolbox = {
         {
             label: "说明",
             name: "comment",
+            col: 6,
             rules: [
             ],
         },
