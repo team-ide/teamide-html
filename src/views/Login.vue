@@ -46,11 +46,11 @@
           :saveShow="false"
           class="pd-10"
         >
-          <div class="tm-row">
+          <div class="col-12">
             <el-checkbox v-model="rememberPassword">记住密码 </el-checkbox>
             <el-checkbox v-model="autoLogin">自动登录 </el-checkbox>
           </div>
-          <div class="tm-row pdtb-10">
+          <div class="pdtb-10  col-12">
             <div
               v-if="source.hasPower('login')"
               class="tm-btn bg-teal-8 ft-18 pdtb-5 tm-btn-block"

@@ -46,7 +46,7 @@
           :saveShow="false"
           class="pd-10"
         >
-          <div class="tm-row pdtb-10">
+          <div class="pdtb-10  col-12">
             <div
               v-if="source.hasPower('register')"
               class="tm-btn bg-teal-8 ft-18 pdtb-5 tm-btn-block"
