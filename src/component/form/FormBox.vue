@@ -51,7 +51,9 @@ export default {
         let formData = formBuild.newDefaultData();
         if (Object.keys(formConfig.data).length > 0) {
           for (let key in formData) {
-            formData[key] = formConfig.data[key];
+            if (formConfig.data[key] !== undefined) {
+              formData[key] = formConfig.data[key];
+            }
           }
         }
         let formObject = {};

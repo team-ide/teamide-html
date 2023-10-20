@@ -25,25 +25,46 @@ let buildFormValidator = function (form) {
     let validatorForm = cloneForm(form);
 
     let colNum = 0;
+    validatorForm.rows = []
+    let lastRow = null;
     validatorForm.fields.forEach((field, index) => {
         if (isEmpty(field.name)) {
             return;
         }
-        field.col = field.col || 12;
+        let col = Number(field.col || 24);
+        field.col = col;
         if (field.showPlaintextBtn) {
             field.showPlaintextBtn = true;
         } else {
             field.showPlaintextBtn = false;
         }
         field.addClass = "";
-        if (field.col != 12) {
-            colNum += Number(field.col)
-            if (colNum % 12 == 0) {
-                field.addClass = 'pdl-5'
-            } else {
-                field.addClass = 'pdr-5'
+        if (lastRow == null) {
+            lastRow = {
+                cols: [],
             }
+            validatorForm.rows.push(lastRow)
         }
+        colNum += col
+        if (col >= 24 || colNum == 24) {
+            colNum = 0
+            if (col < 24) {
+                field.addClass += ' pdl-5'
+            }
+            lastRow.cols.push(field)
+            lastRow = null
+        } else if (colNum > 24) {
+            lastRow = {
+                cols: [],
+            }
+            validatorForm.rows.push(lastRow)
+
+            lastRow.cols.push(field)
+        } else {
+            field.addClass += ' pdr-5'
+            lastRow.cols.push(field)
+        }
+
         field.valid = undefined;
         field.required = false;
         field.validMessage = undefined;

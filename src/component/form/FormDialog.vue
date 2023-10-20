@@ -8,7 +8,7 @@
     :append-to-body="true"
     :visible="showDialog"
     :before-close="hide"
-    :width="width || '900px'"
+    :width="width || '1000px'"
     top="40px"
     style="user-select: text"
   >

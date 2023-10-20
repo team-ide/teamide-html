@@ -14,196 +14,212 @@
         fileObjectMap != null
       "
     >
-      <template v-for="field in formBuild.fields">
-        <template v-if="tool.isEmpty(field.vIf) || exec(field.vIf, formData)">
-          <el-form-item
-            :key="`key-${key}-${field.name}`"
-            :class="`mgb-5 col-${field.col} ${field.addClass}`"
-            :label="field.label"
-          >
-            <label class="el-form-item__label" slot="label">
-              {{ field.label }}
-              <template v-if="field.showPlaintextBtn">
-                <div
-                  class="tm-link color-grey mgl-10"
-                  @click="showPlaintext(field, formData[field.name])"
+      <template v-for="(row, rowIndex) in formBuild.rows">
+        <el-row :key="`row-${key}-${rowIndex}`">
+          <template v-for="(field, fieldIndex) in row.cols">
+            <el-col
+              :key="`row-col-${key}-${rowIndex}-${fieldIndex}`"
+              :span="field.col"
+            >
+              <template
+                v-if="tool.isEmpty(field.vIf) || exec(field.vIf, formData)"
+              >
+                <el-form-item
+                  :key="`key-${key}-${field.name}`"
+                  :class="`mgb-5 ${field.addClass}`"
+                  :label="field.label"
                 >
-                  查看明文
-                </div>
-              </template>
-            </label>
-            <template v-if="field.type == 'select'">
-              <el-select
-                v-model="formData[field.name]"
-                :placeholder="field.placeholder"
-                :required="field.required"
-                style="width: 100%"
-                clearable
-                filterable
-              >
-                <el-option
-                  v-for="(one, index) in field.options ||
-                  form[field.optionsName]"
-                  :key="index"
-                  :value="one.value"
-                  :label="one.text"
-                >
-                </el-option>
-              </el-select>
-            </template>
-            <template v-else-if="field.type == 'radio'">
-              <el-radio-group v-model="formData[field.name]">
-                <el-radio
-                  v-for="(one, index) in field.options ||
-                  form[field.optionsName]"
-                  :key="index"
-                  :label="one.value"
-                  >{{ one.text }}</el-radio
-                >
-              </el-radio-group>
-            </template>
-            <template v-else-if="field.type == 'switch'">
-              <el-switch v-model="form.name"> </el-switch>
-            </template>
-            <template v-else-if="field.type == 'file'">
-              <div
-                class="ft-12 pdb-5"
-                v-if="tool.isNotEmpty(formData[field.name])"
-              >
-                <span class="color-grey">文件：</span>
-                <a
-                  class="tm-link color-green"
-                  :href="source.filesUrl + formData[field.name]"
-                >
-                  {{ formData[field.name] }}
-                </a>
-              </div>
-              <el-upload
-                :action="source.api + 'upload'"
-                :limit="1"
-                :data="{ place: 'other' }"
-                :headers="{ JWT: tool.getJWT() }"
-                name="file"
-                :on-success="fileObjectMap[field.name].success"
-                :show-file-list="false"
-              >
-                <div class="tm-link color-teal-8">点击上传</div>
-              </el-upload>
-            </template>
-            <template v-else-if="field.type == 'textarea'">
-              <el-input
-                type="textarea"
-                v-model="formData[field.name]"
-                :autosize="{ minRows: 5, maxRows: 10 }"
-                @input="valueChange(field)"
-                @change="valueChange(field)"
-              >
-              </el-input>
-            </template>
-            <template v-else-if="field.type == 'datetime'">
-              <el-date-picker
-                v-model="formData[field.name]"
-                type="datetime"
-                placeholder="选择日期时间"
-                @input="valueChange(field)"
-                @change="valueChange(field)"
-                style="width: 100%"
-              >
-              </el-date-picker>
-            </template>
-            <template v-else-if="field.type == 'json'">
-              <el-input
-                type="textarea"
-                v-model="jsonStringMap[field.name].value"
-                :autosize="{ minRows: 5, maxRows: 20 }"
-                @input="
-                  valueChange(field) &&
-                    jsonStringChange(jsonStringMap[field.name])
-                "
-                @change="
-                  valueChange(field) &&
-                    jsonStringChange(jsonStringMap[field.name])
-                "
-              >
-              </el-input>
-            </template>
-            <template v-else-if="field.type == 'list'">
-              <el-table :data="listObjectMap[field.name].list">
-                <template
-                  v-for="(listField, listFieldIndex) in listObjectMap[
-                    field.name
-                  ].fields"
-                >
-                  <el-table-column
-                    :key="listFieldIndex"
-                    :label="listField.label"
-                    fixed
-                  >
-                    <template slot-scope="scope">
-                      <el-input
-                        v-model="scope.row[listField.name]"
-                        type="text"
-                      />
+                  <label class="el-form-item__label" slot="label">
+                    {{ field.label }}
+                    <template v-if="field.showPlaintextBtn">
+                      <div
+                        class="tm-link color-grey mgl-10"
+                        @click="showPlaintext(field, formData[field.name])"
+                      >
+                        查看明文
+                      </div>
                     </template>
-                  </el-table-column>
-                </template>
-                <el-table-column label="操作" width="200px">
-                  <template slot="header" s>
-                    <div
-                      class="tm-link color-green mgl-10"
-                      @click="listObjectMap[field.name].add({})"
+                  </label>
+                  <template v-if="field.type == 'select'">
+                    <el-select
+                      v-model="formData[field.name]"
+                      :placeholder="field.placeholder"
+                      :required="field.required"
+                      style="width: 100%"
+                      clearable
+                      filterable
                     >
-                      新增
-                    </div>
+                      <el-option
+                        v-for="(one, index) in field.options ||
+                        form[field.optionsName]"
+                        :key="index"
+                        :value="one.value"
+                        :label="one.text"
+                      >
+                      </el-option>
+                    </el-select>
                   </template>
-                  <template slot-scope="scope">
-                    <div
-                      class="tm-link color-grey mglr-5"
-                      @click="listObjectMap[field.name].up(scope.row)"
-                    >
-                      上移
-                    </div>
-                    <div
-                      class="tm-link color-grey mglr-5"
-                      @click="listObjectMap[field.name].down(scope.row)"
-                    >
-                      下移
-                    </div>
-                    <div
-                      class="tm-link color-red mglr-5"
-                      @click="listObjectMap[field.name].remove(scope.row)"
-                    >
-                      删除
-                    </div>
+                  <template v-else-if="field.type == 'radio'">
+                    <el-radio-group v-model="formData[field.name]">
+                      <el-radio
+                        v-for="(one, index) in field.options ||
+                        form[field.optionsName]"
+                        :key="index"
+                        :label="one.value"
+                        >{{ one.text }}</el-radio
+                      >
+                    </el-radio-group>
                   </template>
-                </el-table-column>
-              </el-table>
-            </template>
-            <template v-else-if="field.type == 'jsonView'">
-              <el-input
-                type="textarea"
-                v-model="jsonViewMap[field.bindName].value"
-                :autosize="{ minRows: 5, maxRows: 20 }"
-              >
-              </el-input>
-            </template>
-            <template v-else>
-              <el-input
-                v-model="formData[field.name]"
-                :type="field.type"
-                :placeholder="field.placeholder"
-                :required="field.required"
-                autocomplete="new-password"
-                @input="valueChange(field)"
-                @change="valueChange(field)"
-              >
-              </el-input>
-            </template>
-            <div class="color-red" v-if="field.validMessage">
-              {{ field.validMessage }}
-            </div>
-          </el-form-item>
-        </template>
+                  <template v-else-if="field.type == 'switch'">
+                    <el-switch v-model="formData[field.name]"> </el-switch>
+                  </template>
+                  <template v-else-if="field.type == 'file'">
+                    <div
+                      class="ft-12 pdb-5"
+                      v-if="tool.isNotEmpty(formData[field.name])"
+                    >
+                      <span class="color-grey">文件：</span>
+                      <a
+                        class="tm-link color-green"
+                        :href="source.filesUrl + formData[field.name]"
+                      >
+                        {{ formData[field.name] }}
+                      </a>
+                    </div>
+                    <el-upload
+                      :action="source.api + 'upload'"
+                      :limit="1"
+                      :data="{ place: 'other' }"
+                      :headers="{ JWT: tool.getJWT() }"
+                      name="file"
+                      :on-success="fileObjectMap[field.name].success"
+                      :show-file-list="false"
+                    >
+                      <div class="tm-link color-teal-8">点击上传</div>
+                    </el-upload>
+                  </template>
+                  <template v-else-if="field.type == 'textarea'">
+                    <el-input
+                      type="textarea"
+                      v-model="formData[field.name]"
+                      :autosize="{ minRows: 5, maxRows: 10 }"
+                      @input="valueChange(field)"
+                      @change="valueChange(field)"
+                    >
+                    </el-input>
+                  </template>
+                  <template v-else-if="field.type == 'datetime'">
+                    <el-date-picker
+                      v-model="formData[field.name]"
+                      type="datetime"
+                      placeholder="选择日期时间"
+                      @input="valueChange(field)"
+                      @change="valueChange(field)"
+                      style="width: 100%"
+                    >
+                    </el-date-picker>
+                  </template>
+                  <template v-else-if="field.type == 'json'">
+                    <el-input
+                      type="textarea"
+                      v-model="jsonStringMap[field.name].value"
+                      :autosize="{ minRows: 5, maxRows: 20 }"
+                      @input="
+                        valueChange(field) &&
+                          jsonStringChange(jsonStringMap[field.name])
+                      "
+                      @change="
+                        valueChange(field) &&
+                          jsonStringChange(jsonStringMap[field.name])
+                      "
+                    >
+                    </el-input>
+                  </template>
+                  <template v-else-if="field.type == 'list'">
+                    <el-table :data="listObjectMap[field.name].list">
+                      <template
+                        v-for="(listField, listFieldIndex) in listObjectMap[
+                          field.name
+                        ].fields"
+                      >
+                        <el-table-column
+                          :key="listFieldIndex"
+                          :label="listField.label"
+                          fixed
+                        >
+                          <template slot-scope="scope">
+                            <el-input
+                              v-model="scope.row[listField.name]"
+                              type="text"
+                            />
+                          </template>
+                        </el-table-column>
+                      </template>
+                      <el-table-column label="操作" width="200px">
+                        <template slot="header" s>
+                          <div
+                            class="tm-link color-green mgl-10"
+                            @click="listObjectMap[field.name].add({})"
+                          >
+                            新增
+                          </div>
+                        </template>
+                        <template slot-scope="scope">
+                          <div
+                            class="tm-link color-grey mglr-5"
+                            @click="listObjectMap[field.name].up(scope.row)"
+                          >
+                            上移
+                          </div>
+                          <div
+                            class="tm-link color-grey mglr-5"
+                            @click="listObjectMap[field.name].down(scope.row)"
+                          >
+                            下移
+                          </div>
+                          <div
+                            class="tm-link color-red mglr-5"
+                            @click="listObjectMap[field.name].remove(scope.row)"
+                          >
+                            删除
+                          </div>
+                        </template>
+                      </el-table-column>
+                    </el-table>
+                  </template>
+                  <template v-else-if="field.type == 'jsonView'">
+                    <el-input
+                      type="textarea"
+                      v-model="jsonViewMap[field.bindName].value"
+                      :autosize="{ minRows: 5, maxRows: 20 }"
+                    >
+                    </el-input>
+                  </template>
+                  <template v-else>
+                    <el-input
+                      v-model="formData[field.name]"
+                      :type="field.type"
+                      :placeholder="field.placeholder"
+                      :required="field.required"
+                      autocomplete="new-password"
+                      @input="valueChange(field)"
+                      @change="valueChange(field)"
+                    >
+                    </el-input>
+                  </template>
+                  <div class="color-red" v-if="field.validMessage">
+                    {{ field.validMessage }}
+                  </div>
+                </el-form-item>
+                <div
+                  :key="`key-row-${key}-${field.name}`"
+                  v-if="field.isRowEnd"
+                  class="tm-row"
+                ></div>
+              </template>
+            </el-col>
+          </template>
+        </el-row>
       </template>
     </template>
     <slot></slot>

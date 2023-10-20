@@ -18,6 +18,8 @@ const newWorker = function (workerOption) {
         cols: 100,
         isUploading: false,
         isDownloading: false,
+        lastUser: null,
+        lastDir: null,
         init() {
             this.build()
         },
@@ -81,6 +83,12 @@ const newWorker = function (workerOption) {
             url += "&workerId=" + encodeURIComponent(worker.workerId);
             url += "&cols=" + worker.cols;
             url += "&rows=" + worker.rows;
+            if (tool.isNotEmpty(this.lastUser)) {
+                url += "&lastUser=" + this.lastUser;
+            }
+            if (tool.isNotEmpty(this.lastDir)) {
+                url += "&lastDir=" + this.lastDir;
+            }
             let socket = new WebSocket(url);
             worker.socket = socket;
 
@@ -169,6 +177,13 @@ const newWorker = function (workerOption) {
         },
         async newKey() {
             let param = worker.getParam();
+
+            if (tool.isNotEmpty(this.lastUser)) {
+                param.lastUser = this.lastUser;
+            }
+            if (tool.isNotEmpty(this.lastDir)) {
+                param.lastDir = this.lastDir;
+            }
             let res = await server.terminal.key(param);
             if (res.code != 0) {
                 tool.error(res.msg);

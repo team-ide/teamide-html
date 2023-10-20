@@ -68,6 +68,18 @@
           <div class="ft-12 tm-link color-grey mglr-5" @click="openLogs()">
             终端历史记录
           </div>
+          <span
+            v-if="tool.isNotEmpty(worker.lastUser)"
+            class="mgl-10 ft-12 color-orange"
+            style="user-select: text"
+            >用户：{{ worker.lastUser }}</span
+          >
+          <span
+            v-if="tool.isNotEmpty(worker.lastDir)"
+            class="mgl-10 ft-12 color-orange"
+            style="user-select: text"
+            >目录：{{ worker.lastDir }}</span
+          >
         </div>
       </tm-layout>
     </tm-layout>
@@ -246,6 +258,10 @@ export default {
   },
   methods: {
     async init() {
+      if (this.extend) {
+        this.worker.lastUser = this.extend.lastUser;
+        this.worker.lastDir = this.extend.lastDir;
+      }
       this.$nextTick(() => {
         this.initTerm();
         this.worker.init();
@@ -526,6 +542,48 @@ export default {
           this.worker.sendDataToWS(data);
         }
       });
+      // this.term.onBell((arg1, arg2, arg3) => {
+      //   console.log("onBell:", arg1, arg2, arg3);
+      // });
+      this.term.onTitleChange((title) => {
+        if (this.tool.isEmpty(title)) {
+          return;
+        }
+        let ss = title.split("@");
+        if (ss.length != 2) {
+          return;
+        }
+        let user = ss[0].trim();
+        ss = ss[1].split(":");
+        if (ss.length != 2) {
+          return;
+        }
+        let dir = ss[1].trim();
+        if (this.tool.isEmpty(user) || this.tool.isEmpty(dir)) {
+          return;
+        }
+        if (this.worker.lastUser == user && this.worker.lastDir == dir) {
+          return;
+        }
+        this.worker.lastUser = user;
+        this.worker.lastDir = dir;
+        var keyValueMap = {};
+        keyValueMap["lastUser"] = user;
+        keyValueMap["lastDir"] = dir;
+        this.toolboxWorker.updateExtend(keyValueMap);
+      });
+      // this.term.onLineFeed((arg1, arg2, arg3) => {
+      //   console.log("onLineFeed:", arg1, arg2, arg3);
+      // });
+      // this.term.onCursorMove((arg1, arg2, arg3) => {
+      //   console.log("onCursorMove:", arg1, arg2, arg3);
+      // });
+      // this.term.onWriteParsed((arg1, arg2, arg3) => {
+      //   console.log("onWriteParsed:", arg1, arg2, arg3);
+      // });
+      // this.term.onRender((arg1, arg2, arg3) => {
+      //   console.log("onRender:", arg1, arg2, arg3);
+      // });
       this.term.onBinary((data) => {
         if (this.checkIsExit(data)) {
           this.worker.sendDataToWS(data);
@@ -592,6 +650,7 @@ export default {
         this.onContextmenu,
         true
       );
+      window.term = this.term;
     },
     pasteEventListener(ev) {
       // console.log("pasteEventListener", ev);
