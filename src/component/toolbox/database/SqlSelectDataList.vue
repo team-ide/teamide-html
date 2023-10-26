@@ -22,6 +22,20 @@
                 </span>
               </span>
             </template>
+            <template v-if="item.dataList != null">
+              <span class="">
+                查询行数:
+                <span class="color-green pdlr-5">
+                  {{ item.dataSize }}
+                </span>
+              </span>
+              <span v-if="item.showDataMaxSize > 0">
+                最大展示行数:
+                <span class="color-green pdlr-5">
+                  {{ item.showDataMaxSize }}
+                </span>
+              </span>
+            </template>
             <span>
               耗时:
               <span class="pdlr-5">{{ item.useTime }}毫秒</span>

@@ -1,15 +1,15 @@
 <template>
   <div class="toolbox-database-sql">
     <tm-layout height="100%">
-      <tm-layout height="50px" class="" style="overflow: hidden">
+      <tm-layout height="80px" class="">
         <el-form
-          class="pdt-10 pdl-10"
+          class="pdt-5 pdl-10"
           ref="form"
           :model="form"
           size="mini"
           inline
         >
-          <el-form-item label="数据库">
+          <el-form-item label="数据库" class="mgb-5">
             <el-select v-model="form.ownerName" style="width: 150px" filterable>
               <el-option value="" label="不选中库|模式"> </el-option>
               <el-option
@@ -21,17 +21,17 @@
               </el-option>
             </el-select>
           </el-form-item>
-          <el-form-item label="开启事务">
+          <el-form-item label="开启事务" class="mgb-5">
             <el-switch v-model="form.openTransaction"> </el-switch>
           </el-form-item>
-          <el-form-item label="异常继续">
+          <el-form-item label="异常继续" class="mgb-5">
             <el-switch v-model="form.errorContinue"> </el-switch>
           </el-form-item>
-          <el-form-item label="用户名" title="可以指定执行用户">
+          <el-form-item label="用户名" class="mgb-5" title="可以指定执行用户">
             <el-input v-model="form.execUsername" style="width: 80px">
             </el-input>
           </el-form-item>
-          <el-form-item label="密码" title="可以指定执行用户密码">
+          <el-form-item label="密码" class="mgb-5" title="可以指定执行用户密码">
             <el-input
               type="password"
               v-model="form.execPassword"
@@ -40,18 +40,28 @@
             >
             </el-input>
           </el-form-item>
-          <div
-            class="mgt-2 tm-btn tm-btn-sm bg-green ft-13"
-            @click="toExecuteSql"
+          <el-form-item
+            label="最大展示行数"
+            class="mgb-5"
+            title="指定前端最大数据展示行数，超出的数据将被忽略"
           >
-            执行
-          </div>
-          <div
-            class="mgt-2 tm-btn tm-btn-sm bg-blue ft-13"
-            @click="toExecuteSelectSql"
-          >
-            执行选中
-          </div>
+            <el-input v-model="form.showDataMaxSize" style="width: 60px">
+            </el-input>
+          </el-form-item>
+          <el-form-item label="" class="mgb-5">
+            <div
+              class="mgt-2 tm-btn tm-btn-sm bg-green ft-13"
+              @click="toExecuteSql"
+            >
+              执行
+            </div>
+            <div
+              class="mgt-2 tm-btn tm-btn-sm bg-blue ft-13"
+              @click="toExecuteSelectSql"
+            >
+              执行选中
+            </div>
+          </el-form-item>
         </el-form>
       </tm-layout>
       <tm-layout height="300px" class="" style="overflow: hidden">
@@ -109,7 +119,13 @@
                             <span class="">
                               查询行数:
                               <span class="color-green pdlr-5">
-                                {{ one.dataList.length }}
+                                {{ one.dataSize }}
+                              </span>
+                            </span>
+                            <span v-if="one.showDataMaxSize > 0">
+                              最大展示行数:
+                              <span class="color-green pdlr-5">
+                                {{ one.showDataMaxSize }}
                               </span>
                             </span>
                           </template>
@@ -164,6 +180,7 @@ export default {
         errorContinue: false,
         execUsername: null,
         execPassword: null,
+        showDataMaxSize: 500,
       },
       executeList: [],
     };
@@ -243,6 +260,8 @@ export default {
     },
     async doExecuteSql(executeSQL) {
       let param = this.toolboxWorker.getWorkParam(Object.assign({}, this.form));
+      param.showDataMaxSize = Number(param.showDataMaxSize);
+      let showDataMaxSize = param.showDataMaxSize;
 
       param.executeSQL = executeSQL;
       let res = await this.server.database.executeSQL(param);
@@ -255,9 +274,9 @@ export default {
         this.tool.error(data.error);
       }
       this.executeList = data.executeList || [];
-      this.initExecuteList();
+      this.initExecuteList(showDataMaxSize);
     },
-    initExecuteList() {
+    initExecuteList(showDataMaxSize) {
       this.cleanTab();
       this.addExecuteListTab();
       let selectIndex = 0;
@@ -265,6 +284,7 @@ export default {
         one.executeIndex = index;
         if (one.isSelect && one.error == null) {
           one.selectIndex = selectIndex;
+          one.showDataMaxSize = showDataMaxSize;
           this.addExecuteSelectTab(one);
           selectIndex++;
         }
@@ -283,7 +303,7 @@ export default {
     addExecuteSelectTab(executeData) {
       executeData.dataList = executeData.dataList || [];
       let title = `第${executeData.selectIndex + 1}条查询结果（${
-        executeData.dataList.length
+        executeData.dataSize
       }条记录）`;
       let tab = {
         sql: executeData.sql,
@@ -297,6 +317,8 @@ export default {
       tab.isSelect = true;
       tab.columnList = executeData.columnList || [];
       tab.dataList = executeData.dataList;
+      tab.showDataMaxSize = executeData.showDataMaxSize;
+      tab.dataSize = executeData.dataSize;
       this.addTab(tab);
       this.doActiveTab(tab);
     },
