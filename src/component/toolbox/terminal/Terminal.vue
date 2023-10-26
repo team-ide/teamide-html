@@ -68,6 +68,9 @@
           <div class="ft-12 tm-link color-grey mglr-5" @click="openLogs()">
             终端历史记录
           </div>
+          <div class="ft-12 tm-link color-grey mglr-5" @click="reconnect()">
+            重新连接
+          </div>
           <span
             v-if="tool.isNotEmpty(worker.lastUser)"
             class="mgl-10 ft-12 color-orange"
@@ -524,6 +527,7 @@ export default {
       this.term.setBindKeysAfter(this.bindKeysAfter);
 
       this.fitAddon = new FitAddon();
+      // window.term = this.term;
       this.term.loadAddon(this.fitAddon);
 
       this.canvasAddon = new CanvasAddon();
@@ -562,15 +566,52 @@ export default {
         if (this.tool.isEmpty(user) || this.tool.isEmpty(dir)) {
           return;
         }
-        if (this.worker.lastUser == user && this.worker.lastDir == dir) {
+        if (this.worker.userAndDirReadyIng) {
           return;
         }
-        this.worker.lastUser = user;
-        this.worker.lastDir = dir;
-        var keyValueMap = {};
-        keyValueMap["lastUser"] = user;
-        keyValueMap["lastDir"] = dir;
-        this.toolboxWorker.updateExtend(keyValueMap);
+        if (this.worker.lastUser == user && this.worker.lastDir == dir) {
+          this.worker.userAndDirReady = true;
+          return;
+        }
+        if (!this.worker.userAndDirReady) {
+          this.worker.userAndDirReadyIng = true;
+          this.worker.userAndDirReady = true;
+          let command = ``;
+          let lastUser = this.worker.lastUser;
+          let lastDir = this.worker.lastDir;
+          if (this.tool.isNotEmpty(lastUser) && lastUser != user) {
+            if (user != "root") {
+              command += "sudo -i" + "\n";
+            }
+            if (lastUser != "root") {
+              command += "su " + lastUser + "\n";
+            }
+          }
+          if (this.tool.isNotEmpty(lastDir) && lastDir != dir) {
+            command += "cd " + lastDir + "\n";
+          }
+          if (this.tool.isEmpty(lastUser)) {
+            this.worker.lastUser = user;
+          }
+          if (this.tool.isEmpty(lastDir)) {
+            this.worker.lastDir = dir;
+          }
+          if (command != "") {
+            this.worker.sendDataToWS(command);
+            window.setTimeout(() => {
+              delete this.worker.userAndDirReadyIng;
+            }, 1000);
+          } else {
+            delete this.worker.userAndDirReadyIng;
+          }
+        } else {
+          this.worker.lastUser = user;
+          this.worker.lastDir = dir;
+          var keyValueMap = {};
+          keyValueMap["lastUser"] = user;
+          keyValueMap["lastDir"] = dir;
+          this.toolboxWorker.updateExtend(keyValueMap);
+        }
       });
       // this.term.onLineFeed((arg1, arg2, arg3) => {
       //   console.log("onLineFeed:", arg1, arg2, arg3);
@@ -610,6 +651,7 @@ export default {
         .height();
 
       this.changeSizeTimer();
+
       // this.xtermRows = box.getElementsByClassName("xterm-rows")[0];
     },
     bindKeysBefore() {
@@ -720,6 +762,10 @@ export default {
     onSocketOpen() {
       // const attachAddon = new AttachAddon(this.worker.socket);
       // this.term.loadAddon(attachAddon);
+    },
+    reconnect() {
+      this.term.write("\r\n终端会话连接中，请稍后！\r\n");
+      this.worker.refresh();
     },
     onSocketClose() {
       if (this.isDestroyed) {
@@ -910,10 +956,12 @@ export default {
   },
   beforeDestroy() {
     this.isDestroyed = true;
-    this.worker.close();
     if (this.term != null) {
-      this.term.dispose();
+      try {
+        this.term.dispose();
+      } catch (e) {}
     }
+    this.worker.close();
     this.term = null;
     this.worker = null;
   },
