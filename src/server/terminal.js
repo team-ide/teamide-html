@@ -7,8 +7,8 @@ let terminal = {
     key(param) {
         return http.post('api/terminal/key', param);
     },
-    test(param) {
-        return http.post('api/terminal/test', param);
+    check(param) {
+        return http.post('api/terminal/check', param);
     },
     changeSize(param) {
         return http.post('api/terminal/changeSize', param);

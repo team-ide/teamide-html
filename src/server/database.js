@@ -1,8 +1,8 @@
 import http from '@/server/http';
 
 let database = {
-    test(param) {
-        return http.post('api/database/test', param);
+    check(param) {
+        return http.post('api/database/check', param);
     },
     info(param) {
         return http.post('api/database/info', param);
@@ -84,6 +84,24 @@ let database = {
     },
     close(param) {
         return http.post('api/database/close', param);
+    },
+
+    test: {
+        start(param) {
+            return http.post('api/database/test/start', param);
+        },
+        info(param) {
+            return http.post('api/database/test/info', param);
+        },
+        stop(param) {
+            return http.post('api/database/test/stop', param);
+        },
+        list(param) {
+            return http.post('api/database/test/list', param);
+        },
+        delete(param) {
+            return http.post('api/database/test/delete', param);
+        },
     },
 };
 

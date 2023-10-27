@@ -165,17 +165,17 @@
       :onSave="doInsert"
     >
       <div class="tm-link color-blue-8 ft-14 mgt-10" @click="toTestForInsert()">
-        <span v-if="testing">测试中...</span>
+        <span v-if="checking">测试中...</span>
         <span v-else> 测试 </span>
       </div>
       <span
         class="mgl-10 color-red"
-        v-if="testError != null"
+        v-if="checkError != null"
         style="user-select: text"
       >
-        异常：{{ testError }}
+        异常：{{ checkError }}
       </span>
-      <span class="mgl-10 color-green" v-if="testOk"> 测试成功 </span>
+      <span class="mgl-10 color-green" v-if="checkOk"> 测试成功 </span>
     </FormDialog>
     <FormDialog
       ref="UpdateToolbox"
@@ -184,17 +184,17 @@
       :onSave="doUpdate"
     >
       <div class="tm-link color-blue-8 ft-14 mgt-10" @click="toTestForUpdate()">
-        <span v-if="testing">测试中...</span>
+        <span v-if="checking">测试中...</span>
         <span v-else> 测试 </span>
       </div>
       <span
         class="mgl-10 color-red"
-        v-if="testError != null"
+        v-if="checkError != null"
         style="user-select: text"
       >
-        异常：{{ testError }}
+        异常：{{ checkError }}
       </span>
-      <span class="mgl-10 color-green" v-if="testOk"> 测试成功 </span>
+      <span class="mgl-10 color-green" v-if="checkOk"> 测试成功 </span>
     </FormDialog>
     <FormDialog
       ref="ShareToolbox"
@@ -231,9 +231,9 @@ export default {
       toolboxTypes: [],
       toolboxTypeMap: {},
       toolboxGroups: [],
-      testing: false,
-      testError: null,
-      testOk: false,
+      checking: false,
+      checkError: null,
+      checkOk: false,
     };
   },
   // 计算属性 只有依赖数据发生改变，才会重新进行计算
@@ -537,8 +537,8 @@ export default {
       }
     },
     toInsert(toolboxType, selectGroup) {
-      this.testError = null;
-      this.testOk = false;
+      this.checkError = null;
+      this.checkOk = false;
 
       this.tool.stopEvent();
       let toolboxData = {};
@@ -648,8 +648,8 @@ export default {
       }
     },
     toCopy(toolboxType, copy) {
-      this.testError = null;
-      this.testOk = false;
+      this.checkError = null;
+      this.checkOk = false;
 
       this.tool.stopEvent();
       let toolboxData = {};
@@ -668,8 +668,8 @@ export default {
       });
     },
     toUpdate(toolboxType, toolboxData) {
-      this.testError = null;
-      this.testOk = false;
+      this.checkError = null;
+      this.checkOk = false;
 
       this.tool.stopEvent();
 
@@ -790,7 +790,7 @@ export default {
       );
     },
     async toTest(toolboxType, formBox) {
-      if (this.testing) {
+      if (this.checking) {
         this.tool.warn("测试中请稍后！");
         return;
       }
@@ -798,9 +798,9 @@ export default {
       if (!validateResult.valid) {
         return;
       }
-      this.testing = true;
-      this.testError = null;
-      this.testOk = false;
+      this.checking = true;
+      this.checkError = null;
+      this.checkOk = false;
       try {
         let dataList = formBox.getDataList();
         let toolboxData = Object.assign({}, dataList[0]);
@@ -810,32 +810,32 @@ export default {
         toolboxData.option = JSON.stringify(dataList[1]);
         let res = { code: -1, msg: "暂不支持该工具测试" };
         if (toolboxData.toolboxType == "database") {
-          res = await this.server.database.test(toolboxData);
+          res = await this.server.database.check(toolboxData);
         } else if (toolboxData.toolboxType == "redis") {
-          res = await this.server.redis.test(toolboxData);
+          res = await this.server.redis.check(toolboxData);
         } else if (toolboxData.toolboxType == "zookeeper") {
-          res = await this.server.zookeeper.test(toolboxData);
+          res = await this.server.zookeeper.check(toolboxData);
         } else if (toolboxData.toolboxType == "elasticsearch") {
-          res = await this.server.elasticsearch.test(toolboxData);
+          res = await this.server.elasticsearch.check(toolboxData);
         } else if (toolboxData.toolboxType == "kafka") {
-          res = await this.server.kafka.test(toolboxData);
+          res = await this.server.kafka.check(toolboxData);
         } else if (toolboxData.toolboxType == "ssh") {
-          res = await this.server.terminal.test(toolboxData);
+          res = await this.server.terminal.check(toolboxData);
         }
         if (res.code == 0) {
-          this.testOk = true;
+          this.checkOk = true;
           this.tool.success("测试成功");
           return true;
         } else {
-          this.testError = res.msg;
+          this.checkError = res.msg;
           this.tool.error("测试失败：" + res.msg);
           return false;
         }
       } catch (e) {
-        this.testError = e.message;
+        this.checkError = e.message;
         this.tool.error("测试失败：" + e.message);
       } finally {
-        this.testing = false;
+        this.checking = false;
       }
     },
     toInsertGroup() {

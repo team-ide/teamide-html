@@ -1,8 +1,8 @@
 import http from '@/server/http';
 
 let redis = {
-    test(param) {
-        return http.post('api/redis/test', param);
+    check(param) {
+        return http.post('api/redis/check', param);
     },
     info(param) {
         return http.post('api/redis/info', param);

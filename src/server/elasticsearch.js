@@ -1,8 +1,8 @@
 import http from '@/server/http';
 
 let elasticsearch = {
-    test(param) {
-        return http.post('api/elasticsearch/test', param);
+    check(param) {
+        return http.post('api/elasticsearch/check', param);
     },
     info(param) {
         return http.post('api/elasticsearch/info', param);
