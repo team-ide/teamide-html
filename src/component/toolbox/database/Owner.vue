@@ -2,7 +2,7 @@
   <div class="toolbox-database-owner">
     <template v-if="ready">
       <tm-layout height="100%">
-        <tm-layout height="50px">
+        <tm-layout height="80px">
           <div class="pdlr-10 pdt-10">
             <div class="tm-btn tm-btn-xs bg-grey-6" @click="refresh">刷新</div>
             <div class="tm-btn tm-btn-xs bg-teal-8" @click="toOwnerCreate">
@@ -11,8 +11,11 @@
             <div class="tm-btn tm-btn-xs bg-green" @click="toOpenSql">
               新建查询
             </div>
+            <div class="tm-btn tm-btn-xs bg-blue-8" @click="toTest()">
+              性能测试
+            </div>
             <div
-              class="tm-btn tm-btn-xs bg-grey"
+              class="tm-btn tm-btn-xs bg-teal-6"
               @click="toolboxWorker.showInfo()"
             >
               信息
@@ -227,6 +230,22 @@ export default {
         this.toolboxWorker.openTabByExtend(extend);
       }
     },
+    toTest(data) {
+      let extend = {
+        name: "测试",
+        title: "测试",
+        type: "test",
+      };
+      if (data) {
+        if (data.isOwner) {
+          extend.ownerName = data.ownerName;
+        } else if (data.isTable) {
+          extend.ownerName = data.owner.ownerName;
+          extend.tableName = data.tableName;
+        }
+      }
+      this.toolboxWorker.openTabByExtend(extend);
+    },
     nodeClick(data, node, nodeView) {
       let nowTime = new Date().getTime();
       let clickTime = node.clickTime;
@@ -373,6 +392,12 @@ export default {
             } else {
               this.tool.warn("复制失败，请允许访问剪贴板！");
             }
+          },
+        });
+        menus.push({
+          text: "性能测试",
+          onClick: () => {
+            this.toTest(data);
           },
         });
         menus.push({
