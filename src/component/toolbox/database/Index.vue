@@ -33,6 +33,20 @@
       <Table :source="source" :toolboxWorker="toolboxWorker"> </Table>
     </template>
     <ShowInfo :source="source" :toolboxWorker="toolboxWorker"> </ShowInfo>
+
+    <SqlProfile
+      ref="SqlProfile"
+      :source="source"
+      :toolboxWorker="toolboxWorker"
+      :getRowMenus="getRowMenus"
+    >
+    </SqlProfile>
+
+    <DataListExport
+      ref="DataListExport"
+      :source="source"
+      :toolboxWorker="toolboxWorker"
+    ></DataListExport>
   </div>
 </template>
 
@@ -44,6 +58,8 @@ import TableDataListExecSql from "./TableDataListExecSql";
 import TableDataListSql from "./TableDataListSql";
 import OwnerCreate from "./OwnerCreate";
 import ShowInfo from "./ShowInfo";
+import SqlProfile from "./SqlProfile";
+import DataListExport from "./DataListExport";
 
 export default {
   components: {
@@ -53,6 +69,8 @@ export default {
     TableDataListSql,
     OwnerCreate,
     ShowInfo,
+    SqlProfile,
+    DataListExport,
   },
   props: ["source", "toolboxWorker", "extend"],
   data() {
@@ -71,8 +89,66 @@ export default {
       this.toolboxWorker.columnIsDate = this.columnIsDate;
       this.toolboxWorker.formatDateColumn = this.formatDateColumn;
       this.toolboxWorker.formatParam = this.formatParam;
+      this.toolboxWorker.showSqlProfile = this.showSqlProfile;
+      this.toolboxWorker.getRowMenus = this.getRowMenus;
+      this.toolboxWorker.showDataListExport = this.showDataListExport;
       await this.loadData();
       this.ready = true;
+    },
+    getRowMenus(row, column, event) {
+      let menus = [];
+
+      if (column) {
+        menus.push({
+          text: "查看列数据",
+          onClick: () => {
+            this.tool.showJSONData(row[column.name]);
+          },
+        });
+      }
+      menus.push({
+        text: "查看行数据",
+        onClick: () => {
+          this.tool.showJSONData(row);
+        },
+      });
+
+      if (row) {
+        let ownerName = "ownerName";
+        let dataList = [Object.assign({}, row)];
+        let tableDetail = {
+          tableName: "tableName",
+          columnList: [],
+        };
+
+        for (let name in row) {
+          tableDetail.columnList.push({
+            columnName: name,
+          });
+        }
+        menus.push({
+          text: "查看SQL",
+          onClick: () => {
+            this.toolboxWorker.showTableDataListSql(
+              ownerName,
+              tableDetail,
+              dataList
+            );
+          },
+        });
+      }
+
+      return menus;
+    },
+    showDataListExport(options) {
+      this.$refs.DataListExport.show(options);
+    },
+    showSqlProfile(data) {
+      if (data == null || data.profiling == null) {
+        this.tool.warn("Sql Profile数据不存在");
+        return;
+      }
+      this.$refs.SqlProfile.show(data);
     },
     async loadData() {
       let param = this.toolboxWorker.getWorkParam({});

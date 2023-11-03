@@ -133,6 +133,14 @@
                             耗时:
                             <span class="pdlr-5">{{ one.useTime }}毫秒</span>
                           </span>
+                          <template v-if="one.profiling != null">
+                            <span
+                              class="pdlr-5 tm-link color-orange"
+                              @click="toolboxWorker.showSqlProfile(one)"
+                            >
+                              查看SQL Profile
+                            </span>
+                          </template>
                         </div>
                       </template>
                     </div>
@@ -288,7 +296,6 @@ export default {
           this.addExecuteSelectTab(one);
           selectIndex++;
         }
-        this.addExecuteProfileTab(one);
       });
     },
     addExecuteListTab() {
@@ -319,48 +326,9 @@ export default {
       tab.dataList = executeData.dataList;
       tab.showDataMaxSize = executeData.showDataMaxSize;
       tab.dataSize = executeData.dataSize;
+      tab.profiling = executeData.profiling;
       this.addTab(tab);
       this.doActiveTab(tab);
-    },
-    addExecuteProfileTab(executeData) {
-      let profiling = executeData.profiling;
-      if (profiling == null) {
-        return;
-      }
-      let title = `第${executeData.executeIndex + 1}条SQL Profile`;
-      let tab = {
-        sql: executeData.sql,
-        error: executeData.error,
-        rowsAffected: executeData.rowsAffected,
-        useTime: executeData.useTime,
-      };
-      tab.key = "profile-" + this.tool.getNumber();
-      tab.title = title;
-      tab.name = title;
-      tab.isSelect = true;
-
-      let columnList = [];
-      let dataList = [];
-      if (profiling.profilesDataList) {
-        profiling.profilesDataList.forEach((one) => {
-          // if (one.Query != executeData.sql) {
-          //   console.log("query:", one.Query);
-          //   console.log("sql:", executeData.sql);
-          //   return;
-          // }
-          if (one.profileColumnList) {
-            columnList = one.profileColumnList;
-          }
-          if (one.profileDataList) {
-            one.profileDataList.forEach((data) => {
-              dataList.push(data);
-            });
-          }
-        });
-      }
-      tab.columnList = columnList;
-      tab.dataList = dataList;
-      this.addTab(tab);
     },
     getTab(tab) {
       return this.sqlItemsWorker.getItem(tab);

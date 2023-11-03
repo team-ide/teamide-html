@@ -40,6 +40,14 @@
               耗时:
               <span class="pdlr-5">{{ item.useTime }}毫秒</span>
             </span>
+            <template v-if="item.profiling != null">
+              <span
+                class="pdlr-5 tm-link color-orange"
+                @click="toolboxWorker.showSqlProfile(item)"
+              >
+                查看SQL Profile
+              </span>
+            </template>
           </div>
         </template>
       </div>
@@ -68,54 +76,27 @@ export default {
       options.showSize = 50;
       options.dataList = this.item.dataList;
       options.columnList = this.item.columnList;
-      options.getRowMenus = this.getRowMenus;
+
+      let dataList = options.dataList;
+      let columnList = options.columnList;
+      options.getRowMenus = (arg1, arg2, arg3) => {
+        let menus = this.toolboxWorker.getRowMenus(arg1, arg2, arg3);
+        if (dataList.length > 0) {
+          menus.push({
+            text: "数据导出",
+            onClick: () => {
+              this.toolboxWorker.showDataListExport({
+                dataList: dataList,
+                columnList: columnList,
+              });
+            },
+          });
+        }
+        return menus;
+      };
       this.$nextTick(() => {
         this.$refs.DataTable.build(options);
       });
-    },
-    getRowMenus(row, column, event) {
-      let menus = [];
-
-      if (column) {
-        menus.push({
-          text: "查看列数据",
-          onClick: () => {
-            this.tool.showJSONData(row[column.name]);
-          },
-        });
-      }
-      menus.push({
-        text: "查看行数据",
-        onClick: () => {
-          this.tool.showJSONData(row);
-        },
-      });
-
-      if (this.item && this.item.columnList) {
-        let ownerName = "ownerName";
-        let dataList = [Object.assign({}, row)];
-        let tableDetail = {
-          tableName: "tableName",
-          columnList: [],
-        };
-        this.item.columnList.forEach((one) => {
-          tableDetail.columnList.push({
-            columnName: one.name,
-          });
-        });
-        menus.push({
-          text: "查看SQL",
-          onClick: () => {
-            this.toolboxWorker.showTableDataListSql(
-              ownerName,
-              tableDetail,
-              dataList
-            );
-          },
-        });
-      }
-
-      return menus;
     },
   },
   created() {},

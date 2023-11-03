@@ -34,15 +34,19 @@
             :change="packChange"
           >
           </Pack>
-          <el-checkbox v-model="formData.exportStruct">导出结构体 </el-checkbox>
-          <el-checkbox v-model="formData.exportData">导出数据 </el-checkbox>
-          <el-checkbox v-model="formData.formatIndexName">
-            重新定义索引名称
-          </el-checkbox>
-          <template v-if="formData.exportData">
-            <el-checkbox v-model="formData.exportBatchSql"
-              >导出批量插入语句
-            </el-checkbox>
+          <el-form-item v-if="!isDataListExport" label="导出结构体">
+            <el-switch v-model="formData.exportStruct"> </el-switch>
+          </el-form-item>
+          <el-form-item v-if="!isDataListExport" label="导出数据">
+            <el-switch v-model="formData.exportData"> </el-switch>
+          </el-form-item>
+          <el-form-item v-if="!isDataListExport" label="重新定义索引名称">
+            <el-switch v-model="formData.formatIndexName"> </el-switch>
+          </el-form-item>
+          <template v-if="isDataListExport || formData.exportData">
+            <el-form-item label="导出批量插入语句">
+              <el-switch v-model="formData.exportBatchSql"> </el-switch>
+            </el-form-item>
             <template v-if="formData.exportBatchSql">
               <el-form-item label="批量插入数量">
                 <el-input v-model="formData.batchNumber" style="width: 60px">
@@ -51,9 +55,11 @@
             </template>
           </template>
         </template>
-        <el-checkbox v-model="formData.errorContinue"> 有错继续</el-checkbox>
+        <el-form-item v-if="!isDataListExport" label="有错继续">
+          <el-switch v-model="formData.errorContinue"> </el-switch>
+        </el-form-item>
       </el-form>
-      <el-form size="mini" inline>
+      <el-form size="mini" inline v-if="!isDataListExport">
         <template v-if="ownerList == null || owners.length == 0">
           <el-form-item label="导出所有库">
             <div class="tm-link color-green mgr-5" @click="initOwners()">
@@ -76,6 +82,95 @@
           </el-form-item>
         </template>
       </el-form>
+      <template v-if="isDataListExport && exportTable != null">
+        <el-form size="mini" inline>
+          <el-form-item v-if="formData.exportType == 'sql'" label="导出库名">
+            <el-input v-model="formData.exportOwnerName" style="width: 200px">
+            </el-input>
+          </el-form-item>
+          <el-form-item v-if="formData.exportType == 'sql'" label="导出表名">
+            <el-input v-model="formData.exportTableName" style="width: 200px">
+            </el-input>
+          </el-form-item>
+        </el-form>
+        <div class="ft-12 pdtb-10">
+          <div class="">
+            <span class="mgr-10 color-orange">
+              所有数据将传到后台进行处理导出
+            </span>
+            导出数据量：
+            <span class="mgr-10 color-green ft-15 ft-600">
+              {{ dataListSize }}
+            </span>
+            <span class="mgr-10 color-grey" v-if="dataListSize <= 500">
+              数据量适中，可以很快导出
+            </span>
+            <span class="mgr-10 color-orange" v-if="dataListSize > 500">
+              数据量较大，可能导出较慢，
+            </span>
+          </div>
+          <div class="mgt-10">
+            <span class="mgr-10 color-green"> 可以选择想要的列导出 </span>
+          </div>
+        </div>
+        <el-table
+          v-if="isDataListExport"
+          :data="exportTable.columnList"
+          border
+          style="width: 100%"
+          size="mini"
+        >
+          <el-table-column label="字段">
+            <template slot-scope="scope">
+              <div class="">
+                <el-input v-model="scope.row.sourceName" type="text" />
+              </div>
+            </template>
+          </el-table-column>
+          <el-table-column label="导出名称（列名，字段名）">
+            <template slot-scope="scope">
+              <div class="">
+                <el-input v-model="scope.row.targetName" type="text" />
+              </div>
+            </template>
+          </el-table-column>
+          <el-table-column label="导出固定值（函数脚本，默认为列的值）">
+            <template slot-scope="scope">
+              <div class="">
+                <el-input v-model="scope.row.value" type="text" />
+              </div>
+            </template>
+          </el-table-column>
+          <el-table-column label="操作" width="200px">
+            <template slot-scope="scope">
+              <div
+                class="tm-link color-grey mglr-5"
+                @click="upExportColumn(exportTable, scope.row)"
+              >
+                上移
+              </div>
+              <div
+                class="tm-link color-grey mglr-5"
+                @click="downExportColumn(exportTable, scope.row)"
+              >
+                下移
+              </div>
+              <div
+                class="tm-link color-grey mglr-5"
+                @click="addExportColumn(exportTable, {}, scope.row)"
+              >
+                插入
+              </div>
+              <div
+                class="tm-link color-red mglr-5"
+                @click="removeExportColumn(exportTable, scope.row)"
+              >
+                删除
+              </div>
+            </template>
+          </el-table-column>
+        </el-table>
+      </template>
 
       <template v-for="(owner, ownerIndex) in owners">
         <div :key="ownerIndex">
@@ -377,6 +472,9 @@ export default {
     "tableName",
     "columnTypeInfoList",
     "indexTypeInfoList",
+    "isDataListExport",
+    "dataList",
+    "columnList",
   ],
   data() {
     return {
@@ -404,6 +502,9 @@ export default {
         tableNamePackChar: "",
         columnNamePackChar: "",
         sqlValuePackChar: "",
+
+        exportOwnerName: null,
+        exportTableName: null,
       },
       ownersReadonly: false,
       tablesReadonly: false,
@@ -414,6 +515,8 @@ export default {
       tableExportNameLabel: "导出后表名称",
       taskId: null,
       task: null,
+      dataListSize: 0,
+      exportTable: null,
     };
   },
   computed: {},
@@ -447,29 +550,53 @@ export default {
     async init() {
       this.inited = true;
       let ownerList = [];
-      this.ownersReadonly = false;
-      this.tablesReadonly = false;
-      if (this.tool.isNotEmpty(this.ownerName)) {
-        this.ownersReadonly = true;
-        let owner = {
-          ownerName: this.ownerName,
-        };
-        this.initOwnerData(owner);
-        if (this.tool.isNotEmpty(this.tableName)) {
-          this.tablesReadonly = true;
-          let table = {
-            tableName: this.tableName,
+
+      if (!this.isDataListExport) {
+        this.ownersReadonly = false;
+        this.tablesReadonly = false;
+        if (this.tool.isNotEmpty(this.ownerName)) {
+          this.ownersReadonly = true;
+          let owner = {
+            ownerName: this.ownerName,
           };
-          this.initTableData(table);
-          owner.tableList = [];
-          owner.tableList.push(table);
-          owner.tables.push(table);
+          this.initOwnerData(owner);
+          if (this.tool.isNotEmpty(this.tableName)) {
+            this.tablesReadonly = true;
+            let table = {
+              tableName: this.tableName,
+            };
+            this.initTableData(table);
+            owner.tableList = [];
+            owner.tableList.push(table);
+            owner.tables.push(table);
+          }
+          ownerList.push(owner);
+          this.owners.push(owner);
+          this.ownerList = ownerList;
+        } else {
+          this.ownerList = null;
         }
-        ownerList.push(owner);
-        this.owners.push(owner);
-        this.ownerList = ownerList;
       } else {
-        this.ownerList = null;
+        this.dataListSize = this.dataList.length;
+        this.formData.exportOwnerName = this.ownerName;
+        this.formData.exportTableName = this.tableName;
+        if (this.tool.isEmpty(this.formData.exportOwnerName)) {
+          this.formData.exportOwnerName = "DB_XX";
+        }
+        if (this.tool.isEmpty(this.formData.exportTableName)) {
+          this.formData.exportTableName = "TB_XX";
+        }
+        let exportTable = {
+          columnList: [],
+        };
+        this.columnList.forEach((one) => {
+          exportTable.columnList.push({
+            sourceName: one.columnName,
+            targetName: one.columnName,
+            value: null,
+          });
+        });
+        this.exportTable = exportTable;
       }
 
       this.ready = true;
@@ -585,32 +712,47 @@ export default {
 
       param.batchNumber = Number(param.batchNumber);
       param.owners = [];
-      this.owners.forEach((owner) => {
+      if (this.isDataListExport) {
+        param.isDataListExport = true;
         let exportOwner = {
-          sourceName: owner.sourceName,
-          targetName: owner.targetName,
+          sourceName: this.formData.exportOwnerName,
+          targetName: this.formData.exportOwnerName,
           tables: [],
         };
-        owner.tables.forEach((table) => {
-          let exportTable = {
-            sourceName: table.sourceName,
-            targetName: table.targetName,
-            columns: [],
-          };
-          if (table.columnList) {
-            table.columnList.forEach((column) => {
-              let exportColumn = {
-                sourceName: column.sourceName,
-                targetName: column.targetName,
-                value: column.value,
-              };
-              exportTable.columns.push(exportColumn);
-            });
-          }
-          exportOwner.tables.push(exportTable);
-        });
+        this.exportTable.sourceName = this.formData.exportTableName;
+        this.exportTable.targetName = this.formData.exportTableName;
+        this.exportTable.columns = this.exportTable.columnList;
+        exportOwner.tables.push(this.exportTable);
+        param.dataList = this.dataList;
         param.owners.push(exportOwner);
-      });
+      } else {
+        this.owners.forEach((owner) => {
+          let exportOwner = {
+            sourceName: owner.sourceName,
+            targetName: owner.targetName,
+            tables: [],
+          };
+          owner.tables.forEach((table) => {
+            let exportTable = {
+              sourceName: table.sourceName,
+              targetName: table.targetName,
+              columns: [],
+            };
+            if (table.columnList) {
+              table.columnList.forEach((column) => {
+                let exportColumn = {
+                  sourceName: column.sourceName,
+                  targetName: column.targetName,
+                  value: column.value,
+                };
+                exportTable.columns.push(exportColumn);
+              });
+            }
+            exportOwner.tables.push(exportTable);
+          });
+          param.owners.push(exportOwner);
+        });
+      }
 
       let res = await this.server.database.export(param);
       if (res.code != 0) {

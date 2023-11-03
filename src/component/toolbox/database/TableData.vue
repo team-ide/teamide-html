@@ -263,13 +263,19 @@
         </tm-layout>
       </tm-layout>
     </template>
+    <DataListExport
+      ref="DataListExport"
+      :source="source"
+      :toolboxWorker="toolboxWorker"
+    ></DataListExport>
   </div>
 </template>
 
 
 <script>
+import DataListExport from "./DataListExport";
 export default {
-  components: {},
+  components: { DataListExport },
   props: [
     "source",
     "toolboxWorker",
@@ -821,7 +827,19 @@ export default {
           }
         },
       });
-
+      if (this.dataList && this.dataList.length > 0) {
+        menus.push({
+          text: "数据导出",
+          onClick: () => {
+            this.toolboxWorker.showDataListExport({
+              ownerName: this.ownerName,
+              tableDetail: this.tableDetail,
+              dataList: this.dataList,
+              columnList: this.form.columnList,
+            });
+          },
+        });
+      }
       return menus;
     },
     tableKeyUp(event) {
