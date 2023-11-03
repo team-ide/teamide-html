@@ -13,10 +13,10 @@
   >
     <div class="toolbox-editor mgt--20">
       <div class="toolbox-database-sql-profile" v-if="data != null">
-        <div style="height: 70px">
+        <div style="height: 80px">
           <div class="sql-execute-one mgb-10 ft-12">
-            <div>
-              <span class="">{{ data.sql }}</span>
+            <div class="mgb-10">
+              <span class="color-green">{{ data.profiling.Query }}</span>
             </div>
             <template v-if="data.error">
               <div class="color-orange">
