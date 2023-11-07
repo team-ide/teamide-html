@@ -81,7 +81,11 @@
                       <span class="color-grey">文件：</span>
                       <a
                         class="tm-link color-green"
-                        :href="source.filesUrl + formData[field.name]"
+                        :href="
+                          source.filesUrl +
+                          formData[field.name] +
+                          '?isDownload=true'
+                        "
                       >
                         {{ formData[field.name] }}
                       </a>

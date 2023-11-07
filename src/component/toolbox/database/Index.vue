@@ -9,6 +9,8 @@
             :toolboxWorker="toolboxWorker"
             :extend="extend"
             :ownersChange="ownersChange"
+            :openDateFormat="openDateFormat"
+            :changeOpenDateFormat="changeOpenDateFormat"
           >
           </Owner>
         </tm-layout>
@@ -20,6 +22,7 @@
             :owners="owners"
             :columnTypeInfoList="columnTypeInfoList"
             :indexTypeInfoList="indexTypeInfoList"
+            :openDateFormat="openDateFormat"
           >
           </Tabs>
         </tm-layout>
@@ -39,6 +42,7 @@
       :source="source"
       :toolboxWorker="toolboxWorker"
       :getRowMenus="getRowMenus"
+      :openDateFormat="openDateFormat"
     >
     </SqlProfile>
 
@@ -79,12 +83,18 @@ export default {
       owners: [],
       columnTypeInfoList: [],
       indexTypeInfoList: [],
+      openDateFormat: true,
     };
   },
   computed: {},
   watch: {},
   methods: {
     async init() {
+      if (this.extend != null) {
+        if (this.tool.isNotEmpty(this.extend.openDateFormat)) {
+          this.openDateFormat = this.extend.openDateFormat;
+        }
+      }
       this.toolboxWorker.columnIsNumber = this.columnIsNumber;
       this.toolboxWorker.columnIsDate = this.columnIsDate;
       this.toolboxWorker.formatDateColumn = this.formatDateColumn;
@@ -94,6 +104,12 @@ export default {
       this.toolboxWorker.showDataListExport = this.showDataListExport;
       await this.loadData();
       this.ready = true;
+    },
+    changeOpenDateFormat(openDateFormat) {
+      this.openDateFormat = openDateFormat;
+      this.toolboxWorker.updateExtend({
+        openDateFormat: openDateFormat,
+      });
     },
     getRowMenus(row, column, event) {
       let menus = [];

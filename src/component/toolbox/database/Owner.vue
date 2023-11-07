@@ -3,7 +3,7 @@
     <template v-if="ready">
       <tm-layout height="100%">
         <tm-layout height="80px">
-          <div class="pdlr-10 pdt-10">
+          <div class="pdlr-10 pdt-10 toolbox-database-owner-btns">
             <div class="tm-btn tm-btn-xs bg-grey-6" @click="refresh">刷新</div>
             <div class="tm-btn tm-btn-xs bg-teal-8" @click="toOwnerCreate">
               新建库
@@ -20,6 +20,22 @@
             >
               信息
             </div>
+            <template v-if="openDateFormat">
+              <div
+                class="tm-btn tm-btn-xs bg-orange"
+                @click="changeOpenDateFormat(false)"
+              >
+                关闭日期识别
+              </div>
+            </template>
+            <template v-else>
+              <div
+                class="tm-btn tm-btn-xs bg-green"
+                @click="changeOpenDateFormat(true)"
+              >
+                开启日期识别
+              </div>
+            </template>
           </div>
         </tm-layout>
         <tm-layout height="auto" class="app-scroll-bar">
@@ -93,7 +109,14 @@
 <script>
 export default {
   components: {},
-  props: ["source", "toolboxWorker", "extend", "ownersChange"],
+  props: [
+    "source",
+    "toolboxWorker",
+    "extend",
+    "ownersChange",
+    "openDateFormat",
+    "changeOpenDateFormat",
+  ],
   data() {
     return {
       ready: false,
@@ -739,5 +762,11 @@ export default {
 .toolbox-database-owner {
   width: 100%;
   height: 100%;
+}
+.toolbox-database-owner-btns .tm-btn + .tm-btn {
+  margin-left: 0px;
+}
+.toolbox-database-owner-btns .tm-btn {
+  margin-right: 10px;
 }
 </style>

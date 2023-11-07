@@ -44,14 +44,52 @@
           >
             <template slot-scope="scope">
               <div class="">
-                <input
-                  v-model="scope.row[column.name]"
-                  :name="column.name"
-                  @change="inputValueChange(scope.row, column, $event)"
-                  @input="inputValueChange(scope.row, column, $event)"
-                  :placeholder="scope.row[column.name] == null ? 'NULL' : ''"
-                  type="text"
-                />
+                <template v-if="typeIsDate(column)">
+                  <el-date-picker
+                    v-model="scope.row[column.name]"
+                    type="date"
+                    placeholder="选择日期"
+                    value-format="timestamp"
+                  >
+                  </el-date-picker>
+                </template>
+                <template v-else-if="typeIsDateTime(column)">
+                  <el-date-picker
+                    v-model="scope.row[column.name]"
+                    type="datetime"
+                    placeholder="选择时间"
+                    value-format="timestamp"
+                  >
+                  </el-date-picker>
+                </template>
+                <template v-else-if="valueIsDate(scope.row[column.name])">
+                  <el-date-picker
+                    v-model="scope.row[column.name]"
+                    type="date"
+                    placeholder="选择日期"
+                    value-format="timestamp"
+                  >
+                  </el-date-picker>
+                </template>
+                <template v-else-if="valueIsDateTime(scope.row[column.name])">
+                  <el-date-picker
+                    v-model="scope.row[column.name]"
+                    type="datetime"
+                    placeholder="选择时间"
+                    value-format="timestamp"
+                  >
+                  </el-date-picker>
+                </template>
+                <template v-else>
+                  <input
+                    v-model="scope.row[column.name]"
+                    :name="column.name"
+                    @change="inputValueChange(scope.row, column, $event)"
+                    @input="inputValueChange(scope.row, column, $event)"
+                    :placeholder="scope.row[column.name] == null ? 'NULL' : ''"
+                    type="text"
+                  />
+                </template>
               </div>
             </template>
           </el-table-column>
@@ -65,7 +103,14 @@
 <script>
 export default {
   components: {},
-  props: ["source", "selects", "inserts", "updates", "deletes"],
+  props: [
+    "source",
+    "selects",
+    "inserts",
+    "updates",
+    "deletes",
+    "openDateFormat",
+  ],
   data() {
     return {
       columnList: [],
@@ -83,6 +128,7 @@ export default {
       this.dataList = options.dataList || [];
       this.showSize = options.showSize || 0;
       this.columnList.splice(0, this.columnList.length);
+      // console.log(this.columnList);
       columnList.forEach((one) => {
         let column = Object.assign({}, one);
         column.checked = true;
@@ -94,6 +140,48 @@ export default {
       this.$nextTick(() => {
         this.bind();
       });
+    },
+    typeIsDate(column) {
+      let columnType = column.columnDataType || column.type;
+      if (
+        this.openDateFormat &&
+        this.tool.isNotEmpty(columnType) &&
+        columnType.toLowerCase() == "date"
+      ) {
+        return true;
+      }
+      return false;
+    },
+    typeIsDateTime(column) {
+      let columnType = column.columnDataType || column.type;
+      if (
+        this.openDateFormat &&
+        this.tool.isNotEmpty(columnType) &&
+        (columnType.toLowerCase() == "datetime" ||
+          columnType.toLowerCase() == "timestamp")
+      ) {
+        return true;
+      }
+      return false;
+    },
+
+    valueIsDate(value) {
+      return false;
+    },
+    valueIsDateTime(value) {
+      if (this.tool.isEmpty(value)) {
+        return false;
+      }
+      if (this.openDateFormat && ("" + value).length == 13) {
+        try {
+          if (new Date(Number(value)).getTime() > 0) {
+            return true;
+          }
+        } catch (error) {
+          console.log(error);
+        }
+      }
+      return false;
     },
     refreshData() {
       this.showDataList.splice(0, this.showDataList.length);
@@ -235,4 +323,11 @@ export default {
 </script>
 
 <style>
+.toolbox-editor .el-table .el-date-editor input {
+  padding: 0px 30px;
+}
+.toolbox-editor .el-table .el-date-editor.el-input,
+.el-date-editor.el-input__inner {
+  width: 100%;
+}
 </style>

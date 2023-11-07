@@ -53,7 +53,11 @@
       </div>
     </div>
     <div style="height: calc(100% - 70px)">
-      <DataTable ref="DataTable" :source="source"></DataTable>
+      <DataTable
+        ref="DataTable"
+        :source="source"
+        :openDateFormat="openDateFormat"
+      ></DataTable>
     </div>
   </div>
 </template>
@@ -62,7 +66,7 @@
 <script>
 export default {
   components: {},
-  props: ["source", "toolboxWorker", "item"],
+  props: ["source", "toolboxWorker", "item", "openDateFormat"],
   data() {
     return {
       updates: [],

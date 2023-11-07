@@ -153,6 +153,7 @@
                     :source="source"
                     :toolboxWorker="toolboxWorker"
                     :item="item"
+                    :openDateFormat="openDateFormat"
                   >
                   </SqlSelectDataList>
                 </div>
@@ -171,7 +172,15 @@ import SqlSelectDataList from "./SqlSelectDataList.vue";
 
 export default {
   components: { SqlSelectDataList },
-  props: ["source", "toolboxWorker", "actived", "extend", "owners", "tabId"],
+  props: [
+    "source",
+    "toolboxWorker",
+    "actived",
+    "extend",
+    "owners",
+    "tabId",
+    "openDateFormat",
+  ],
   data() {
     let sqlItemsWorker = this.tool.newItemsWorker({
       async onRemoveItem(item) {},

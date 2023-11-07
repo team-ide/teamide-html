@@ -60,7 +60,11 @@
           </div>
         </div>
         <div style="height: 560px">
-          <DataTable ref="DataTable" :source="source"></DataTable>
+          <DataTable
+            ref="DataTable"
+            :source="source"
+            :openDateFormat="openDateFormat"
+          ></DataTable>
         </div>
       </div>
     </div>
@@ -71,7 +75,7 @@
 <script>
 export default {
   components: {},
-  props: ["source", "toolboxWorker"],
+  props: ["source", "toolboxWorker", "openDateFormat"],
   data() {
     return {
       showDialog: false,

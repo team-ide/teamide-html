@@ -229,6 +229,7 @@
             :inserts="inserts"
             :updates="updates"
             @keyup="tableKeyUp"
+            :openDateFormat="openDateFormat"
           >
           </DataTable>
         </tm-layout>
@@ -284,6 +285,7 @@ export default {
     "tableName",
     "extend",
     "tabId",
+    "openDateFormat",
   ],
   data() {
     return {
