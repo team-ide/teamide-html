@@ -19,7 +19,16 @@ export default {
       hints: [],
     };
   },
-  watch: {},
+  watch: {
+    "source.userSetting.theme"() {
+      if (this.monacoInstance) {
+        let theme = this.getTheme();
+        this.monacoInstance.updateOptions({
+          theme: theme,
+        });
+      }
+    },
+  },
   methods: {
     setValue(value) {
       if (this.monacoInstance) {
@@ -31,6 +40,13 @@ export default {
           this.monacoInstance.setValue(value);
         }
       }
+    },
+    getTheme() {
+      let theme = "vs-dark";
+      if (this.source.userSetting.theme == "light") {
+        theme = "vs-light";
+      }
+      return theme;
     },
     getValue() {
       return this.monacoInstance.getValue();
@@ -88,8 +104,9 @@ export default {
       if (this.lineNumbers !== null) {
         lineNumbers = this.lineNumbers;
       }
+
       this.monacoInstance = monaco.editor.create(this.$refs.editor, {
-        theme: "vs-dark", //官方自带三种主题vs, hc-black, or vs-dark
+        theme: this.getTheme(), //官方自带三种主题vs, hc-black, or vs-dark
         minimap: { enabled: false }, // 缩略导航
         value: this.value || "", //编辑器初始显示文字
         language: language.id,
@@ -107,6 +124,7 @@ export default {
         contextmenu: false,
         stopRenderingLineAfter: -1, // 一行最大显示字符数，默认 10000 ，-1 表示 一直渲染
       });
+      // console.log(this.monacoInstance);
       this.monacoInstance.onDidChangeModelContent((e) => {
         if (this.isSetValue) {
           delete this.isSetValue;

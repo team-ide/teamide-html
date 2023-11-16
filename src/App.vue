@@ -147,6 +147,10 @@ export default {
     },
     onKeyUp(event) {
       event = event || window.event;
+      if (this.source.eventIsUserKey(event)) {
+        this.tool.stopEvent(event);
+        return;
+      }
       if (this.tool.keyIsCtrlS(event)) {
         this.tool.stopEvent(event);
       }
@@ -210,71 +214,6 @@ body {
 }
 .el-message-box {
   user-select: text;
-}
-
-/* 滚动条样式*/
-.app-scroll-bar {
-  overflow: scroll;
-}
-
-.app-scroll-bar:hover::-webkit-scrollbar-thumb {
-  box-shadow: inset 0 0 10px #333333;
-  background: #333333;
-}
-.app-scroll-bar:hover::-webkit-scrollbar-track {
-  box-shadow: inset 0 0 10px #262626;
-  background: #262626;
-}
-.app-scroll-bar:hover::-webkit-scrollbar-corner {
-  background: #262626;
-}
-
-.app-scroll-bar::-webkit-scrollbar {
-  width: 10px;
-  height: 10px;
-}
-.app-scroll-bar:hover::-webkit-scrollbar {
-  width: 10px;
-  height: 10px;
-}
-.app-scroll-bar::-webkit-scrollbar-thumb {
-  border-radius: 0px;
-}
-.app-scroll-bar::-webkit-scrollbar-track {
-  border-radius: 0;
-}
-.app-scroll-bar::-webkit-scrollbar-corner {
-  background: transparent;
-}
-
-.app-scroll-bar-textarea textarea::-webkit-scrollbar-thumb {
-  box-shadow: inset 0 0 10px #333333;
-  background: #333333;
-}
-.app-scroll-bar-textarea textarea:hover::-webkit-scrollbar-track {
-  box-shadow: inset 0 0 10px #262626;
-  background: #262626;
-}
-.app-scroll-bar-textarea textarea:hover::-webkit-scrollbar-corner {
-  background: #262626;
-}
-
-.app-scroll-bar-textarea textarea::-webkit-scrollbar {
-  width: 10px;
-  height: 10px;
-}
-.app-scroll-bar-textarea textarea:hover::-webkit-scrollbar {
-  width: 10px;
-  height: 10px;
-}
-.app-scroll-bar-textarea textarea::-webkit-scrollbar-thumb {
-  border-radius: 0px;
-}
-.app-scroll-bar-textarea textarea::-webkit-scrollbar-track {
-  border-radius: 0;
-}
-.app-scroll-bar-textarea textarea::-webkit-scrollbar-corner {
-  background: transparent;
 }
 
 .tm-link {

@@ -81,7 +81,19 @@ let keyCodeMap = {
     F12: 123,
 };
 
-let keyEvent = {};
+let keyEvent = {
+    keyCodeMap: keyCodeMap,
+    keyCodeTextMap: {},
+};
+for (let key in keyCodeMap) {
+    let codes = keyCodeMap[key];
+    if (!codes.length) {
+        codes = [codes];
+    }
+    codes.forEach(code => {
+        keyEvent.keyCodeTextMap[code] = key;
+    })
+}
 for (let key in keyCodeMap) {
     let codes = keyCodeMap[key];
     if (!codes.length) {

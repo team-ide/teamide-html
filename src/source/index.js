@@ -13,6 +13,59 @@ source.filesUrl = null;
 source.hasNewVersion = false;
 source.isServer = true;
 source.setting = {};
+let defaultUserSetting = {
+    theme: "dark",
+    keyTabClose: "Alt + 87",
+    keySwitchTabUp: "Alt + 37",
+    keySwitchTabDown: "Alt + 39",
+}
+source.defaultUserSetting = defaultUserSetting;
+source.userSetting = Object.assign({}, defaultUserSetting);
+source.eventIsUserKey = (event) => {
+    if (source.eventIsKeyGroups(event, source.userSetting.keyTabClose)) {
+        if (source.workspaceTabClose) {
+            source.workspaceTabClose()
+            return true
+        }
+    } else if (source.eventIsKeyGroups(event, source.userSetting.keySwitchTabUp)) {
+        if (source.workspaceSwitchTabUp) {
+            source.workspaceSwitchTabUp()
+            return true
+        }
+    } else if (source.eventIsKeyGroups(event, source.userSetting.keySwitchTabDown)) {
+        if (source.workspaceSwitchTabDown) {
+            source.workspaceSwitchTabDown()
+            return true
+        }
+    }
+};
+source.eventIsKeyGroups = (event, keyGroups) => {
+    if (tool.isEmpty(keyGroups)) {
+        return false;
+    }
+    let ks = ('' + keyGroups).split(" + ");
+    if (ks.length > 0) {
+        for (let i in ks) {
+            if (!source.matchEventKey(event, ks[i])) {
+                return false;
+            }
+        }
+        return true;
+    }
+    return false;
+};
+source.matchEventKey = (event, key) => {
+    key = ('' + key).toLowerCase()
+    if (key == 'ctrl') {
+        return event.ctrlKey;
+    } else if (key == 'shift') {
+        return event.shiftKey;
+    } else if (key == 'alt') {
+        return event.altKey;
+    } else {
+        return event.keyCode == key;
+    }
+};
 
 source.header = {
     title: "Team · IDE",
@@ -486,6 +539,9 @@ source.initSession = (data) => {
             if (JSON.stringify(oldUser) != JSON.stringify(newUser)) {
                 source.login.user = data.user;
             }
+        }
+        if (data.userSetting != null) {
+            source.userSetting = Object.assign(Object.assign({}, defaultUserSetting), data.userSetting || {});
         }
         source.powers = data.powers || [];
         tool.setJWT(data.JWT);

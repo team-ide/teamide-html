@@ -3,9 +3,7 @@
     class="workspace-container"
     :class="{
       'workspace-theme-dark': theme.isDark,
-    }"
-    :style="{
-      backgroundColor: theme.backgroundColor,
+      'workspace-theme-light': !theme.isDark,
     }"
   >
     <div class="workspace-header">
@@ -277,6 +275,9 @@
                   <MenuItem @click="openPage('userCenter', '个人中心')">
                     个人中心
                   </MenuItem>
+                  <MenuItem @click="openPage('userSetting', '个人设置')">
+                    个人设置
+                  </MenuItem>
                   <MenuItem
                     v-if="source.hasPower('logout')"
                     @click="tool.toLogout()"
@@ -336,6 +337,9 @@
 <script>
 import ToolboxContext from "./ToolboxContext";
 
+import "./theme-dark.css";
+import "./theme-light.css";
+
 export default {
   components: { ToolboxContext },
   props: ["source"],
@@ -350,7 +354,6 @@ export default {
       showTabGroupTitle: "",
       theme: {
         isDark: true,
-        backgroundColor: "#383838",
       },
     };
   },
@@ -359,15 +362,34 @@ export default {
     "source.login.userId"() {
       this.initUserData();
     },
+    "source.userSetting.theme"() {
+      this.initTheme();
+    },
   },
   methods: {
+    initTheme() {
+      this.theme.isDark = this.source.userSetting.theme == "dark";
+    },
     async initUserData() {
       await this.source.initLoginUserData();
       await this.initOpens();
       this.initShowTabGroup();
     },
     init() {
+      this.initTheme();
       this.initUserData();
+
+      this.source.workspaceTabClose = () => {
+        if (this.mainItemsWorker.activeItem) {
+          this.mainItemsWorker.toRemoveItem(this.mainItemsWorker.activeItem);
+        }
+      };
+      this.source.workspaceSwitchTabUp = () => {
+        this.mainItemsWorker.activeUpItem();
+      };
+      this.source.workspaceSwitchTabDown = () => {
+        this.mainItemsWorker.activeDownItem();
+      };
     },
     initShowTabGroup() {
       var isShowAll = false;
@@ -757,16 +779,12 @@ export default {
   padding: 0px;
   position: relative;
 }
-.workspace-container.workspace-theme-dark {
-  color: #d9d9d9;
-}
 .workspace-header {
   width: 100%;
   height: 30px;
   margin: 0px;
   padding: 0px;
   position: relative;
-  border-bottom: 1px solid #4e4e4e;
 }
 .workspace-main {
   width: 100%;
@@ -806,9 +824,6 @@ export default {
   white-space: nowrap;
   align-items: center;
   display: flex;
-}
-.workspace-header-nav:hover {
-  background-color: #505050;
 }
 
 .file-manager-dropdown.el-dropdown {
@@ -875,11 +890,51 @@ export default {
   width: 100%;
   height: 30px;
   position: relative;
-  border-bottom: 1px solid #4e4e4e;
 }
 .default-spans-container {
   width: 100%;
   height: calc(100% - 30px);
   position: relative;
+}
+
+/* 滚动条样式*/
+.app-scroll-bar {
+  overflow: scroll;
+}
+
+.app-scroll-bar::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+.app-scroll-bar:hover::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+.app-scroll-bar::-webkit-scrollbar-thumb {
+  border-radius: 0px;
+}
+.app-scroll-bar::-webkit-scrollbar-track {
+  border-radius: 0;
+}
+.app-scroll-bar::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
+.app-scroll-bar-textarea textarea::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+.app-scroll-bar-textarea textarea:hover::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+.app-scroll-bar-textarea textarea::-webkit-scrollbar-thumb {
+  border-radius: 0px;
+}
+.app-scroll-bar-textarea textarea::-webkit-scrollbar-track {
+  border-radius: 0;
+}
+.app-scroll-bar-textarea textarea::-webkit-scrollbar-corner {
+  background: transparent;
 }
 </style>

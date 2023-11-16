@@ -51,12 +51,18 @@
           <el-form-item label="" class="mgb-5">
             <div
               class="mgt-2 tm-btn tm-btn-sm bg-green ft-13"
+              :class="{
+                'tm-disabled': executeSQLIng,
+              }"
               @click="toExecuteSql"
             >
               执行
             </div>
             <div
               class="mgt-2 tm-btn tm-btn-sm bg-blue ft-13"
+              :class="{
+                'tm-disabled': executeSQLIng,
+              }"
               @click="toExecuteSelectSql"
             >
               执行选中
@@ -75,7 +81,7 @@
         ></Editor>
       </tm-layout>
       <tm-layout-bar bottom></tm-layout-bar>
-      <tm-layout height="auto">
+      <tm-layout height="auto" v-loading="executeSQLIng">
         <div class="default-tabs-container">
           <WorkspaceTabs :source="source" :itemsWorker="sqlItemsWorker">
           </WorkspaceTabs>
@@ -190,6 +196,7 @@ export default {
     return {
       ready: false,
       executeSQL: null,
+      executeSQLIng: false,
       sqlItemsWorker: sqlItemsWorker,
       form: {
         ownerName: null,
@@ -276,6 +283,11 @@ export default {
       await this.doExecuteSql(this.executeSQL);
     },
     async doExecuteSql(executeSQL) {
+      if (this.executeSQLIng) {
+        this.tool.warn("有SQL正在执行");
+        return;
+      }
+      this.executeSQLIng = true;
       let param = this.toolboxWorker.getWorkParam(Object.assign({}, this.form));
       param.showDataMaxSize = Number(param.showDataMaxSize);
       let showDataMaxSize = param.showDataMaxSize;
@@ -284,14 +296,11 @@ export default {
       let res = await this.server.database.executeSQL(param);
       if (res.code != 0) {
         this.tool.error(res.msg);
-        return;
       }
       let data = res.data || {};
-      if (data.error) {
-        this.tool.error(data.error);
-      }
       this.executeList = data.executeList || [];
       this.initExecuteList(showDataMaxSize);
+      this.executeSQLIng = false;
     },
     initExecuteList(showDataMaxSize) {
       this.cleanTab();

@@ -8,7 +8,7 @@
     :append-to-body="true"
     :visible="showDialog"
     :before-close="hide"
-    width="98%"
+    width="96%"
     top="30px"
   >
     <div class="toolbox-editor mgt--20">

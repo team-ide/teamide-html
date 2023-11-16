@@ -8,7 +8,7 @@
     :append-to-body="true"
     :visible="showDialog"
     :before-close="hide"
-    width="800px"
+    width="90%"
     top="40px"
   >
     <div class="">

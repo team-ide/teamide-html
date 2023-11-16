@@ -67,12 +67,15 @@
             >
               <div class="file-icon">
                 <i v-if="one.isDir" class="mdi mdi-folder color-orange-3"></i>
-                <i v-else class="mdi mdi-file color-white"></i>
+                <i
+                  v-else
+                  class="mdi mdi-file toolbox-file-manager-file-icon"
+                ></i>
               </div>
               <div class="file-name">
                 <template v-if="one.rename">
                   <input
-                    class="file-rename-input"
+                    class="toolbox-file-manager-rename-input"
                     v-model="one.newname"
                     @blur="onRenameBlur(one, $event)"
                     @keyup="onRenameKeyup(one, $event)"
@@ -502,17 +505,29 @@ export default {
     },
     toFocusFile(file) {
       this.$nextTick(() => {
-        if (this.$el.getElementsByClassName("file-rename-input")[0]) {
+        if (
+          this.$el.getElementsByClassName(
+            "toolbox-file-manager-rename-input"
+          )[0]
+        ) {
           setTimeout(() => {
-            this.$el.getElementsByClassName("file-rename-input")[0].focus();
+            this.$el
+              .getElementsByClassName("toolbox-file-manager-rename-input")[0]
+              .focus();
           }, 100);
         }
       });
     },
     toBlurFile(file) {
       this.$nextTick(() => {
-        if (this.$el.getElementsByClassName("file-rename-input")[0]) {
-          this.$el.getElementsByClassName("file-rename-input")[0].blur();
+        if (
+          this.$el.getElementsByClassName(
+            "toolbox-file-manager-rename-input"
+          )[0]
+        ) {
+          this.$el
+            .getElementsByClassName("toolbox-file-manager-rename-input")[0]
+            .blur();
         }
       });
     },
@@ -602,12 +617,6 @@ export default {
   user-select: none;
   padding: 0px 5px;
 }
-.toolbox-file-manager-file-box:hover {
-  background: #4a4a4a;
-}
-.toolbox-file-manager-file-select {
-  background: #4f4f4f;
-}
 .toolbox-file-manager-file-box .file-icon {
   padding: 0px 5px;
 }
@@ -640,17 +649,12 @@ export default {
   text-align: left;
 }
 .toolbox-file-manager-filter-input input {
-  background: transparent;
-  color: #ffffff;
   outline: none;
   box-sizing: border-box;
 }
 .toolbox-file-manager-dir-input {
-  color: #ffffff;
   width: 100%;
   border: 0px dashed #ddd;
-  border-bottom: 1px solid #ddd;
-  background-color: transparent;
   height: 25px;
   line-height: 25px;
   padding-left: 0px;
@@ -660,10 +664,7 @@ export default {
   font-size: 15px;
 }
 .toolbox-file-manager-rename-input {
-  color: #3c3c3c !important;
   width: 100%;
-  border: 1px solid #ddd;
-  background-color: #ddd !important;
   line-height: 16px;
   box-sizing: border-box;
   outline: none;
@@ -671,7 +672,6 @@ export default {
 
 .toolbox-file-manager-dir-names-breadcrumb {
   border: 0px dashed #ddd;
-  border-bottom: 1px solid #ddd;
   height: 25px;
   line-height: 25px;
   font-size: 15px;
@@ -685,13 +685,11 @@ export default {
   .el-breadcrumb
   .el-breadcrumb__separator {
   margin: 0px;
-  color: #ffffff;
 }
 .toolbox-file-manager-dir-names-breadcrumb
   .el-breadcrumb
   .el-breadcrumb__inner {
   margin: 0px;
-  color: #ffffff;
 }
 .toolbox-file-manager-dir-names-breadcrumb
   .el-breadcrumb
@@ -699,11 +697,5 @@ export default {
   > span {
   cursor: pointer;
   display: inline-block;
-}
-
-.toolbox-file-manager-dir-names-breadcrumb
-  .el-breadcrumb
-  .el-breadcrumb__inner:hover {
-  color: #ddd;
 }
 </style>

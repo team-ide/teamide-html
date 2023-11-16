@@ -1,19 +1,24 @@
 <template>
   <div class="toolbox-database-sync">
     <div class="app-scroll-bar pd-10" style="height: calc(100% - 120px)">
+      <div>目标数据库配置</div>
+      <FormBox ref="DatabaseFormBox" :source="source"></FormBox>
       <el-form :model="formData" size="mini" inline>
-        <el-form-item label="目标数据库配置">
-          <FormBox ref="DatabaseFormBox" :source="source"></FormBox>
+        <el-form-item label="库不存在则创建">
+          <el-switch v-model="formData.ownerCreateIfNotExist"> </el-switch>
         </el-form-item>
-        <el-checkbox v-model="formData.ownerCreateIfNotExist">
-          库不存在则创建
-        </el-checkbox>
-        <el-checkbox v-model="formData.errorContinue"> 有错继续</el-checkbox>
-        <el-checkbox v-model="formData.syncStruct"> 同步结构体</el-checkbox>
-        <el-checkbox v-model="formData.syncData"> 同步数据</el-checkbox>
-        <el-checkbox v-model="formData.formatIndexName">
-          重新定义索引名称
-        </el-checkbox>
+        <el-form-item label="有错继续">
+          <el-switch v-model="formData.errorContinue"> </el-switch>
+        </el-form-item>
+        <el-form-item label="同步结构体">
+          <el-switch v-model="formData.syncStruct"> </el-switch>
+        </el-form-item>
+        <el-form-item label="同步数据">
+          <el-switch v-model="formData.syncData"> </el-switch>
+        </el-form-item>
+        <el-form-item label="重新定义索引名称">
+          <el-switch v-model="formData.formatIndexName"> </el-switch>
+        </el-form-item>
       </el-form>
       <el-form :model="formData" size="mini" inline>
         <template v-if="ownerList == null || owners.length == 0">

@@ -497,6 +497,55 @@ export default {
       //   this.term.write(new Uint8Array(data));
       // }
     },
+    getTheme() {
+      let theme = {
+        background: "#1c2431",
+        foreground: "#cccccc",
+        selectionBackground: "#399ef440",
+        black: "#666666",
+        blue: "#399ef4",
+        brightBlack: "#666666",
+        brightBlue: "#399ef4",
+        brightCyan: "#21c5c7",
+        brightGreen: "#4eb071",
+        brightMagenta: "#b168df",
+        brightRed: "#da6771",
+        brightWhite: "#efefef",
+        brightYellow: "#fff099",
+        cyan: "#21c5c7",
+        green: "#4eb071",
+        magenta: "#b168df",
+        red: "#da6771",
+        white: "#efefef",
+        yellow: "#fff099",
+      };
+      if (this.source.userSetting.theme == "light") {
+        theme = {
+          background: "#ffffff",
+          foreground: "#333333",
+          cursor: "#333333",
+          cursorAccent: "#ffffff",
+          selectionBackground: "#add6ff",
+          black: "#000000",
+          blue: "#0451a5",
+          brightBlack: "#666666",
+          brightBlue: "#0451a5",
+          brightCyan: "#0598bc",
+          brightGreen: "#14ce14",
+          brightMagenta: "#bc05bc",
+          brightRed: "#cd3131",
+          brightWhite: "#a5a5a5",
+          brightYellow: "#b5ba00",
+          cyan: "#0598bc",
+          green: "#00bc00",
+          magenta: "#bc05bc",
+          red: "#cd3131",
+          white: "#555555",
+          yellow: "#949800",
+        };
+      }
+      return theme;
+    },
     initTerm() {
       if (this.term != null) {
         this.term.dispose();
@@ -516,6 +565,7 @@ export default {
         convertEol: true, //启用时，光标将设置为下一行的开头
         // disableStdin: false, //是否应禁用输入
         // // cursorStyle: "underline", //光标样式
+        theme: this.getTheme(),
         // theme: {
         //   foreground: "#ECECEC", //字体
         //   background: "#000000", //背景色
@@ -978,7 +1028,6 @@ export default {
   width: 100%;
   height: 100%;
   position: relative;
-  background-color: black;
   overflow: hidden;
 }
 .toolbox-terminal-box .terminal-xterm-box-back {
@@ -1035,27 +1084,18 @@ export default {
   .xterm
   .xterm-viewport::-webkit-scrollbar-thumb {
   border-radius: 0px;
-  background: #6b6b6b;
 }
 .toolbox-terminal-box
   .terminal-xterm-box
   .xterm
   .xterm-viewport::-webkit-scrollbar-track {
   border-radius: 0;
-  background: #383838;
-}
-.toolbox-terminal-box
-  .terminal-xterm-box
-  .xterm
-  .xterm-viewport::-webkit-scrollbar-corner {
-  background: #ddd;
 }
 
 .toolbox-terminal-file-manager-box {
   position: absolute;
   right: 20px;
   bottom: 40px;
-  background: #172029;
   transition: all 0s;
   transform: scale(0);
   z-index: -1;
@@ -1072,7 +1112,6 @@ export default {
   width: 100%;
   margin-top: -2px;
   height: 4px;
-  background: #4e4e4e;
   cursor: row-resize;
   z-index: 1;
 }
@@ -1083,14 +1122,12 @@ export default {
   height: 100%;
   width: 4px;
   margin-left: -2px;
-  background: #4e4e4e;
   cursor: col-resize;
   z-index: 1;
 }
 
 .toolbox-terminal-file-manager-box-header {
   height: 29px;
-  border-bottom: 1px solid #2f2f2f;
 }
 .toolbox-terminal-file-manager-box-body {
   height: calc(100% - 30px);

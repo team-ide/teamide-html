@@ -126,8 +126,24 @@ const newItemsWorker = function (workerOption) {
             }
             this.initItems();
         },
-        activeNextItem(item) {
-            let find = worker.getItem(item);
+        activeUpItem() {
+            let find = worker.getItem(worker.activeItem);
+            if (find == null) {
+                return;
+            }
+            let index = worker.items.indexOf(find);
+            let next = null;
+            if (index >= 0) {
+                if (worker.items[index - 1]) {
+                    next = worker.items[index - 1];
+                }
+            }
+            if (next) {
+                worker.toActiveItem(next);
+            }
+        },
+        activeDownItem() {
+            let find = worker.getItem(worker.activeItem);
             if (find == null) {
                 return;
             }
@@ -136,11 +152,11 @@ const newItemsWorker = function (workerOption) {
             if (index >= 0) {
                 if (worker.items[index + 1]) {
                     next = worker.items[index + 1];
-                } else {
-                    next = worker.items[index - 1];
                 }
             }
-            worker.toActiveItem(next);
+            if (next) {
+                worker.toActiveItem(next);
+            }
         },
         toActiveItem(item) {
             item = worker.getItem(item);

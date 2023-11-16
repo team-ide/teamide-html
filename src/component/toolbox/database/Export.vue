@@ -34,6 +34,9 @@
             :change="packChange"
           >
           </Pack>
+          <el-form-item v-if="!isDataListExport" label="合并到一个文件">
+            <el-switch v-model="formData.mergeIntoOneFile"> </el-switch>
+          </el-form-item>
           <el-form-item v-if="!isDataListExport" label="导出结构体">
             <el-switch v-model="formData.exportStruct"> </el-switch>
           </el-form-item>
@@ -505,6 +508,8 @@ export default {
 
         exportOwnerName: null,
         exportTableName: null,
+
+        mergeIntoOneFile: false,
       },
       ownersReadonly: false,
       tablesReadonly: false,
@@ -709,6 +714,10 @@ export default {
         Object.assign({}, this.formData)
       );
       this.toolboxWorker.formatParam(param);
+
+      if (param.exportType != "sql") {
+        delete param.mergeIntoOneFile;
+      }
 
       param.batchNumber = Number(param.batchNumber);
       param.owners = [];

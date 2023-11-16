@@ -1,0 +1,174 @@
+.workspace-theme-light {
+    color: #606266;
+    /* background-color: #efefef; */
+}
+
+.workspace-theme-light .workspace-header {
+    border-bottom: 1px solid #ddd;
+}
+
+.workspace-theme-light .workspace-header-nav:hover {
+    background-color: #d9d9d9;
+}
+
+.workspace-theme-light .teamide-editor {
+    outline: 1px solid #ddd;
+}
+
+.workspace-theme-light .workspace-tabs {
+    border-bottom: 1px solid #ddd;
+}
+
+.workspace-theme-light .workspace-tabs-left,
+.workspace-theme-light .workspace-tabs-right {
+    background: #cecece;
+}
+
+.workspace-theme-light .workspace-tabs-left .workspace-tabs-nav {
+    border-right: 1px solid #cecece;
+}
+
+.workspace-theme-light .workspace-tabs-right .workspace-tabs-nav {
+    border-left: 1px solid #cecece;
+}
+
+.workspace-theme-light .workspace-tabs-one {
+    border-right: 1px solid #dedede;
+}
+
+.workspace-theme-light .workspace-tabs-one.active {
+    background-color: #dedede;
+}
+
+
+.workspace-theme-light .toolbox-editor .tm-layout>.tm-layout-bar {
+    background-color: #dedede;
+}
+
+.workspace-theme-light .toolbox-editor .tm-layout-bar>.tm-layout-bar-part {
+    background-color: #dedede;
+}
+
+.workspace-theme-light .toolbox-editor .toolbox-layout-header {
+    border-bottom: 1px solid #dedede;
+}
+
+
+.workspace-theme-light .toolbox-editor .el-table th {
+    background-color: #dedede;
+}
+
+.workspace-theme-light .toolbox-editor .el-table td {
+    /* background-color: #e3e3e3; */
+}
+
+.workspace-theme-light .toolbox-editor .el-table__fixed-right-patch {
+    background-color: #dedede;
+}
+
+.workspace-theme-light .toolbox-editor .el-table tr {
+    /* background-color: #dedede; */
+}
+
+
+.workspace-theme-light .data-list-box {
+    border: 1px solid #dedede;
+}
+
+.workspace-theme-light .data-list-box .data-list-one {
+    border-bottom: 1px solid #dedede;
+}
+
+.workspace-theme-light .data-list-box .data-list-one:hover {
+    background: #ddd;
+}
+
+
+.workspace-theme-light .toolbox-editor .el-tree {
+    border: 1px dotted #dedede;
+}
+
+.workspace-theme-light .toolbox-editor .el-tree-node__content {
+    border-bottom: 1px dotted #dedede;
+}
+
+.workspace-theme-light .toolbox-editor .el-tree .el-tree-node.is-current>.el-tree-node__content {
+    background-color: #dbdbdb !important;
+}
+
+.workspace-theme-light .toolbox-editor .el-tree .el-tree-node:focus>.el-tree-node__content {
+    background-color: #ddd;
+}
+
+.workspace-theme-light .toolbox-editor .el-tree .el-tree-node>.el-tree-node__content:hover {
+    background-color: #ddd;
+}
+
+.workspace-theme-light .toolbox-editor .el-checkbox__input.is-disabled+span.el-checkbox__label {
+    color: #999;
+}
+
+
+.workspace-theme-light .toolbox-terminal-box .terminal-xterm-box {
+    border: 1px solid #ddd;
+}
+
+.workspace-theme-light .terminal-xterm-box .xterm .xterm-viewport::-webkit-scrollbar-thumb {
+    background: #b3b3b3;
+}
+
+.workspace-theme-light .terminal-xterm-box .xterm .xterm-viewport::-webkit-scrollbar-track {
+    background: #c4c4c4;
+}
+
+.workspace-theme-light .terminal-xterm-box .xterm .xterm-viewport::-webkit-scrollbar-corner {
+    background: #8f8f8f;
+}
+
+
+
+
+.workspace-theme-light .toolbox-file-manager-file-box:hover {
+    background: #ddd;
+}
+
+.workspace-theme-light .toolbox-file-manager-file-select {
+    background: #dbdbdb;
+}
+
+.workspace-theme-light .toolbox-file-manager-filter-input input {}
+
+.workspace-theme-light .toolbox-file-manager-dir-input {
+    background-color: transparent;
+}
+
+.workspace-theme-light .toolbox-file-manager-rename-input {
+    border: 1px solid #666666 !important;
+}
+
+.workspace-theme-light .toolbox-file-manager-dir-names-breadcrumb {
+    border-bottom: 1px solid #ddd;
+}
+
+
+.workspace-theme-light .toolbox-file-manager-dir-names-breadcrumb .el-breadcrumb .el-breadcrumb__inner:hover {
+    color: #1a1a1a;
+}
+
+.workspace-theme-light .toolbox-file-manager-file-icon {
+    color: #b1b1b1;
+}
+
+.workspace-theme-light .toolbox-terminal-file-manager-box {}
+
+.workspace-theme-light .toolbox-terminal-file-manager-box-top-line {
+    background: #ddd;
+}
+
+.workspace-theme-light .toolbox-terminal-file-manager-box-left-line {
+    background: #ddd;
+}
+
+.workspace-theme-light .toolbox-terminal-file-manager-box-header {
+    border-bottom: 1px solid #ddd;
+}

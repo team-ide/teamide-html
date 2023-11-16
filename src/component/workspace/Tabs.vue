@@ -376,7 +376,6 @@ export default {
   position: relative;
   user-select: none;
   display: flex;
-  border-bottom: 1px solid #4e4e4e;
 }
 .workspace-tabs.workspace-tabs-no-tab {
   border-bottom: 1px solid transparent;
@@ -391,7 +390,6 @@ export default {
   height: 100%;
   position: relative;
   padding: 0px 0px;
-  background: #2a2a2a;
   display: flex;
 }
 .workspace-tabs-nav-dropdown {
@@ -404,25 +402,15 @@ export default {
   display: flex;
   white-space: nowrap;
 }
-.workspace-tabs-left .workspace-tabs-nav {
-  border-right: 1px solid #404040;
-}
-.workspace-tabs-right .workspace-tabs-nav {
-  border-left: 1px solid #404040;
-}
 .workspace-tabs-nav .mdi {
   font-size: 16px;
 }
 .workspace-tabs-one {
   display: flex;
-  border-right: 1px solid #4e4e4e;
   position: relative;
   border-top-left-radius: 0px;
   border-top-right-radius: 10px;
   align-items: center;
-}
-.workspace-tabs-one.active {
-  background-color: #172029;
 }
 .workspace-tabs-one .workspace-tabs-one-text {
   display: flex;

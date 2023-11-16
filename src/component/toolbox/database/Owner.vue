@@ -14,6 +14,9 @@
             <div class="tm-btn tm-btn-xs bg-blue-8" @click="toTest()">
               性能测试
             </div>
+            <div class="tm-btn tm-btn-xs bg-blue-8" @click="toExport()">
+              导出
+            </div>
             <div
               class="tm-btn tm-btn-xs bg-teal-6"
               @click="toolboxWorker.showInfo()"
@@ -594,13 +597,17 @@ export default {
     async toExport(data) {
       let ownerName = null;
       let tableName = null;
-      if (data.isOwner) {
+      if (data == null) {
+      } else if (data.isOwner) {
         ownerName = data.ownerName;
       } else if (data.isTable) {
         ownerName = data.owner.ownerName;
         tableName = data.tableName;
       }
-      let name = "导出[" + ownerName + "]库";
+      let name = "导出";
+      if (ownerName) {
+        name += "[" + tableName + "]库";
+      }
       if (tableName) {
         name += "[" + tableName + "]表";
       }

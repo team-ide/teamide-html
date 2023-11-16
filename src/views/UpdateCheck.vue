@@ -9,7 +9,7 @@
     :visible="showDialog"
     :before-close="hide"
     top="20px"
-    width="900px"
+    width="96%"
   >
     <div class="mgt--20" style="user-select: text">
       <div class="ft-14 mgb-10">

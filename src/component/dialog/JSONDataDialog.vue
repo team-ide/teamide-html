@@ -8,7 +8,7 @@
     :append-to-body="true"
     :visible="showDialog"
     :before-close="hide"
-    width="1200px"
+    width="96%"
     top="40px"
   >
     <div class="mgt--20">

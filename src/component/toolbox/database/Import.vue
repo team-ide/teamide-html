@@ -26,7 +26,9 @@
             </el-input>
           </el-form-item>
         </template>
-        <el-checkbox v-model="formData.errorContinue"> 有错继续</el-checkbox>
+        <el-form-item label="有错继续">
+          <el-switch v-model="formData.errorContinue"> </el-switch>
+        </el-form-item>
       </el-form>
       <el-form size="mini" inline>
         <template v-if="ownerList == null">

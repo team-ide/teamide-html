@@ -8,7 +8,7 @@
     :append-to-body="true"
     :visible="showDialog"
     :before-close="hide"
-    width="700px"
+    width="96%"
     top="40px"
   >
     <el-form class="mgt--20" ref="form" :model="form" size="mini">
