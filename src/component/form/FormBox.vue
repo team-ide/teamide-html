@@ -1,24 +1,33 @@
 <template>
   <div class="form-box tm-row">
-    <template v-for="formObject in formObjectList">
-      <div :key="formObject.key" class="form-one">
-        <Form
-          :ref="formObject.key"
-          :source="source"
-          :formBuild="formObject.formBuild"
-          :formData="formObject.formData"
-        >
-        </Form>
-      </div>
-    </template>
+    <div
+      class="tm-row"
+      :style="{
+        height: formHeight,
+      }"
+    >
+      <template v-for="formObject in formObjectList">
+        <div :key="formObject.key" class="form-one">
+          <Form
+            :ref="formObject.key"
+            :source="source"
+            :formBuild="formObject.formBuild"
+            :formData="formObject.formData"
+          >
+          </Form>
+        </div>
+      </template>
+    </div>
     <div class="tm-row">
-      <div
-        v-if="onSave != null"
-        class="tm-btn bg-teal-8 ft-18 pdtb-5 tm-btn-block mgt-5"
-        :class="{ 'tm-disabled': saveBtnDisabled }"
-        @click="doSave"
-      >
-        {{ saveText || "保存" }}
+      <div>
+        <div
+          v-if="onSave != null"
+          class="tm-btn bg-teal-8 ft-13 mgt-5"
+          :class="{ 'tm-disabled': saveBtnDisabled }"
+          @click="doSave"
+        >
+          {{ saveText || "保存" }}
+        </div>
       </div>
       <slot></slot>
     </div>
@@ -28,7 +37,7 @@
 <script>
 export default {
   components: {},
-  props: ["source", "onSave", "saveText", "onSuccess"],
+  props: ["source", "onSave", "saveText", "onSuccess", "formHeight"],
   data() {
     return {
       formObjectList: [],

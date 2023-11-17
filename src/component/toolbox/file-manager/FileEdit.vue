@@ -3,15 +3,15 @@
     ref="modal"
     :title="`文件：${path}`"
     :close-on-click-modal="false"
-    :close-on-press-escape="false"
+    :close-on-press-escape="true"
     :show-close="true"
     :append-to-body="true"
     :visible="showDialog"
     :before-close="hide"
-    :fullscreen="true"
-    width="96%"
-    custom-class="toolbox-file-manager-edit-file-dialog"
     :destroy-on-close="true"
+    :fullscreen="true"
+    class="app-dialog"
+    custom-class="toolbox-file-manager-edit-file-dialog"
   >
     <div class="toolbox-file-manager-edit-file" v-loading="loading">
       <template v-if="isImage">
@@ -177,28 +177,6 @@ export default {
 </script>
 
 <style>
-.toolbox-file-manager-edit-file-dialog {
-  background-color: #3c3c3c;
-  color: white;
-  user-select: text;
-}
-.toolbox-file-manager-edit-file-dialog .el-dialog__header {
-  padding: 10px 20px 10px;
-}
-.toolbox-file-manager-edit-file-dialog .el-dialog__header .el-dialog__title {
-  color: white;
-}
-.toolbox-file-manager-edit-file-dialog
-  .el-dialog__header
-  .el-dialog__headerbtn {
-  top: 15px;
-  right: 15px;
-}
-.toolbox-file-manager-edit-file-dialog .el-dialog__body {
-  height: calc(100% - 44px);
-  padding: 0px;
-  overflow: hidden;
-}
 .toolbox-file-manager-edit-file {
   height: 100%;
   width: 100%;
@@ -206,5 +184,6 @@ export default {
 .toolbox-file-manager-edit-file .teamide-editor-box {
   height: calc(100% - 50px);
   width: 100%;
+  padding: 10px;
 }
 </style>

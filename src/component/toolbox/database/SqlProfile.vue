@@ -3,16 +3,21 @@
     ref="modal"
     title="Sql Profile"
     :close-on-click-modal="false"
-    :close-on-press-escape="false"
+    :close-on-press-escape="true"
     :show-close="true"
     :append-to-body="true"
     :visible="showDialog"
     :before-close="hide"
-    width="96%"
-    top="30px"
+    :destroy-on-close="true"
+    class="app-dialog"
+    :fullscreen="true"
   >
-    <div class="toolbox-editor mgt--20">
-      <div class="toolbox-database-sql-profile" v-if="data != null">
+    <div class="pd-10 toolbox-editor" style="height: 100%">
+      <div
+        class="toolbox-database-sql-profile"
+        style="height: 100%"
+        v-if="data != null"
+      >
         <div style="height: 80px">
           <div class="sql-execute-one mgb-10 ft-12">
             <div class="mgb-10">
@@ -59,7 +64,7 @@
             </template>
           </div>
         </div>
-        <div style="height: 560px">
+        <div style="height: calc(100% - 80px)">
           <DataTable
             ref="DataTable"
             :source="source"

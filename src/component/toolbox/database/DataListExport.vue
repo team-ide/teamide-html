@@ -3,15 +3,16 @@
     ref="modal"
     title="数据导出"
     :close-on-click-modal="false"
-    :close-on-press-escape="false"
+    :close-on-press-escape="true"
     :show-close="true"
     :append-to-body="true"
     :visible="showDialog"
     :before-close="hide"
-    width="96%"
-    top="30px"
+    :destroy-on-close="true"
+    :fullscreen="true"
+    class="app-dialog"
   >
-    <div class="toolbox-editor mgt--20 pd-10">
+    <div class="toolbox-editor pd-10" style="height: calc(100% - 0px)">
       <Export
         v-if="ready"
         :source="source"

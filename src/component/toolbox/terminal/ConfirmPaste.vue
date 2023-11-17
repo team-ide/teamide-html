@@ -2,21 +2,22 @@
   <el-dialog
     ref="modal"
     :title="`确认粘贴`"
-    :close-on-click-modal="true"
+    :close-on-click-modal="false"
     :close-on-press-escape="true"
     :show-close="true"
     :append-to-body="true"
     :visible="showDialog"
     :before-close="hide"
-    width="96%"
-    top="40px"
+    :destroy-on-close="true"
+    :fullscreen="true"
+    class="app-dialog"
   >
-    <div>
-      <div style="height: 620px !important">
+    <div class="pd-10" style="height: calc(100% - 60px)">
+      <div style="height: 100%">
         <Editor ref="Editor" :source="source" value="" language="html"></Editor>
       </div>
     </div>
-    <div class="pdt-20">
+    <div class="pd-10">
       <div class="tm-btn bg-green ft-13 mgr-10" @click="doConfirm">确认</div>
       <div class="tm-btn bg-grey ft-13" @click="hide">取消</div>
     </div>

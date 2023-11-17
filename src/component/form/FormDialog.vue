@@ -3,21 +3,24 @@
     ref="modal"
     :title="`${title_ || title}`"
     :close-on-click-modal="false"
-    :close-on-press-escape="false"
+    :close-on-press-escape="true"
     :show-close="true"
     :append-to-body="true"
     :visible="showDialog"
     :before-close="hide"
-    :width="width || '90%'"
-    top="40px"
-    style="user-select: text"
+    :destroy-on-close="true"
+    :fullscreen="true"
+    class="app-dialog"
   >
     <FormBox
+      style="height: 100%"
+      class="pd-10"
       :source="source"
       ref="FormBox"
       :onSave="onSave"
       :saveText="saveText"
       :onSuccess="onSuccess"
+      :formHeight="formHeight_"
     >
       <slot></slot>
     </FormBox>
@@ -36,18 +39,29 @@ export default {
     "saveText",
     "showName",
     "hideName",
+    "formHeight",
   ],
   data() {
     return {
       showDialog: false,
       saveBtnDisabled: false,
       title_: null,
+      formHeight_: null,
     };
   },
   computed: {},
   watch: {},
   methods: {
     init() {
+      if (this.tool.isNotEmpty(this.formHeight)) {
+        this.formHeight_ = this.formHeight;
+      } else {
+        if (this.onSave != null) {
+          this.formHeight_ = "calc(100% - 60px)";
+        } else {
+          this.formHeight_ = "100%";
+        }
+      }
       if (this.wrap) {
         if (this.showName) {
           this.wrap[this.showName] = this.show;

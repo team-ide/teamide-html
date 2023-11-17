@@ -3,15 +3,16 @@
     ref="modal"
     :title="`SSH快速指令`"
     :close-on-click-modal="false"
-    :close-on-press-escape="false"
+    :close-on-press-escape="true"
     :show-close="true"
     :append-to-body="true"
     :visible="showDialog"
     :before-close="hide"
-    width="90%"
-    top="40px"
+    :destroy-on-close="true"
+    :fullscreen="true"
+    class="app-dialog"
   >
-    <div class="">
+    <div class="pd-10" style="height: calc(100% - 60px)">
       <el-form ref="form" size="mini" @submit.native.prevent>
         <el-form-item label="名称">
           <el-input type="input" v-model="name"> </el-input>
@@ -25,7 +26,7 @@
         </el-form-item>
       </el-form>
     </div>
-    <div class="">
+    <div class="pd-10">
       <div
         class="tm-btn bg-teal-8 ft-18 pdtb-5"
         :class="{ 'tm-disabled': saveBtnDisabled }"

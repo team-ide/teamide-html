@@ -3,16 +3,17 @@
     ref="modal"
     :title="title || '表达式'"
     :close-on-click-modal="false"
-    :close-on-press-escape="false"
+    :close-on-press-escape="true"
     :show-close="true"
     :append-to-body="true"
     :visible="showDialog"
     :before-close="hide"
-    width="96%"
-    top="40px"
+    :destroy-on-close="true"
+    :fullscreen="true"
+    class="app-dialog"
   >
-    <div class="mgt--20">
-      <div style="height: 720px !important">
+    <div class="pd-10" style="height: 100%">
+      <div style="height: 100%">
         <Editor
           ref="Editor"
           :source="source"

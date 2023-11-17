@@ -3,25 +3,35 @@
     ref="modal"
     :title="`索引[${indexName}]数据`"
     :close-on-click-modal="false"
-    :close-on-press-escape="false"
+    :close-on-press-escape="true"
     :show-close="true"
     :append-to-body="true"
     :visible="showDialog"
     :before-close="hide"
-    width="96%"
-    top="40px"
+    :destroy-on-close="true"
+    :fullscreen="true"
+    class="app-dialog"
   >
-    <div class="mgt--25">
-      <el-form ref="form" size="mini" @submit.native.prevent>
+    <div class="pd-10" style="height: calc(100% - 60px)">
+      <el-form
+        ref="form"
+        size="mini"
+        @submit.native.prevent
+        style="height: 100%"
+      >
         <el-form-item label="ID">
           <el-input type="input" v-model="id" style="width: 800px"> </el-input>
         </el-form-item>
-        <div class="tm-row">
-          <div class="col-6 pdr-5">
-            <el-form-item label="数据">
+        <div class="tm-row" style="height: calc(100% - 30px)">
+          <div class="col-6 pdr-5" style="height: 100%">
+            <el-form-item
+              label="数据"
+              style="height: 100%"
+              class="editor-form-item mg-0"
+            >
               <div
                 style="
-                  height: 520px !important;
+                  height: calc(100% - 60px) !important;
                   display: inline-block;
                   width: 100%;
                 "
@@ -35,11 +45,15 @@
               </div>
             </el-form-item>
           </div>
-          <div class="col-6 pdl-5">
-            <el-form-item label="数据JSON预览">
+          <div class="col-6 pdl-5" style="height: 100%">
+            <el-form-item
+              label="数据JSON预览"
+              style="height: 100%"
+              class="editor-form-item mg-0"
+            >
               <div
                 style="
-                  height: 520px !important;
+                  height: calc(100% - 60px) !important;
                   display: inline-block;
                   width: 100%;
                 "
@@ -51,9 +65,9 @@
         </div>
       </el-form>
     </div>
-    <div class="">
+    <div class="pd-10">
       <div
-        class="tm-btn bg-teal-8 ft-18 pdtb-5"
+        class="tm-btn bg-teal-8 ft-13"
         :class="{ 'tm-disabled': saveBtnDisabled }"
         @click="doSave"
       >
@@ -192,4 +206,7 @@ export default {
 </script>
 
 <style>
+.editor-form-item .el-form-item__content {
+  height: 100%;
+}
 </style>

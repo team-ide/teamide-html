@@ -3,15 +3,16 @@
     ref="modal"
     :title="`索引[${indexName}]结构`"
     :close-on-click-modal="false"
-    :close-on-press-escape="false"
+    :close-on-press-escape="true"
     :show-close="true"
     :append-to-body="true"
     :visible="showDialog"
     :before-close="hide"
-    width="96%"
-    top="40px"
+    :destroy-on-close="true"
+    :fullscreen="true"
+    class="app-dialog"
   >
-    <div class="">
+    <div class="pd-10" style="height: calc(100% - 60px); overflow: auto">
       <el-form ref="form" size="mini" @submit.native.prevent>
         <el-form-item label="结构">
           <el-input
@@ -33,9 +34,9 @@
         </template>
       </el-form>
     </div>
-    <div class="">
+    <div class="pd-10">
       <div
-        class="tm-btn bg-teal-8 ft-18 pdtb-5 tm-btn-block"
+        class="tm-btn bg-teal-8 ft-13"
         :class="{ 'tm-disabled': saveBtnDisabled }"
         @click="doSave"
       >

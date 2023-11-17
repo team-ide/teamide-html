@@ -9,15 +9,16 @@
       '] 数据为SQL'
     "
     :close-on-click-modal="false"
-    :close-on-press-escape="false"
+    :close-on-press-escape="true"
     :show-close="true"
     :append-to-body="true"
     :visible="showDialog"
     :before-close="hide"
-    width="96%"
-    top="40px"
+    :destroy-on-close="true"
+    class="app-dialog"
+    :fullscreen="true"
   >
-    <div class="mgt--20">
+    <div class="pd-10" style="height: 100%">
       <el-form ref="form" :model="form" size="mini" :inline="true">
         <Pack
           :source="source"
@@ -27,7 +28,7 @@
         >
         </Pack>
       </el-form>
-      <div style="height: 600px !important">
+      <div style="height: calc(100% - 120px)">
         <Editor
           ref="Editor"
           :source="source"

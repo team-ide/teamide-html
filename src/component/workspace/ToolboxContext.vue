@@ -163,6 +163,7 @@
       :source="source"
       title="新增Toolbox"
       :onSave="doInsert"
+      formHeight="calc(100% - 100px)"
     >
       <div class="tm-link color-blue-8 ft-14 mgt-10" @click="toTestForInsert()">
         <span v-if="checking">测试中...</span>
@@ -182,6 +183,7 @@
       :source="source"
       title="编辑Toolbox"
       :onSave="doUpdate"
+      formHeight="calc(100% - 100px)"
     >
       <div class="tm-link color-blue-8 ft-14 mgt-10" @click="toTestForUpdate()">
         <span v-if="checking">测试中...</span>

@@ -3,20 +3,20 @@
     ref="modal"
     title="终端执行记录"
     :close-on-click-modal="false"
-    :close-on-press-escape="false"
+    :close-on-press-escape="true"
     :show-close="true"
     :append-to-body="true"
     :visible="showDialog"
     :before-close="hide"
-    width="96%"
-    custom-class="toolbox-terminal-logs-dialog"
     :destroy-on-close="true"
+    :fullscreen="true"
+    class="app-dialog"
   >
-    <div class="mgt-20">
+    <div class="pd-10" style="height: calc(100% - 0px)">
       <el-table
         :data="dataList"
         :border="true"
-        height="500px"
+        height="100%"
         style="width: 100%"
         size="mini"
       >
@@ -168,7 +168,4 @@ export default {
 </script>
 
 <style>
-.toolbox-terminal-logs-dialog {
-  user-select: text;
-}
 </style>

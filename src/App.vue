@@ -227,4 +227,22 @@ body {
   width: 100px;
   height: 100px;
 }
+
+.app-dialog {
+  user-select: text;
+}
+.app-dialog.el-dialog__wrapper {
+  top: 20px;
+  left: 20px;
+  right: 20px;
+  bottom: 20px;
+}
+.app-dialog.el-dialog__wrapper .el-dialog.is-fullscreen .el-dialog__header {
+  padding: 15px 10px 5px;
+}
+.app-dialog.el-dialog__wrapper .el-dialog.is-fullscreen .el-dialog__body {
+  height: calc(100% - 44px);
+  padding: 0px;
+  overflow: auto;
+}
 </style>

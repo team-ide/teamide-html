@@ -3,15 +3,16 @@
     ref="modal"
     :title="`文件上传`"
     :close-on-click-modal="false"
-    :close-on-press-escape="false"
+    :close-on-press-escape="true"
     :show-close="true"
     :append-to-body="true"
     :visible="showDialog"
     :before-close="hide"
-    width="96%"
-    top="40px"
+    :destroy-on-close="true"
+    :fullscreen="true"
+    class="app-dialog"
   >
-    <div>
+    <div class="pd-10" style="height: 100%">
       <div
         class="terminal-upload-box"
         @drop="onDrop"
@@ -19,10 +20,14 @@
         @dragleave="onDragleave"
         draggable="true"
       >
-        <i class="mdi mdi-upload ft-20"></i>
-        <div class="mgt-10 ft-16">
-          将文件拖到此处 ，或
-          <div class="tm-link color-green" @click="toClickUpload">点击上传</div>
+        <div style="top: 40%; position: relative">
+          <i class="mdi mdi-upload ft-20"></i>
+          <div class="mgt-10 ft-16">
+            将文件拖到此处 ，或
+            <div class="tm-link color-green" @click="toClickUpload">
+              点击上传
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -411,7 +416,7 @@ export default {
   margin: 0px auto;
   text-align: center;
   border: 2px dashed #ddd;
-  padding: 200px;
+  height: 100%;
 }
 #input-for-upload {
   width: 0px;

@@ -3,16 +3,17 @@
     ref="modal"
     :title="title || '数据'"
     :close-on-click-modal="false"
-    :close-on-press-escape="false"
+    :close-on-press-escape="true"
     :show-close="true"
     :append-to-body="true"
     :visible="showDialog"
     :before-close="hide"
-    width="96%"
-    top="40px"
+    :destroy-on-close="true"
+    :fullscreen="true"
+    class="app-dialog"
   >
-    <div class="mgt--20">
-      <div style="height: 620px !important">
+    <div class="pd-10" style="height: calc(100% - 60px)">
+      <div style="height: 100%">
         <Editor
           ref="Editor"
           :source="source"
@@ -21,15 +22,15 @@
         ></Editor>
       </div>
     </div>
-    <div class="mgt-10">
+    <div class="pd-10">
       <div
         v-if="onSave != null"
-        class="tm-btn bg-teal-8 ft-18 pdtb-5"
+        class="tm-btn bg-teal-8 ft-13 mgr-10"
         @click="doSave"
       >
         确认
       </div>
-      <div class="tm-btn bg-teal-8 ft-18 pdtb-5" @click="toView">预览</div>
+      <div class="tm-btn bg-teal-8 ft-13" @click="toView">预览</div>
     </div>
   </el-dialog>
 </template>

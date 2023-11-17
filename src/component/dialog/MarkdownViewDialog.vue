@@ -2,17 +2,17 @@
   <el-dialog
     ref="modal"
     :title="title || '数据'"
-    :close-on-click-modal="true"
+    :close-on-click-modal="false"
     :close-on-press-escape="true"
     :show-close="true"
     :append-to-body="true"
     :visible="showDialog"
     :before-close="hide"
-    width="96%"
-    top="0px"
-    class="markdown-view-dialog"
+    :destroy-on-close="true"
+    class="app-dialog"
+    :fullscreen="true"
   >
-    <div class="mgt--20">
+    <div class="" style="height: calc(100% - 0px)">
       <article
         class="markdown-body"
         style="text-align: left"
@@ -68,7 +68,6 @@ export default {
 <style>
 .markdown-body {
   box-sizing: border-box;
-  min-width: 200px;
   /* max-width: 980px; */
   /* padding: 45px; */
   max-width: 100%;
@@ -93,9 +92,5 @@ export default {
   .markdown-body {
     padding: 15px;
   }
-}
-.markdown-view-dialog .el-dialog {
-  margin-bottom: 0px;
-  user-select: text;
 }
 </style>

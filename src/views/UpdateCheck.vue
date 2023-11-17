@@ -2,16 +2,17 @@
   <el-dialog
     ref="modal"
     :title="`检测新版本`"
-    :close-on-click-modal="true"
+    :close-on-click-modal="false"
     :close-on-press-escape="true"
     :show-close="true"
     :append-to-body="true"
     :visible="showDialog"
     :before-close="hide"
-    top="20px"
-    width="96%"
+    :destroy-on-close="true"
+    :fullscreen="true"
+    class="app-dialog"
   >
-    <div class="mgt--20" style="user-select: text">
+    <div class="pd-10" style="height: 100%; user-select: text">
       <div class="ft-14 mgb-10">
         当前版本
         <span class="color-green mgl-10">{{ currentVersion }}</span>
@@ -25,7 +26,10 @@
           >{{ githubReleasesURL }}</a
         >
       </div>
-      <div v-html="releaseHistory"></div>
+      <div
+        v-html="releaseHistory"
+        style="height: calc(100% - 60px); overflow: auto"
+      ></div>
     </div>
   </el-dialog>
 </template>
