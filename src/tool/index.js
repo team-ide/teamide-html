@@ -409,6 +409,16 @@ tool.Utf8ArrayToStr = function (array) {
     }
     return out;
 };
+
+tool.getStringValue = function (v) {
+    if (v == null) {
+        return v;
+    }
+    if (typeof (v) === 'object') {
+        return JSON.stringify(v)
+    }
+    return v;
+};
 tool.clipboardWrite = async function (text) {
 
     return new Promise(function (resolve, reject) {

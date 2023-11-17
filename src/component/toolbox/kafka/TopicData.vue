@@ -84,13 +84,17 @@
               <template v-for="(column, index) in headerColumnList">
                 <template v-if="column.checked">
                   <el-table-column
-                    :key="index"
+                    :key="'header-key-' + index"
                     :prop="column.name"
                     :label="`header:${column.name}`"
                   >
                     <template slot-scope="scope">
                       <div class="">
-                        {{ scope.row.headerValue[column.name] }}
+                        {{
+                          tool.getStringValue(
+                            scope.row.headerValue[column.name]
+                          )
+                        }}
                       </div>
                     </template>
                   </el-table-column>
@@ -109,13 +113,15 @@
               <template v-for="(column, index) in columnList">
                 <template v-if="column.checked">
                   <el-table-column
-                    :key="index"
+                    :key="'value-key-' + index"
                     :prop="column.name"
                     :label="`json:${column.name}`"
                   >
                     <template slot-scope="scope">
                       <div class="">
-                        {{ scope.row.jsonValue[column.name] }}
+                        {{
+                          tool.getStringValue(scope.row.jsonValue[column.name])
+                        }}
                       </div>
                     </template>
                   </el-table-column>

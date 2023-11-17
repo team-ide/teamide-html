@@ -199,7 +199,9 @@
                   >
                     <template slot-scope="scope">
                       <span class="">
-                        {{ scope.row._source[column.name] }}
+                        {{
+                          tool.getStringValue(scope.row._source[column.name])
+                        }}
                       </span>
                     </template>
                   </el-table-column>
@@ -593,6 +595,7 @@ export default {
           let hits = result.hits || [];
           hits.forEach((one) => {
             one._source = this.formatSourceJSON(one._source);
+            // console.log(this.tool.getStringValue(one._source["aa"]));
           });
           this.dataList = hits;
           this.total = 0;
