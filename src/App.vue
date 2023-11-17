@@ -4,7 +4,7 @@
       <InfoBox :source="source"></InfoBox>
       <SystemInfoBox :source="source"></SystemInfoBox>
       <AlertBox :source="source"></AlertBox>
-      <router-view :source="source"></router-view>
+      <Index :source="source"></Index>
       <Login v-show="source.login.show" :source="source"></Login>
       <Register v-show="source.register.show" :source="source"></Register>
       <UpdateCheck :source="source"></UpdateCheck>
@@ -54,12 +54,13 @@
 <script>
 import source from "@/source";
 
+import Index from "@/views/Index.vue";
 import Login from "@/views/Login.vue";
 import Register from "@/views/Register.vue";
 import UpdateCheck from "@/views/UpdateCheck.vue";
 
 export default {
-  components: { Login, Register, UpdateCheck },
+  components: { Index, Login, Register, UpdateCheck },
   props: [],
   data() {
     return { source, contextmenu: { menus: [] } };
@@ -95,43 +96,43 @@ export default {
       this.tool.showJavascriptFunc = this.$refs.JavascriptFuncDialog.show;
       this.tool.showJavascriptExample = this.$refs.JavascriptExampleDialog.show;
 
-      window.onMonacoLoad(() => {
-        let monaco = window.monaco;
-        this.monacoInstance = monaco.editor.create(this.$refs.editorForCopy, {
-          theme: "vs-dark", //官方自带三种主题vs, hc-black, or vs-dark
-          minimap: { enabled: false }, // 缩略导航
-          value: "", //编辑器初始显示文字
-          language: "html",
-          selectOnLineNumbers: false, //显示行号
-          roundedSelection: false,
-          cursorStyle: "line", //光标样式
-          automaticLayout: false, //自动布局
-          glyphMargin: false, //字形边缘
-          useTabStops: false,
-          fontSize: 13, //字体大小
-          autoIndent: false, //自动布局
-          // quickSuggestionsDelay: 500, //代码提示延时
-          contextmenu: false,
-        });
-        this.tool.copyByEditor = (text) => {
-          this.monacoInstance.setValue(text || "");
-          this.monacoInstance.setSelection({
-            startLineNumber: 0,
-            startColumn: 0,
-            endLineNumber: 999999,
-            endColumn: 999999,
-          });
-          let action = this.monacoInstance.getAction(
-            "editor.action.clipboardCopyWithSyntaxHighlightingAction"
-          );
-          if (action) {
-            action.run();
-            return { success: true };
-          } else {
-            return { success: false };
-          }
-        };
-      });
+      // this.tool.copyByEditor = (text) => {
+      //   if (this.monacoInstance == null) {
+      //     let monaco = window.monaco;
+      //     this.monacoInstance = monaco.editor.create(this.$refs.editorForCopy, {
+      //       theme: "vs-dark", //官方自带三种主题vs, hc-black, or vs-dark
+      //       minimap: { enabled: false }, // 缩略导航
+      //       value: "", //编辑器初始显示文字
+      //       language: "html",
+      //       selectOnLineNumbers: false, //显示行号
+      //       roundedSelection: false,
+      //       cursorStyle: "line", //光标样式
+      //       automaticLayout: false, //自动布局
+      //       glyphMargin: false, //字形边缘
+      //       useTabStops: false,
+      //       fontSize: 13, //字体大小
+      //       autoIndent: false, //自动布局
+      //       // quickSuggestionsDelay: 500, //代码提示延时
+      //       contextmenu: false,
+      //     });
+      //   }
+      //   this.monacoInstance.setValue(text || "");
+      //   this.monacoInstance.setSelection({
+      //     startLineNumber: 0,
+      //     startColumn: 0,
+      //     endLineNumber: 999999,
+      //     endColumn: 999999,
+      //   });
+      //   let action = this.monacoInstance.getAction(
+      //     "editor.action.clipboardCopyWithSyntaxHighlightingAction"
+      //   );
+      //   if (action) {
+      //     action.run();
+      //     return { success: true };
+      //   } else {
+      //     return { success: false };
+      //   }
+      // };
     },
     showContextmenu(menus) {
       let e = window.event;

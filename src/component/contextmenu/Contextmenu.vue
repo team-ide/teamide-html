@@ -85,20 +85,24 @@ export default {
         delete this.showing;
       });
     },
-  },
-  mounted() {
-    if (this.contextmenu) {
-      this.contextmenu.show = this.show;
-      this.contextmenu.hide = this.hide;
-    }
-    document.addEventListener("mouseup", (e) => {
+    onMouseup(e) {
       if (this.$el.contains(e.target)) {
         return;
       }
       if (e.button == 0) {
         this.hide();
       }
-    });
+    },
+  },
+  beforeDestroy() {
+    document.removeEventListener("mouseup", this.onMouseup);
+  },
+  mounted() {
+    if (this.contextmenu) {
+      this.contextmenu.show = this.show;
+      this.contextmenu.hide = this.hide;
+    }
+    document.addEventListener("mouseup", this.onMouseup);
   },
 };
 </script>

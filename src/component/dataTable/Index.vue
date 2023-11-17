@@ -138,6 +138,7 @@ export default {
       this.refreshData();
 
       this.$nextTick(() => {
+        this.unbind();
         this.bind();
       });
     },
@@ -196,6 +197,12 @@ export default {
     bind() {
       this.selectWrap = this.$el.querySelector(".el-table__body-wrapper");
       this.selectWrap.addEventListener("scroll", this.onBodyScroll);
+    },
+    unbind() {
+      let selectWrap = this.$el.querySelector(".el-table__body-wrapper");
+      if (selectWrap) {
+        selectWrap.removeEventListener("scroll", this.onBodyScroll);
+      }
     },
     onBodyScroll() {
       const scrollDistance =
@@ -319,6 +326,9 @@ export default {
   },
   created() {},
   mounted() {},
+  beforeDestroy() {
+    this.unbind();
+  },
 };
 </script>
 

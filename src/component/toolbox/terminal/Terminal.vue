@@ -431,23 +431,37 @@ export default {
       }
       this.$nextTick(this.bindDrapFTPEvent);
     },
+    unbindDrapFTPEvent() {
+      this.$refs["ftpBoxLeftLine"] &&
+        this.$refs["ftpBoxLeftLine"].removeEventListener(
+          "mousedown",
+          this.leftLineMousedown
+        );
+      this.$refs["ftpBoxTopLine"] &&
+        this.$refs["ftpBoxTopLine"].removeEventListener(
+          "mousedown",
+          this.topLineMousedown
+        );
+    },
     bindDrapFTPEvent() {
       if (this.bindDrapFTPEvented) {
         return;
       }
       this.bindDrapFTPEvented = true;
       let leftLine = this.$refs.ftpBoxLeftLine;
-      leftLine.addEventListener("mousedown", (e) => {
-        this.lineLeftClientX = e.clientX;
-        document.addEventListener("mouseup", this.documentMouseupEvent);
-        document.addEventListener("mousemove", this.documentMousemoveLeftEvent);
-      });
+      leftLine.addEventListener("mousedown", this.leftLineMousedown);
       let topLine = this.$refs.ftpBoxTopLine;
-      topLine.addEventListener("mousedown", (e) => {
-        this.lineTopClientY = e.clientY;
-        document.addEventListener("mouseup", this.documentMouseupEvent);
-        document.addEventListener("mousemove", this.documentMousemoveTopEvent);
-      });
+      topLine.addEventListener("mousedown", this.topLineMousedown);
+    },
+    leftLineMousedown(e) {
+      this.lineLeftClientX = e.clientX;
+      document.addEventListener("mouseup", this.documentMouseupEvent);
+      document.addEventListener("mousemove", this.documentMousemoveLeftEvent);
+    },
+    topLineMousedown(e) {
+      this.lineTopClientY = e.clientY;
+      document.addEventListener("mouseup", this.documentMouseupEvent);
+      document.addEventListener("mousemove", this.documentMousemoveTopEvent);
     },
     documentMouseupEvent() {
       document.removeEventListener("mouseup", this.documentMouseupEvent);
@@ -742,7 +756,27 @@ export default {
         this.onContextmenu,
         true
       );
-      window.term = this.term;
+      // window.term = this.term;
+    },
+    unbindTermEvent() {
+      if (this.term) {
+        this.term.textarea.removeEventListener(
+          "paste",
+          this.pasteEventListener
+        );
+        this.term.element.removeEventListener("paste", this.pasteEventListener);
+        this.term.element.removeEventListener("keydown", this.onKeydown);
+        this.term.element.removeEventListener("mouseup", this.onMouseup);
+        this.term.element.removeEventListener("mousedown", this.onMousedown);
+        this.term.textarea.removeEventListener(
+          "contextmenu",
+          this.onContextmenu
+        );
+        this.term.element.removeEventListener(
+          "contextmenu",
+          this.onContextmenu
+        );
+      }
     },
     pasteEventListener(ev) {
       // console.log("pasteEventListener", ev);
@@ -1012,6 +1046,8 @@ export default {
       } catch (e) {}
     }
     this.worker.close();
+    this.unbindDrapFTPEvent();
+    this.unbindTermEvent();
     this.term = null;
     this.worker = null;
   },
