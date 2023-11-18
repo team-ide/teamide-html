@@ -311,6 +311,13 @@
               </el-dropdown-menu>
             </el-dropdown>
           </div>
+          <div
+            class="workspace-header-nav pdlr-0"
+            @click="openPage('userSetting', '个人设置')"
+            title="个人设置"
+          >
+            <i class="mdi mdi-account-wrench ft-18"></i>
+          </div>
         </template>
         <div
           v-if="source.hasPower('updateCheck')"
