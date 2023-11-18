@@ -88,6 +88,9 @@ export default {
   text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
   white-space: nowrap;
   text-decoration: none;
+  max-width: 300px;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 li {
   position: relative;
@@ -102,6 +105,9 @@ li a {
   white-space: nowrap;
   text-decoration: none;
   cursor: pointer;
+  max-width: 300px;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 li > a:hover,

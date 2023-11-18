@@ -26,7 +26,7 @@
         <div v-if="source.hasPower('toolbox')" class="workspace-header-nav">
           <el-dropdown
             trigger="click"
-            class="terminal-dropdown"
+            class="workspace-header-dropdown"
             ref="showTabGroupDropdown"
           >
             <span class="el-dropdown-link" style="padding: 5px 0px">
@@ -41,7 +41,10 @@
               </span>
               <i class="el-icon-arrow-down el-icon--right"></i>
             </span>
-            <el-dropdown-menu slot="dropdown" class="terminal-dropdown-menu">
+            <el-dropdown-menu
+              slot="dropdown"
+              class="workspace-header-dropdown-menu"
+            >
               <MenuBox class="menu-mini">
                 <template
                   v-if="source.showTabGroups && source.showTabGroups.length > 0"
@@ -76,29 +79,49 @@
           </el-dropdown>
         </div>
         <div
-          v-if="source.hasPower('node')"
+          v-if="source.hasPower('node') || source.hasPower('node/netProxy')"
           class="workspace-header-nav"
-          @click="openNodeContext()"
         >
-          节点
-        </div>
-        <div
-          v-if="source.hasPower('node/netProxy')"
-          class="workspace-header-nav"
-          @click="openNodeNetProxyContext()"
-        >
-          网络代理|透传
+          <el-dropdown
+            trigger="click"
+            class="workspace-header-dropdown"
+            ref="terminalDropdown"
+          >
+            <span class="el-dropdown-link" style="padding: 5px 0px">
+              节点|透传<i class="el-icon-arrow-down el-icon--right"></i>
+            </span>
+            <el-dropdown-menu
+              slot="dropdown"
+              class="workspace-header-dropdown-menu"
+            >
+              <MenuBox class="menu-mini">
+                <MenuItem
+                  v-if="source.hasPower('node')"
+                  @click="openNodeContext()"
+                  >节点</MenuItem
+                >
+                <MenuItem
+                  v-if="source.hasPower('node/netProxy')"
+                  @click="openNodeNetProxyContext()"
+                  >网络代理|透传</MenuItem
+                >
+              </MenuBox>
+            </el-dropdown-menu>
+          </el-dropdown>
         </div>
         <div v-if="source.hasPower('terminal')" class="workspace-header-nav">
           <el-dropdown
             trigger="click"
-            class="terminal-dropdown"
+            class="workspace-header-dropdown"
             ref="terminalDropdown"
           >
             <span class="el-dropdown-link" style="padding: 5px 0px">
               终端<i class="el-icon-arrow-down el-icon--right"></i>
             </span>
-            <el-dropdown-menu slot="dropdown" class="terminal-dropdown-menu">
+            <el-dropdown-menu
+              slot="dropdown"
+              class="workspace-header-dropdown-menu"
+            >
               <MenuBox class="menu-mini">
                 <template v-if="source.setting.terminalLocalEnable">
                   <MenuItem @click="openTerminal('local')">本地</MenuItem>
@@ -156,7 +179,7 @@
         <div v-if="source.hasPower('fileManager')" class="workspace-header-nav">
           <el-dropdown
             trigger="click"
-            class="file-manager-dropdown"
+            class="workspace-header-dropdown"
             ref="fileManagerDropdown"
           >
             <span class="el-dropdown-link" style="padding: 5px 0px">
@@ -164,7 +187,7 @@
             </span>
             <el-dropdown-menu
               slot="dropdown"
-              class="file-manager-dropdown-menu"
+              class="workspace-header-dropdown-menu"
             >
               <MenuBox class="menu-mini">
                 <template v-if="source.setting.fileManagerLocalEnable">
@@ -826,34 +849,15 @@ export default {
   display: flex;
 }
 
-.file-manager-dropdown.el-dropdown {
+.workspace-header-dropdown.el-dropdown {
   color: unset;
   font-size: unset;
   display: flex;
   white-space: nowrap;
   align-items: center;
-}
-.file-manager-dropdown-menu.el-dropdown-menu {
-  padding: 0;
-  margin: 0;
-  border: 0;
-  border-radius: 4px;
-  box-shadow: 0 0 0;
-  background: transparent;
-  top: 35px !important;
-}
-.file-manager-dropdown-menu .menu-box a {
-  cursor: pointer;
 }
 
-.terminal-dropdown.el-dropdown {
-  color: unset;
-  font-size: unset;
-  display: flex;
-  white-space: nowrap;
-  align-items: center;
-}
-.terminal-dropdown-menu.el-dropdown-menu {
+.workspace-header-dropdown-menu.el-dropdown-menu {
   padding: 0;
   margin: 0;
   border: 0;
@@ -862,7 +866,7 @@ export default {
   background: transparent;
   top: 35px !important;
 }
-.terminal-dropdown-menu .menu-box a {
+.workspace-header-dropdown-menu .menu-box a {
   cursor: pointer;
 }
 
