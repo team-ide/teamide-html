@@ -41,6 +41,52 @@
 }
 
 
+
+
+.workspace-theme-light .toolbox-context-box {
+    background: #ffffff;
+}
+
+.workspace-theme-light .toolbox-context-box .toolbox-group-box {
+    background: #e9e9e9;
+}
+
+.workspace-theme-light .toolbox-context-box .toolbox-group-header-search-box .toolbox-group-header-search {
+    border: 1px solid #ddd;
+}
+
+.workspace-theme-light .toolbox-context-box .toolbox-group-title {
+    background: #e1e1e1;
+}
+
+.workspace-theme-light .toolbox-context-box .toolbox-group-one:hover .toolbox-group-title {
+    background: #ddd;
+}
+
+.workspace-theme-light .toolbox-context-box .toolbox-group-one.active .toolbox-group-title {
+    background: #cacaca;
+}
+
+.workspace-theme-light .toolbox-context-box .toolbox-search-box .toolbox-search-input {
+    border: 1px solid #ddd;
+}
+
+.workspace-theme-light .toolbox-context-box .toolbox-type-title {
+    background: #f5f5f5;
+    color: #959595;
+}
+
+.workspace-theme-light .toolbox-context-box .toolbox-type-data-box {
+    background: #efefef;
+}
+
+.workspace-theme-light .toolbox-context-box .toolbox-type-data:hover {
+    background: #ddd;
+}
+
+
+
+
 .workspace-theme-light .toolbox-editor .tm-layout>.tm-layout-bar {
     background-color: #dedede;
 }

@@ -3,156 +3,180 @@
     class="toolbox-context-box"
     :class="{ 'toolbox-context-box-show': showBox }"
   >
-    <div class="toolbox-context-box-header">
-      <div class="color-white ft-16 pdl-10 pdt-5">
-        工具箱
-        <span class="color-orange mgl-20 ft-12"
-          >请右击进行操作，点击某个分组，查看一分组的各类工具</span
-        >
-      </div>
-      <div
-        style="display: inline-block; position: absolute; top: 0px; right: 0px"
-      >
-        <span title="关闭" class="tm-link color-write mgr-0" @click="hide">
-          <i class="mdi mdi-close ft-21"></i>
-        </span>
-      </div>
-    </div>
-    <div class="toolbox-context-body" v-if="selectGroup != null">
-      <div class="toolbox-group-box">
-        <div class="toolbox-group-header">
-          <div class="toolbox-group-header-text">分组</div>
-          <span
-            class="tm-link color-green mgl-5 mgt-5"
-            title="新增分组"
-            @click="toInsertGroup()"
+    <template v-if="showBox">
+      <div class="toolbox-context-box-header">
+        <div class="ft-16 pdl-10 pdt-5">
+          工具箱
+          <span class="color-orange mgl-20 ft-12"
+            >请右击进行操作，点击某个分组，查看一分组的各类工具</span
           >
-            <i class="mdi mdi-plus ft-14"></i>
+        </div>
+        <div
+          style="
+            display: inline-block;
+            position: absolute;
+            top: 0px;
+            right: 0px;
+          "
+        >
+          <span title="关闭" class="tm-link color-write mgr-0" @click="hide">
+            <i class="mdi mdi-close ft-21"></i>
           </span>
-          <div class="toolbox-group-header-search-box mgl-10">
+        </div>
+      </div>
+      <div class="toolbox-context-body" v-if="selectGroup != null">
+        <div class="toolbox-group-box">
+          <div class="toolbox-group-header">
+            <div class="toolbox-group-header-text">分组</div>
+            <span
+              class="tm-link color-green mgl-5 mgt-5"
+              title="新增分组"
+              @click="toInsertGroup()"
+            >
+              <i class="mdi mdi-plus ft-14"></i>
+            </span>
+            <div class="toolbox-group-header-search-box mgl-10">
+              <input
+                class="toolbox-group-header-search"
+                v-model="searchGroup"
+                placeholder="输入过滤"
+              />
+            </div>
+          </div>
+          <div class="toolbox-group-body app-scroll-bar">
+            <template v-for="group in groupList">
+              <div
+                :key="group.groupId"
+                class="toolbox-group-one"
+                :class="{ active: group.groupId == selectGroup.groupId }"
+                v-if="
+                  tool.isEmpty(searchGroup) ||
+                  group.name.toLowerCase().indexOf(searchGroup.toLowerCase()) >=
+                    0
+                "
+                @click="toSelectGroup(group)"
+                @contextmenu="groupContextmenu(group)"
+              >
+                <div class="toolbox-group-title">
+                  <div class="toolbox-group-title-text">
+                    {{ group.name }}
+                  </div>
+                </div>
+              </div>
+            </template>
+          </div>
+        </div>
+
+        <div
+          class="toolbox-type-box app-scroll-bar"
+          v-if="showToolboxContext != null"
+        >
+          <div class="toolbox-search-box">
             <input
-              class="toolbox-group-header-search"
-              v-model="searchGroup"
+              class="toolbox-search-input"
+              v-model="toolboxSearch"
               placeholder="输入过滤"
             />
           </div>
-        </div>
-        <div class="toolbox-group-body app-scroll-bar">
-          <template v-for="group in groupList">
-            <div
-              :key="group.groupId"
-              class="toolbox-group-one"
-              :class="{ active: group.groupId == selectGroup.groupId }"
-              v-if="
-                tool.isEmpty(searchGroup) ||
-                group.name.toLowerCase().indexOf(searchGroup.toLowerCase()) >= 0
-              "
-              @click="toSelectGroup(group)"
-              @contextmenu="groupContextmenu(group)"
-            >
-              <div class="toolbox-group-title">
-                <div class="toolbox-group-title-text">
-                  {{ group.name }}
+          <template v-for="toolboxType in showToolboxTypes">
+            <div :key="toolboxType.name" class="toolbox-type-one">
+              <div class="toolbox-type-title">
+                <div class="toolbox-type-title-text">
+                  <template v-if="toolboxType.name == 'database'">
+                    <IconFont class="teamide-database"> </IconFont>
+                  </template>
+                  <template v-else-if="toolboxType.name == 'redis'">
+                    <IconFont class="teamide-redis"> </IconFont>
+                  </template>
+                  <template v-else-if="toolboxType.name == 'elasticsearch'">
+                    <IconFont class="teamide-elasticsearch"> </IconFont>
+                  </template>
+                  <template v-else-if="toolboxType.name == 'kafka'">
+                    <IconFont class="teamide-kafka"> </IconFont>
+                  </template>
+                  <template v-else-if="toolboxType.name == 'zookeeper'">
+                    <IconFont class="teamide-zookeeper"> </IconFont>
+                  </template>
+                  <template v-else-if="toolboxType.name == 'ssh'">
+                    <IconFont class="teamide-ssh"> </IconFont>
+                    <IconFont class="teamide-ftp"> </IconFont>
+                  </template>
+                  <span class="toolbox-type-text">
+                    {{ toolboxType.text || toolboxType.name }}
+                    <span
+                      v-if="showToolboxContext[toolboxType.name] != null"
+                      class="mgl-5 color-green ft-12"
+                    >
+                      (
+                      {{ showToolboxContext[toolboxType.name].length }}
+                      )
+                    </span>
+                  </span>
+                  <span
+                    class="tm-link color-green mgl-10"
+                    title="新增"
+                    v-if="toolboxType.name != 'other'"
+                    @click="toInsert(toolboxType, selectGroup)"
+                  >
+                    <i class="mdi mdi-plus ft-14"></i>
+                  </span>
                 </div>
+              </div>
+              <div
+                class="toolbox-type-data-box"
+                :class="{
+                  'app-scroll-bar toolbox-type-data-box-have-data':
+                    showToolboxContext[toolboxType.name] != null &&
+                    showToolboxContext[toolboxType.name].length != 0,
+                }"
+                @contextmenu="dataContextmenu(toolboxType)"
+              >
+                <template
+                  v-if="
+                    showToolboxContext[toolboxType.name] == null ||
+                    showToolboxContext[toolboxType.name].length == 0
+                  "
+                >
+                  <span
+                    class="tm-link color-green mglr-10 mgtb-5"
+                    title="新增"
+                    v-if="toolboxType.name != 'other'"
+                    @click="toInsert(toolboxType, selectGroup)"
+                  >
+                    新增
+                  </span>
+                </template>
+                <template v-else>
+                  <template
+                    v-for="toolboxData in showToolboxContext[toolboxType.name]"
+                  >
+                    <div
+                      :key="toolboxData.toolboxId"
+                      v-if="
+                        tool.isEmpty(toolboxSearch) ||
+                        toolboxData.name
+                          .toLowerCase()
+                          .indexOf(toolboxSearch.toLowerCase()) >= 0
+                      "
+                      class="toolbox-type-data"
+                      @contextmenu="dataContextmenu(toolboxType, toolboxData)"
+                      @click="toolboxDataOpen(toolboxData)"
+                    >
+                      <span
+                        class="toolbox-type-data-text"
+                        :title="'打开:' + toolboxData.name"
+                      >
+                        {{ toolboxData.name }}
+                      </span>
+                    </div>
+                  </template>
+                </template>
               </div>
             </div>
           </template>
         </div>
       </div>
-
-      <div class="toolbox-type-box app-scroll-bar" v-if="searchMap != null">
-        <template v-for="toolboxType in toolboxTypes">
-          <div :key="toolboxType.name" class="toolbox-type-one">
-            <div class="toolbox-type-title">
-              <div class="toolbox-type-title-text">
-                <template v-if="toolboxType.name == 'database'">
-                  <IconFont class="teamide-database"> </IconFont>
-                </template>
-                <template v-else-if="toolboxType.name == 'redis'">
-                  <IconFont class="teamide-redis"> </IconFont>
-                </template>
-                <template v-else-if="toolboxType.name == 'elasticsearch'">
-                  <IconFont class="teamide-elasticsearch"> </IconFont>
-                </template>
-                <template v-else-if="toolboxType.name == 'kafka'">
-                  <IconFont class="teamide-kafka"> </IconFont>
-                </template>
-                <template v-else-if="toolboxType.name == 'zookeeper'">
-                  <IconFont class="teamide-zookeeper"> </IconFont>
-                </template>
-                <template v-else-if="toolboxType.name == 'ssh'">
-                  <IconFont class="teamide-ssh"> </IconFont>
-                  <IconFont class="teamide-ftp"> </IconFont>
-                </template>
-                <span class="toolbox-type-text">
-                  {{ toolboxType.text || toolboxType.name }}
-                </span>
-                <span
-                  class="tm-link color-green mgl-10"
-                  title="新增"
-                  v-if="toolboxType.name != 'other'"
-                  @click="toInsert(toolboxType, selectGroup)"
-                >
-                  <i class="mdi mdi-plus ft-14"></i>
-                </span>
-              </div>
-              <div class="toolbox-type-data-search-box">
-                <input
-                  class="toolbox-type-data-search"
-                  v-model="searchMap[toolboxType.name]"
-                  placeholder="输入过滤"
-                />
-              </div>
-            </div>
-            <div
-              class="toolbox-type-data-box app-scroll-bar"
-              @contextmenu="dataContextmenu(toolboxType)"
-            >
-              <template
-                v-if="
-                  selectGroup.context[toolboxType.name] == null ||
-                  selectGroup.context[toolboxType.name].length == 0
-                "
-              >
-                <span
-                  class="tm-link color-green"
-                  title="新增"
-                  v-if="toolboxType.name != 'other'"
-                  @click="toInsert(toolboxType, selectGroup)"
-                >
-                  新增
-                </span>
-              </template>
-              <template v-else>
-                <template
-                  v-for="toolboxData in selectGroup.context[toolboxType.name]"
-                >
-                  <div
-                    :key="toolboxData.toolboxId"
-                    v-if="
-                      tool.isEmpty(searchMap[toolboxType.name]) ||
-                      toolboxData.name
-                        .toLowerCase()
-                        .indexOf(searchMap[toolboxType.name].toLowerCase()) >= 0
-                    "
-                    class="toolbox-type-data"
-                    @contextmenu="dataContextmenu(toolboxType, toolboxData)"
-                    @click="toolboxDataOpen(toolboxData)"
-                  >
-                    <span
-                      class="toolbox-type-data-text"
-                      :title="'打开:' + toolboxData.name"
-                    >
-                      {{ toolboxData.name }}
-                    </span>
-                  </div>
-                </template>
-              </template>
-            </div>
-          </div>
-        </template>
-      </div>
-    </div>
+    </template>
     <FormDialog
       ref="ShowToolboxInfo"
       :source="source"
@@ -226,12 +250,13 @@ export default {
   data() {
     return {
       showBox: false,
-      searchMap: null,
+      toolboxSearch: null,
       selectGroup: null,
       groupList: [],
       searchGroup: null,
-      toolboxTypes: [],
-      toolboxTypeMap: {},
+      showToolboxTypes: [],
+      showToolboxContext: null,
+
       toolboxGroups: [],
       checking: false,
       checkError: null,
@@ -251,6 +276,9 @@ export default {
       if (this.showBox) {
         this.initData();
       }
+    },
+    selectGroup() {
+      this.initDataList();
     },
   },
   methods: {
@@ -296,22 +324,8 @@ export default {
       this.toolboxGroups = groups;
     },
     async initData() {
-      this.source.initLoginUserData();
       await this.initToolboxGroups();
-      if (this.toolboxTypes.length == 0) {
-        this.toolboxTypes = this.source.toolboxTypes || [];
-      }
       await this.initToolboxDataGroup();
-      if (this.searchMap == null) {
-        let searchMap = {};
-        this.toolboxTypes.forEach((one) => {
-          searchMap[one.name] = "";
-        });
-        this.searchMap = searchMap;
-      }
-      this.toolboxTypes.forEach((one) => {
-        this.toolboxTypeMap[one.name] = one;
-      });
     },
     toSelectGroup(group) {
       if (group == null) {
@@ -320,36 +334,29 @@ export default {
       this.selectGroup = group;
     },
     async initToolboxDataGroup() {
+      let toolboxTypes = this.source.toolboxTypes || [];
+      this.toolboxTypeMap = {};
+      toolboxTypes.forEach((one) => {
+        this.toolboxTypeMap[one.name] = one;
+      });
       let groupList = [];
       let toolboxList = [];
 
-      let res = await this.server.toolbox.list({});
+      let res = await this.server.toolbox.queryVisibility({});
       if (res.code != 0) {
         this.tool.error(res.msg);
       } else {
         let data = res.data || {};
         toolboxList = data.toolboxList || [];
+        this.source.toolboxCount = toolboxList.length;
+        this.source.initUserToolboxSSHList(toolboxList);
       }
-
-      let context = {};
-      var sshToolboxList = [];
-
-      toolboxList.forEach((one) => {
-        context[one.toolboxType] = context[one.toolboxType] || [];
-        context[one.toolboxType].push(one);
-        if (one.toolboxType == "ssh") {
-          sshToolboxList.push(one);
-        }
-      });
-      this.sshToolboxList = sshToolboxList;
+      this.toolboxList = toolboxList;
 
       let groups = this.toolboxGroups || [];
       groupList.push({
         groupId: null,
         name: "未分组",
-        context: {
-          other: context["other"] || [],
-        },
       });
       let groupIdCache = {};
       groups.forEach((one) => {
@@ -357,9 +364,6 @@ export default {
         groupList.push({
           groupId: one.groupId,
           name: one.name,
-          context: {
-            other: context["other"] || [],
-          },
         });
       });
       let selectGroup = groupList[0];
@@ -370,35 +374,60 @@ export default {
           }
         });
       }
-      this.toolboxTypes.forEach((type) => {
-        if (type.name == "other") {
-          return;
-        }
-        let list = context[type.name] || [];
-        list.forEach((one) => {
-          if (this.tool.isNotEmpty(one.groupId)) {
-            if (groupIdCache[one.groupId] == null) {
-              one.groupNotFound = true;
-            }
-          }
-        });
-        groupList.forEach((g) => {
-          let groupToolboxList = [];
-          list.forEach((t) => {
-            if (
-              this.tool.isEmpty(g.groupId) &&
-              (this.tool.isEmpty(t.groupId) || t.groupNotFound)
-            ) {
-              groupToolboxList.push(t);
-            } else if (g.groupId == t.groupId) {
-              groupToolboxList.push(t);
-            }
-          });
-          g.context[type.name] = groupToolboxList;
-        });
-      });
+
+      this.groupIdCache = groupIdCache;
       this.groupList = groupList;
       this.selectGroup = selectGroup;
+      this.initDataList();
+    },
+    initDataList() {
+      let selectGroup = this.selectGroup;
+      if (selectGroup == null) {
+        return;
+      }
+      let showToolboxContext = {};
+
+      let isDefaultGroup = this.tool.isEmpty(selectGroup.groupId);
+
+      this.toolboxList.forEach((one) => {
+        let isThisGroup = false;
+        if (
+          isDefaultGroup &&
+          (this.tool.isEmpty(one.groupId) ||
+            this.groupIdCache[one.groupId] == null)
+        ) {
+          isThisGroup = true;
+        } else if (selectGroup.groupId == one.groupId) {
+          isThisGroup = true;
+        }
+        if (isThisGroup) {
+          showToolboxContext[one.toolboxType] =
+            showToolboxContext[one.toolboxType] || [];
+          showToolboxContext[one.toolboxType].push(one);
+        }
+      });
+
+      let showToolboxTypes = [];
+      let toolboxTypes = this.source.toolboxTypes || [];
+
+      toolboxTypes.forEach((type) => {
+        if (
+          showToolboxContext[type.name] != null &&
+          showToolboxContext[type.name].length > 0
+        ) {
+          showToolboxTypes.push(type);
+        }
+      });
+      toolboxTypes.forEach((type) => {
+        if (
+          showToolboxContext[type.name] == null ||
+          showToolboxContext[type.name].length == 0
+        ) {
+          showToolboxTypes.push(type);
+        }
+      });
+      this.showToolboxTypes = showToolboxTypes;
+      this.showToolboxContext = showToolboxContext;
     },
     groupContextmenu(group) {
       let menus = [];
@@ -555,6 +584,12 @@ export default {
       });
     },
     async toCopyToClipboard(toolboxType, data) {
+      let find = await this.getToolbox(data.toolboxId);
+      if (find == null) {
+        return;
+      }
+      Object.assign(data, find);
+
       let out = {
         isToolboxData: true,
         toolboxType: toolboxType.name,
@@ -649,13 +684,19 @@ export default {
         this.tool.error(res.msg);
       }
     },
-    toCopy(toolboxType, copy) {
+    async toCopy(toolboxType, copy) {
       this.checkError = null;
       this.checkOk = false;
 
       this.tool.stopEvent();
+
+      let find = await this.getToolbox(copy.toolboxId);
+      if (find == null) {
+        return;
+      }
+
       let toolboxData = {};
-      Object.assign(toolboxData, copy);
+      Object.assign(toolboxData, find);
       delete toolboxData.toolboxId;
       toolboxData.name = toolboxData.name + " Copy";
 
@@ -666,14 +707,20 @@ export default {
         form: [this.form.toolbox, toolboxType.configForm],
         data: [toolboxData, optionsJSON],
         toolboxType,
-        groupId: copy.groupId,
+        groupId: find.groupId,
       });
     },
-    toUpdate(toolboxType, toolboxData) {
+    async toUpdate(toolboxType, toolboxData) {
       this.checkError = null;
       this.checkOk = false;
 
       this.tool.stopEvent();
+
+      let find = await this.getToolbox(toolboxData.toolboxId);
+      if (find == null) {
+        return;
+      }
+      Object.assign(toolboxData, find);
 
       let optionsJSON = this.tool.getOptionJSON(toolboxData.option);
 
@@ -685,8 +732,14 @@ export default {
         toolboxData,
       });
     },
-    toShare(toolboxType, toolboxData) {
+    async toShare(toolboxType, toolboxData) {
       this.tool.stopEvent();
+
+      let find = await this.getToolbox(toolboxData.toolboxId);
+      if (find == null) {
+        return;
+      }
+      Object.assign(toolboxData, find);
 
       this.$refs.ShareToolbox.show({
         title: `分享[${toolboxType.text}][${toolboxData.name}]工具`,
@@ -712,6 +765,20 @@ export default {
       } else {
         this.tool.error(res.msg);
         return false;
+      }
+    },
+    async getToolbox(toolboxId) {
+      let res = await this.server.toolbox.get({
+        toolboxId: toolboxId,
+      });
+      if (res.code == 0) {
+        if (res.data == null) {
+          this.tool.warn("工具箱数据丢失！");
+        }
+        return res.data;
+      } else {
+        this.tool.error(res.msg);
+        return null;
       }
     },
     toDelete(toolboxType, toolboxData) {
@@ -851,8 +918,9 @@ export default {
         data: [data, optionsJSON],
       });
     },
-    toUpdateGroup(data) {
+    async toUpdateGroup(data) {
       this.tool.stopEvent();
+
       this.updateGroupData = data;
 
       let optionsJSON = this.tool.getOptionJSON(data.option);
@@ -937,11 +1005,9 @@ export default {
   position: absolute;
   top: 30px;
   width: 100%;
-  background: #0f1b26;
   transition: all 0s;
   transform: scale(0);
   height: calc(100% - 30px);
-  color: #ffffff;
 }
 .toolbox-context-box.toolbox-context-box-show {
   transform: scale(1);
@@ -955,10 +1021,10 @@ export default {
   display: flex;
 }
 .toolbox-context-box .toolbox-group-box {
-  width: 200px;
+  width: 220px;
   font-size: 12px;
-  height: 100%;
-  background: #1b2a38;
+  height: calc(100% - 10px);
+  margin-left: 10px;
 }
 
 .toolbox-context-box .toolbox-group-header {
@@ -987,11 +1053,9 @@ export default {
   height: 26px;
   line-height: 26px;
   margin-top: 4px;
-  border: 1px solid #767676;
   font-size: 12px;
   background: transparent;
 }
-
 .toolbox-context-box .toolbox-group-body {
   /* width: calc(25% - 12.5px); */
   width: 100%;
@@ -1006,17 +1070,10 @@ export default {
 }
 .toolbox-context-box .toolbox-group-title {
   padding: 0px 10px;
-  background: #15222d;
-  color: #ffffff;
   line-height: 30px;
   display: flex;
 }
-.toolbox-context-box .toolbox-group-one.active .toolbox-group-title {
-  background: #3f4e5d;
-}
-.toolbox-context-box .toolbox-group-one:hover .toolbox-group-title {
-  background: #2f3f4f;
-}
+
 .toolbox-context-box .toolbox-group-title-text {
   flex: 1;
   overflow: hidden;
@@ -1031,10 +1088,22 @@ export default {
   padding: 0px;
 }
 
+.toolbox-context-box .toolbox-search-box {
+  margin: 10px 10px;
+}
+.toolbox-context-box .toolbox-search-box .toolbox-search-input {
+  width: 300px;
+  height: 30px;
+  line-height: 30px;
+  font-size: 12px;
+  background: transparent;
+  padding: 0px 10px;
+}
+
 .toolbox-context-box .toolbox-type-box {
   flex: 1;
   font-size: 12px;
-  height: 100%;
+  height: calc(100% - 10px);
 }
 .toolbox-context-box .toolbox-type-box:after {
   content: "";
@@ -1047,10 +1116,9 @@ export default {
   float: left;
   margin: 0px 0px 10px 10px;
 }
+
 .toolbox-context-box .toolbox-type-title {
   padding: 0px 10px;
-  background: #2b3f51;
-  color: #ffffff;
   line-height: 23px;
   display: flex;
 }
@@ -1063,35 +1131,15 @@ export default {
 .toolbox-context-box .toolbox-type-title .tm-link {
   padding: 0px;
 }
-.toolbox-context-box .toolbox-type-title .toolbox-type-data-search-box {
-  width: 100px;
-}
-.toolbox-context-box
-  .toolbox-type-title
-  .toolbox-type-data-search-box
-  .toolbox-type-data-search {
-  width: 100%;
-  height: 20px;
-  line-height: 20px;
-  margin-top: 4px;
-  border: 1px solid #767676;
-  font-size: 12px;
-  background: transparent;
-}
-.toolbox-context-box .toolbox-type-data-box {
-  background: #1b2a38;
-  padding: 5px 0px;
-  padding-right: 0px;
-  height: 250px;
+.toolbox-context-box .toolbox-type-data-box-have-data {
+  padding: 0px;
+  height: 270px;
 }
 .toolbox-context-box .toolbox-type-data {
   display: flex;
   overflow: hidden;
   padding: 2px 0px;
   cursor: pointer;
-}
-.toolbox-context-box .toolbox-type-data:hover {
-  background: #2f3f4f;
 }
 .toolbox-context-box .toolbox-type-data-text {
   overflow: hidden;

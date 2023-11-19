@@ -1,8 +1,8 @@
 import http from '@/server/http';
 
 let toolbox = {
-    list(param) {
-        return http.post('api/toolbox/list', param);
+    queryVisibility(param) {
+        return http.post('api/toolbox/queryVisibility', param);
     },
     get(param) {
         return http.post('api/toolbox/get', param);

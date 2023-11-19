@@ -36,6 +36,54 @@
     background-color: #172029;
 }
 
+
+.workspace-theme-dark .toolbox-context-box {
+    background: #0f1b26;
+    color: #ffffff;
+}
+
+.workspace-theme-dark .toolbox-context-box .toolbox-group-box {
+    background: #1b2a38;
+}
+
+.workspace-theme-dark .toolbox-context-box .toolbox-group-header-search-box .toolbox-group-header-search {
+    border: 1px solid #767676;
+    color: #ffffff;
+}
+
+.workspace-theme-dark .toolbox-context-box .toolbox-group-title {
+    background: #15222d;
+    color: #ffffff;
+}
+
+.workspace-theme-dark .toolbox-context-box .toolbox-group-one.active .toolbox-group-title {
+    background: #3f4e5d;
+}
+
+.workspace-theme-dark .toolbox-context-box .toolbox-group-one:hover .toolbox-group-title {
+    background: #2f3f4f;
+}
+
+.workspace-theme-dark .toolbox-context-box .toolbox-search-box .toolbox-search-input {
+    border: 1px solid #767676;
+    color: #ffffff;
+}
+
+.workspace-theme-dark .toolbox-context-box .toolbox-type-title {
+    background: #2b3f51;
+    color: #ffffff;
+}
+
+.workspace-theme-dark .toolbox-context-box .toolbox-type-data-box {
+    background: #1b2a38;
+}
+
+.workspace-theme-dark .toolbox-context-box .toolbox-type-data:hover {
+    background: #2f3f4f;
+}
+
+
+
 .workspace-theme-dark .toolbox-editor .el-checkbox {
     color: #ddd;
 }

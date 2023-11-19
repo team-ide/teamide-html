@@ -19,20 +19,6 @@ Vue.component('SystemInfoBox', SystemInfoBox);
 import AlertBox from './message/AlertBox.vue'
 Vue.component('AlertBox', AlertBox);
 
-import JSONDataDialog from './dialog/JSONDataDialog.vue'
-Vue.component('JSONDataDialog', JSONDataDialog);
-import MarkdownDialog from './dialog/MarkdownDialog.vue'
-Vue.component('MarkdownDialog', MarkdownDialog);
-import MarkdownViewDialog from './dialog/MarkdownViewDialog.vue'
-Vue.component('MarkdownViewDialog', MarkdownViewDialog);
-import JavascriptFuncDialog from './dialog/JavascriptFuncDialog.vue'
-Vue.component('JavascriptFuncDialog', JavascriptFuncDialog);
-import JavascriptExampleDialog from './dialog/JavascriptExampleDialog.vue'
-Vue.component('JavascriptExampleDialog', JavascriptExampleDialog);
-
-import TextDialog from './dialog/TextDialog.vue'
-Vue.component('TextDialog', TextDialog);
-
 import DataTable from './dataTable/Index.vue'
 Vue.component('DataTable', DataTable);
 

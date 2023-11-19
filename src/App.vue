@@ -59,8 +59,26 @@ import Login from "@/views/Login.vue";
 import Register from "@/views/Register.vue";
 import UpdateCheck from "@/views/UpdateCheck.vue";
 
+import JSONDataDialog from "@/views/dialog/JSONDataDialog";
+import MarkdownDialog from "@/views/dialog/MarkdownDialog";
+import MarkdownViewDialog from "@/views/dialog/MarkdownViewDialog";
+import JavascriptFuncDialog from "@/views/dialog/JavascriptFuncDialog";
+import JavascriptExampleDialog from "@/views/dialog/JavascriptExampleDialog";
+import TextDialog from "@/views/dialog/TextDialog";
+
 export default {
-  components: { Index, Login, Register, UpdateCheck },
+  components: {
+    Index,
+    Login,
+    Register,
+    UpdateCheck,
+    JSONDataDialog,
+    MarkdownDialog,
+    MarkdownViewDialog,
+    JavascriptFuncDialog,
+    JavascriptExampleDialog,
+    TextDialog,
+  },
   props: [],
   data() {
     return { source, contextmenu: { menus: [] } };
