@@ -35,7 +35,7 @@
             >
               <i class="mdi mdi-plus ft-14"></i>
             </span>
-            <div class="toolbox-group-header-search-box mgl-10">
+            <div class="toolbox-group-header-search-box mgl-5">
               <input
                 class="toolbox-group-header-search"
                 v-model="searchGroup"
@@ -67,10 +67,7 @@
           </div>
         </div>
 
-        <div
-          class="toolbox-type-box app-scroll-bar"
-          v-if="showToolboxContext != null"
-        >
+        <div class="toolbox-data-list-box" v-if="showToolboxContext != null">
           <div class="toolbox-search-box">
             <input
               class="toolbox-search-input"
@@ -78,102 +75,109 @@
               placeholder="输入过滤"
             />
           </div>
-          <template v-for="toolboxType in showToolboxTypes">
-            <div :key="toolboxType.name" class="toolbox-type-one">
-              <div class="toolbox-type-title">
-                <div class="toolbox-type-title-text">
-                  <template v-if="toolboxType.name == 'database'">
-                    <IconFont class="teamide-database"> </IconFont>
-                  </template>
-                  <template v-else-if="toolboxType.name == 'redis'">
-                    <IconFont class="teamide-redis"> </IconFont>
-                  </template>
-                  <template v-else-if="toolboxType.name == 'elasticsearch'">
-                    <IconFont class="teamide-elasticsearch"> </IconFont>
-                  </template>
-                  <template v-else-if="toolboxType.name == 'kafka'">
-                    <IconFont class="teamide-kafka"> </IconFont>
-                  </template>
-                  <template v-else-if="toolboxType.name == 'zookeeper'">
-                    <IconFont class="teamide-zookeeper"> </IconFont>
-                  </template>
-                  <template v-else-if="toolboxType.name == 'ssh'">
-                    <IconFont class="teamide-ssh"> </IconFont>
-                    <IconFont class="teamide-ftp"> </IconFont>
-                  </template>
-                  <span class="toolbox-type-text">
-                    {{ toolboxType.text || toolboxType.name }}
-                    <span
-                      v-if="showToolboxContext[toolboxType.name] != null"
-                      class="mgl-5 color-green ft-12"
-                    >
-                      (
-                      {{ showToolboxContext[toolboxType.name].length }}
-                      )
+          <div
+            class="toolbox-type-box app-scroll-bar"
+            v-if="showToolboxContext != null"
+          >
+            <template v-for="toolboxType in showToolboxTypes">
+              <div :key="toolboxType.name" class="toolbox-type-one">
+                <div class="toolbox-type-title">
+                  <div class="toolbox-type-title-text">
+                    <template v-if="toolboxType.name == 'database'">
+                      <IconFont class="teamide-database"> </IconFont>
+                    </template>
+                    <template v-else-if="toolboxType.name == 'redis'">
+                      <IconFont class="teamide-redis"> </IconFont>
+                    </template>
+                    <template v-else-if="toolboxType.name == 'elasticsearch'">
+                      <IconFont class="teamide-elasticsearch"> </IconFont>
+                    </template>
+                    <template v-else-if="toolboxType.name == 'kafka'">
+                      <IconFont class="teamide-kafka"> </IconFont>
+                    </template>
+                    <template v-else-if="toolboxType.name == 'zookeeper'">
+                      <IconFont class="teamide-zookeeper"> </IconFont>
+                    </template>
+                    <template v-else-if="toolboxType.name == 'ssh'">
+                      <IconFont class="teamide-ssh"> </IconFont>
+                      <IconFont class="teamide-ftp"> </IconFont>
+                    </template>
+                    <span class="toolbox-type-text">
+                      {{ toolboxType.text || toolboxType.name }}
+                      <span
+                        v-if="showToolboxContext[toolboxType.name] != null"
+                        class="mgl-5 color-green ft-12"
+                      >
+                        (
+                        {{ showToolboxContext[toolboxType.name].length }}
+                        )
+                      </span>
                     </span>
-                  </span>
-                  <span
-                    class="tm-link color-green mgl-10"
-                    title="新增"
-                    v-if="toolboxType.name != 'other'"
-                    @click="toInsert(toolboxType, selectGroup)"
+                    <span
+                      class="tm-link color-green mgl-10"
+                      title="新增"
+                      v-if="toolboxType.name != 'other'"
+                      @click="toInsert(toolboxType, selectGroup)"
+                    >
+                      <i class="mdi mdi-plus ft-14"></i>
+                    </span>
+                  </div>
+                </div>
+                <div
+                  class="toolbox-type-data-box"
+                  :class="{
+                    'app-scroll-bar toolbox-type-data-box-have-data':
+                      showToolboxContext[toolboxType.name] != null &&
+                      showToolboxContext[toolboxType.name].length != 0,
+                  }"
+                  @contextmenu="dataContextmenu(toolboxType)"
+                >
+                  <template
+                    v-if="
+                      showToolboxContext[toolboxType.name] == null ||
+                      showToolboxContext[toolboxType.name].length == 0
+                    "
                   >
-                    <i class="mdi mdi-plus ft-14"></i>
-                  </span>
+                    <span
+                      class="tm-link color-green mglr-10 mgtb-5"
+                      title="新增"
+                      v-if="toolboxType.name != 'other'"
+                      @click="toInsert(toolboxType, selectGroup)"
+                    >
+                      新增
+                    </span>
+                  </template>
+                  <template v-else>
+                    <template
+                      v-for="toolboxData in showToolboxContext[
+                        toolboxType.name
+                      ]"
+                    >
+                      <div
+                        :key="toolboxData.toolboxId"
+                        v-if="
+                          tool.isEmpty(toolboxSearch) ||
+                          toolboxData.name
+                            .toLowerCase()
+                            .indexOf(toolboxSearch.toLowerCase()) >= 0
+                        "
+                        class="toolbox-type-data"
+                        @contextmenu="dataContextmenu(toolboxType, toolboxData)"
+                        @click="toolboxDataOpen(toolboxData)"
+                      >
+                        <span
+                          class="toolbox-type-data-text"
+                          :title="'打开:' + toolboxData.name"
+                        >
+                          {{ toolboxData.name }}
+                        </span>
+                      </div>
+                    </template>
+                  </template>
                 </div>
               </div>
-              <div
-                class="toolbox-type-data-box"
-                :class="{
-                  'app-scroll-bar toolbox-type-data-box-have-data':
-                    showToolboxContext[toolboxType.name] != null &&
-                    showToolboxContext[toolboxType.name].length != 0,
-                }"
-                @contextmenu="dataContextmenu(toolboxType)"
-              >
-                <template
-                  v-if="
-                    showToolboxContext[toolboxType.name] == null ||
-                    showToolboxContext[toolboxType.name].length == 0
-                  "
-                >
-                  <span
-                    class="tm-link color-green mglr-10 mgtb-5"
-                    title="新增"
-                    v-if="toolboxType.name != 'other'"
-                    @click="toInsert(toolboxType, selectGroup)"
-                  >
-                    新增
-                  </span>
-                </template>
-                <template v-else>
-                  <template
-                    v-for="toolboxData in showToolboxContext[toolboxType.name]"
-                  >
-                    <div
-                      :key="toolboxData.toolboxId"
-                      v-if="
-                        tool.isEmpty(toolboxSearch) ||
-                        toolboxData.name
-                          .toLowerCase()
-                          .indexOf(toolboxSearch.toLowerCase()) >= 0
-                      "
-                      class="toolbox-type-data"
-                      @contextmenu="dataContextmenu(toolboxType, toolboxData)"
-                      @click="toolboxDataOpen(toolboxData)"
-                    >
-                      <span
-                        class="toolbox-type-data-text"
-                        :title="'打开:' + toolboxData.name"
-                      >
-                        {{ toolboxData.name }}
-                      </span>
-                    </div>
-                  </template>
-                </template>
-              </div>
-            </div>
-          </template>
+            </template>
+          </div>
         </div>
       </div>
     </template>
@@ -1044,7 +1048,7 @@ export default {
 }
 
 .toolbox-context-box .toolbox-group-header .toolbox-group-header-search-box {
-  width: 100px;
+  width: 140px;
 }
 .toolbox-context-box
   .toolbox-group-header-search-box
@@ -1055,6 +1059,8 @@ export default {
   margin-top: 4px;
   font-size: 12px;
   background: transparent;
+  outline: 0px;
+  padding: 0px 10px;
 }
 .toolbox-context-box .toolbox-group-body {
   /* width: calc(25% - 12.5px); */
@@ -1089,21 +1095,25 @@ export default {
 }
 
 .toolbox-context-box .toolbox-search-box {
-  margin: 10px 10px;
+  margin: 0px 10px 10px;
 }
 .toolbox-context-box .toolbox-search-box .toolbox-search-input {
   width: 300px;
   height: 30px;
   line-height: 30px;
-  font-size: 12px;
+  font-size: 13px;
   background: transparent;
   padding: 0px 10px;
+  outline: 0px;
 }
 
-.toolbox-context-box .toolbox-type-box {
+.toolbox-context-box .toolbox-data-list-box {
   flex: 1;
   font-size: 12px;
-  height: calc(100% - 10px);
+  height: 100%;
+}
+.toolbox-context-box .toolbox-type-box {
+  height: calc(100% - 40px);
 }
 .toolbox-context-box .toolbox-type-box:after {
   content: "";
