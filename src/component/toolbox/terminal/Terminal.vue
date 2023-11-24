@@ -1,7 +1,23 @@
 <template>
   <div class="toolbox-terminal-box">
-    <tm-layout height="100%">
-      <tm-layout height="auto">
+    <div style="height: calc(100% - 30px); display: flex">
+      <div
+        v-if="terminalInfoOpen"
+        style="height: 100%"
+        :style="{ width: terminalInfoWidthValue }"
+      >
+        <template v-if="terminalInfo == null">
+          <div class="color-orange text-center ft-12 pdt-20">
+            未能识别终端信息
+          </div>
+        </template>
+        <template v-else>
+          <div class="color-orange text-center ft-12 pdt-20">
+            未能识别终端信息
+          </div>
+        </template>
+      </div>
+      <div style="height: 100%; flex: 1">
         <div v-show="showSearch" class="terminal-search-box">
           <input
             ref="searchInput"
@@ -59,33 +75,47 @@
           "
         />
         <div class="terminal-xterm-box-back" ref="terminalXtermBoxBack" />
-      </tm-layout>
-      <tm-layout height="30px">
-        <div class="pdt-2 pdlr-10">
-          <div class="ft-12 tm-link color-grey mglr-5" @click="openFtpWindow()">
-            文件管理器
-          </div>
-          <div class="ft-12 tm-link color-grey mglr-5" @click="openLogs()">
-            终端历史记录
-          </div>
-          <div class="ft-12 tm-link color-grey mglr-5" @click="reconnect()">
-            重新连接
-          </div>
-          <span
-            v-if="tool.isNotEmpty(worker.lastUser)"
-            class="mgl-10 ft-12 color-orange"
-            style="user-select: text"
-            >用户：{{ worker.lastUser }}</span
-          >
-          <span
-            v-if="tool.isNotEmpty(worker.lastDir)"
-            class="mgl-10 ft-12 color-orange"
-            style="user-select: text"
-            >目录：{{ worker.lastDir }}</span
-          >
+      </div>
+    </div>
+    <div style="height: 30px">
+      <div class="pdt-2 pdlr-10">
+        <div
+          v-if="!terminalInfoOpen"
+          class="ft-12 tm-link color-grey mglr-5"
+          @click="showTerminalInfo()"
+        >
+          显示终端信息
         </div>
-      </tm-layout>
-    </tm-layout>
+        <div
+          v-else
+          class="ft-12 tm-link color-grey mglr-5"
+          @click="hideTerminalInfo()"
+        >
+          隐藏终端信息
+        </div>
+        <div class="ft-12 tm-link color-grey mglr-5" @click="openFtpWindow()">
+          文件管理器
+        </div>
+        <div class="ft-12 tm-link color-grey mglr-5" @click="openLogs()">
+          终端历史记录
+        </div>
+        <div class="ft-12 tm-link color-grey mglr-5" @click="reconnect()">
+          重新连接
+        </div>
+        <span
+          v-if="tool.isNotEmpty(worker.lastUser)"
+          class="mgl-10 ft-12 color-orange"
+          style="user-select: text"
+          >用户：{{ worker.lastUser }}</span
+        >
+        <span
+          v-if="tool.isNotEmpty(worker.lastDir)"
+          class="mgl-10 ft-12 color-orange"
+          style="user-select: text"
+          >目录：{{ worker.lastDir }}</span
+        >
+      </div>
+    </div>
     <template v-if="isOpenFTP">
       <div
         class="toolbox-terminal-file-manager-box"
@@ -224,6 +254,9 @@ export default {
       worker: worker,
       ftpWidth: 900,
       ftpHeight: 600,
+      terminalInfoWidthValue: "220px",
+      terminalInfoOpen: false,
+      terminalInfo: null,
 
       isOpenFTP: false,
       isShowFTP: true,
@@ -258,6 +291,11 @@ export default {
         this.doSearch();
       }
     },
+    terminalInfoOpen() {
+      this.$nextTick(() => {
+        this.doChangeSize();
+      });
+    },
   },
   methods: {
     async init() {
@@ -269,6 +307,13 @@ export default {
         this.initTerm();
         this.worker.init();
       });
+    },
+    showTerminalInfo() {
+      this.terminalInfoOpen = true;
+      this.startSystemMonitor();
+    },
+    hideTerminalInfo() {
+      this.terminalInfoOpen = false;
     },
     onFocus() {
       this.term && this.term.focus();
@@ -716,7 +761,6 @@ export default {
 
       this.changeSizeTimer();
 
-      this.startSystemMonitor();
       // this.xtermRows = box.getElementsByClassName("xterm-rows")[0];
     },
     bindKeysBefore() {
@@ -844,7 +888,7 @@ export default {
       }
       return true;
     },
-    onSocketOpen() {
+    async onSocketOpen() {
       // const attachAddon = new AttachAddon(this.worker.socket);
       // this.term.loadAddon(attachAddon);
     },
@@ -1035,21 +1079,35 @@ export default {
       });
     },
     async startSystemMonitor() {
-      if (this.startSystemMonitorIng || this.isDestroyed) {
+      if (
+        this.startSystemMonitorIng ||
+        this.isDestroyed ||
+        !this.terminalInfoOpen
+      ) {
         return;
       }
       this.startSystemMonitorIng = true;
       try {
-        // await this.loadSystemMonitor();
+        await this.loadSystemMonitor();
       } catch (e) {
       } finally {
         this.startSystemMonitorIng = false;
-        // setTimeout(this.startSystemMonitor, 50000);
+        setTimeout(this.startSystemMonitor, 50000);
       }
     },
     async loadSystemMonitor() {
+      if (this.terminalInfo == null) {
+        await this.loadSystemInfo();
+      }
+      if (this.terminalInfo == null) {
+        return;
+      }
       let data = await this.worker.systemMonitor();
-      console.log(data);
+      console.log("systemMonitor:", data);
+    },
+    async loadSystemInfo() {
+      let data = await this.worker.systemInfo();
+      console.log("systemInfo:", data);
     },
   },
   created() {},
