@@ -25,6 +25,14 @@ let terminal = {
     downloadLog(param) {
         return http.post('api/terminal/downloadLog', param);
     },
+    system:{
+        monitor(param) {
+            return http.post('api/terminal/system/monitor', param);
+        },
+        info(param) {
+            return http.post('api/terminal/system/info', param);
+        },
+    },
 };
 
 

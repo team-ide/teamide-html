@@ -371,6 +371,8 @@
 
 .workspace-theme-dark .toolbox-terminal-file-manager-box {
     background: #172029;
+    border-right: 1px solid #4e4e4e;
+    border-bottom: 1px solid #4e4e4e;
 }
 
 .workspace-theme-dark .toolbox-terminal-file-manager-box-top-line {

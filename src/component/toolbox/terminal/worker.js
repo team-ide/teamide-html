@@ -212,6 +212,22 @@ const newWorker = function (workerOption) {
             }
             return res.data;
         },
+        async systemMonitor() {
+            let param = worker.getParam();
+            let res = await server.terminal.system.monitor(param);
+            // if (res.code != 0) {
+            //     tool.error(res.msg);
+            // }
+            return res.data;
+        },
+        async systemInfo() {
+            let param = worker.getParam();
+            let res = await server.terminal.system.info(param);
+            // if (res.code != 0) {
+            //     tool.error(res.msg);
+            // }
+            return res.data;
+        },
     };
 
 

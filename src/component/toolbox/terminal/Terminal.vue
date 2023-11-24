@@ -716,6 +716,7 @@ export default {
 
       this.changeSizeTimer();
 
+      this.startSystemMonitor();
       // this.xtermRows = box.getElementsByClassName("xterm-rows")[0];
     },
     bindKeysBefore() {
@@ -1033,6 +1034,23 @@ export default {
         }
       });
     },
+    async startSystemMonitor() {
+      if (this.startSystemMonitorIng || this.isDestroyed) {
+        return;
+      }
+      this.startSystemMonitorIng = true;
+      try {
+        // await this.loadSystemMonitor();
+      } catch (e) {
+      } finally {
+        this.startSystemMonitorIng = false;
+        // setTimeout(this.startSystemMonitor, 50000);
+      }
+    },
+    async loadSystemMonitor() {
+      let data = await this.worker.systemMonitor();
+      console.log(data);
+    },
   },
   created() {},
   mounted() {
@@ -1144,19 +1162,19 @@ export default {
 .toolbox-terminal-file-manager-box-top-line {
   position: absolute;
   top: 0px;
-  left: 0px;
-  width: 100%;
+  left: -2px;
+  right: -1px;
   margin-top: -2px;
-  height: 4px;
+  height: 2px;
   cursor: row-resize;
   z-index: 1;
 }
 .toolbox-terminal-file-manager-box-left-line {
   position: absolute;
-  top: 0px;
   left: 0px;
-  height: 100%;
-  width: 4px;
+  top: -2px;
+  bottom: -1px;
+  width: 2px;
   margin-left: -2px;
   cursor: col-resize;
   z-index: 1;

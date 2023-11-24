@@ -205,7 +205,11 @@
     color: #b1b1b1;
 }
 
-.workspace-theme-light .toolbox-terminal-file-manager-box {}
+.workspace-theme-light .toolbox-terminal-file-manager-box {
+    background: #ffffff;
+    border-right: 1px solid #ddd;
+    border-bottom: 1px solid #ddd;
+}
 
 .workspace-theme-light .toolbox-terminal-file-manager-box-top-line {
     background: #ddd;
