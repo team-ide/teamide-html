@@ -82,12 +82,12 @@
             ></Mem>
           </div>
           <div>
-            <Disk
+            <DiskIOCounters
               ref="disk"
               :source="source"
               :timeList="timeList"
-              :diskUsageStatList="diskUsageStatList"
-            ></Disk>
+              :diskIOCountersStatsList="diskIOCountersStatsList"
+            ></DiskIOCounters>
           </div>
           <div>
             <Net
@@ -107,10 +107,10 @@
 import CPU from "./echarts/CPU.vue";
 import Mem from "./echarts/Mem.vue";
 import Net from "./echarts/Net.vue";
-import Disk from "./echarts/Disk.vue";
+import DiskIOCounters from "./echarts/DiskIOCounters.vue";
 
 export default {
-  components: { CPU, Mem, Net, Disk },
+  components: { CPU, Mem, Net, DiskIOCounters },
   props: ["source", "serverId"],
   data() {
     return {
@@ -121,7 +121,7 @@ export default {
       timeList: [],
       virtualMemoryStatList: [],
       cpuPercentsList: [],
-      diskUsageStatList: [],
+      diskIOCountersStatsList: [],
       netIOCountersStatsList: [],
       viewList: ["cpu", "disk", "mem", "net"],
     };
@@ -157,7 +157,7 @@ export default {
       this.timeList = [];
       this.virtualMemoryStatList = [];
       this.cpuPercentsList = [];
-      this.diskUsageStatList = [];
+      this.diskIOCountersStats = [];
       this.netIOCountersStatsList = [];
       this.loadMonitorData();
     },
@@ -202,28 +202,19 @@ export default {
           });
           this.cpuPercentsList.push(one.cpuPercents);
 
-          one.diskUsageStat.total = Number(
-            one.diskUsageStat.total / 1024 / 1024 / 1024
-          ).toFixed(2);
-          one.diskUsageStat.free = Number(
-            one.diskUsageStat.free / 1024 / 1024 / 1024
-          ).toFixed(2);
-          one.diskUsageStat.used = Number(
-            one.diskUsageStat.used / 1024 / 1024 / 1024
-          ).toFixed(2);
-          this.diskUsageStatList.push(one.diskUsageStat);
+          one.diskIOCountersStats.forEach((d) => {
+            d.readBytesSpeed = Number(
+              (d.readBytesSpeed || 0) / 1024 / 1024
+            ).toFixed(2);
+            d.writeBytesSpeed = Number(
+              (d.writeBytesSpeed || 0) / 1024 / 1024
+            ).toFixed(2);
+          });
+          this.diskIOCountersStatsList.push(one.diskIOCountersStats);
 
-          one.netIOCountersStats.forEach((d, i) => {
-            one.netIOCountersStats[i].speedRecv =
-              one.netIOCountersStats[i].speedRecv || 0;
-            one.netIOCountersStats[i].speedRecv = Number(
-              d.speedRecv / 1024 / 1024
-            ).toFixed(2);
-            one.netIOCountersStats[i].speedSent =
-              one.netIOCountersStats[i].speedSent || 0;
-            one.netIOCountersStats[i].speedSent = Number(
-              d.speedSent / 1024 / 1024
-            ).toFixed(2);
+          one.netIOCountersStats.forEach((d) => {
+            d.speedRecv = Number((d.speedRecv || 0) / 1024 / 1024).toFixed(2);
+            d.speedSent = Number((d.speedSent || 0) / 1024 / 1024).toFixed(2);
           });
           this.netIOCountersStatsList.push(one.netIOCountersStats);
         });

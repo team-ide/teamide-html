@@ -4,16 +4,137 @@
       <div
         v-if="terminalInfoOpen"
         style="height: 100%"
+        class="app-scroll-bar"
         :style="{ width: terminalInfoWidthValue }"
       >
-        <template v-if="terminalInfo == null">
+        <template v-if="systemInfoLoading">
+          <div class="color-orange text-center ft-12 pdt-20">信息加载中...</div>
+        </template>
+        <template v-else-if="systemInfo == null">
           <div class="color-orange text-center ft-12 pdt-20">
             未能识别终端信息
           </div>
         </template>
         <template v-else>
-          <div class="color-orange text-center ft-12 pdt-20">
-            未能识别终端信息
+          <div class="pd-10">
+            <div class="tm-link color-grey ft-12" @click="loadSystemInfo()">
+              刷新
+            </div>
+          </div>
+          <div
+            class="ft-12 pdtb-10 pdlr-5"
+            style="user-select: text; line-height: 20px"
+          >
+            <div
+              v-if="tool.isNotEmpty(systemInfo.hostInfoStat.hostname)"
+              class="system-info-line"
+            >
+              <div class="system-info-lable">主机:</div>
+              <div class="system-info-value">
+                {{ systemInfo.hostInfoStat.hostname }}
+              </div>
+            </div>
+            <div
+              v-if="tool.isNotEmpty(systemInfo.hostInfoStat.platform)"
+              class="system-info-line"
+            >
+              <div class="system-info-lable">平台:</div>
+              <div class="system-info-value">
+                {{ systemInfo.hostInfoStat.platform }}
+              </div>
+            </div>
+            <div
+              v-if="tool.isNotEmpty(systemInfo.hostInfoStat.platformFamily)"
+              class="system-info-line"
+            >
+              <div class="system-info-lable">平台架构:</div>
+              <div class="system-info-value">
+                {{ systemInfo.hostInfoStat.platformFamily }}
+              </div>
+            </div>
+            <div
+              v-if="tool.isNotEmpty(systemInfo.hostInfoStat.platformVersion)"
+              class="system-info-line"
+            >
+              <div class="system-info-lable">平台版本:</div>
+              <div class="system-info-value">
+                {{ systemInfo.hostInfoStat.platformVersion }}
+              </div>
+            </div>
+            <div
+              v-if="tool.isNotEmpty(systemInfo.hostInfoStat.kernelArch)"
+              class="system-info-line"
+            >
+              <div class="system-info-lable">内核:</div>
+              <div class="system-info-value">
+                {{ systemInfo.hostInfoStat.kernelArch }}
+              </div>
+            </div>
+            <div
+              v-if="tool.isNotEmpty(systemInfo.hostInfoStat.kernelVersion)"
+              class="system-info-line"
+            >
+              <div class="system-info-lable">内核版本:</div>
+              <div class="system-info-value">
+                {{ systemInfo.hostInfoStat.kernelVersion }}
+              </div>
+            </div>
+            <template v-if="systemInfo.memory != null">
+              <div class="system-info-line">
+                <div class="system-info-lable">内存总:</div>
+                <div class="system-info-value">
+                  {{ systemInfo.memory.total }} GB
+                </div>
+              </div>
+              <div class="system-info-line">
+                <div class="system-info-lable">内存空闲:</div>
+                <div class="system-info-value">
+                  {{ systemInfo.memory.free }} GB
+                </div>
+              </div>
+              <div class="system-info-line">
+                <div class="system-info-lable">内存使用:</div>
+                <div class="system-info-value">
+                  {{ systemInfo.memory.usedPercent }} %
+                </div>
+              </div>
+            </template>
+            <template v-if="systemInfo.disks != null">
+              <template v-for="(one, index) in systemInfo.disks">
+                <div :key="'disk-' + index" class="system-info-line">
+                  <div class="system-info-lable">路径-{{ index + 1 }}:</div>
+                  <div class="system-info-value">{{ one.path }}</div>
+                </div>
+                <div :key="'total-' + index" class="system-info-line">
+                  <div class="system-info-lable"></div>
+                  <div class="system-info-value">{{ one.total }} GB</div>
+                </div>
+                <div :key="'used-' + index" class="system-info-line">
+                  <div class="system-info-lable"></div>
+                  <div class="system-info-value">
+                    {{ one.used }} GB {{ one.usedPercent }} %
+                  </div>
+                </div>
+              </template>
+            </template>
+            <template v-if="systemInfo.cpuInfoStats != null">
+              <template v-for="(one, index) in systemInfo.cpuInfoStats">
+                <div :key="'cpu-' + index" class="system-info-line">
+                  <div class="system-info-lable">CPU-{{ index + 1 }}:</div>
+                  <div class="system-info-value">{{ one.cores }} 核</div>
+                </div>
+                <div :key="'vendorId-' + index" class="system-info-line">
+                  <div class="system-info-lable"></div>
+                  <div class="system-info-value">{{ one.vendorId }}</div>
+                </div>
+                <div :key="'modelName-' + index" class="system-info-line">
+                  <div class="system-info-lable"></div>
+                  <div class="system-info-value">
+                    {{ one.modelName }}
+                  </div>
+                </div>
+              </template>
+            </template>
           </div>
         </template>
       </div>
@@ -238,7 +359,14 @@ import ConfirmPaste from "./ConfirmPaste.vue";
 import Logs from "./Logs.vue";
 
 export default {
-  components: { FileManager, Progress, Download, Upload, ConfirmPaste, Logs },
+  components: {
+    FileManager,
+    Progress,
+    Download,
+    Upload,
+    ConfirmPaste,
+    Logs,
+  },
   props: ["source", "toolboxWorker", "place", "placeId", "extend"],
   data() {
     let worker = _worker.newWorker({
@@ -256,7 +384,8 @@ export default {
       ftpHeight: 600,
       terminalInfoWidthValue: "220px",
       terminalInfoOpen: false,
-      terminalInfo: null,
+      systemInfo: null,
+      systemInfoLoading: false,
 
       isOpenFTP: false,
       isShowFTP: true,
@@ -1096,18 +1225,58 @@ export default {
       }
     },
     async loadSystemMonitor() {
-      if (this.terminalInfo == null) {
+      if (this.systemInfo == null) {
         await this.loadSystemInfo();
       }
-      if (this.terminalInfo == null) {
+      if (this.systemInfo == null) {
         return;
       }
-      let data = await this.worker.systemMonitor();
-      console.log("systemMonitor:", data);
+      // let data = await this.worker.systemMonitor();
+      // console.log("systemMonitor:", data);
     },
     async loadSystemInfo() {
+      this.systemInfoLoading = true;
       let data = await this.worker.systemInfo();
-      console.log("systemInfo:", data);
+      if (data != null) {
+        //data.monitorData = await this.worker.systemMonitor();
+        if (data.disks != null) {
+          data.disks.forEach((one) => {
+            one.total = Number((one.total || 0) / 1024 / 1024 / 1024).toFixed(
+              2
+            );
+            one.used = Number((one.used || 0) / 1024 / 1024 / 1024).toFixed(2);
+            one.free = Number((one.free || 0) / 1024 / 1024 / 1024).toFixed(2);
+            one.usedPercent = Number(one.usedPercent || 0).toFixed(2);
+          });
+        }
+        if (data.memory != null) {
+          data.memory.available = Number(
+            (data.memory.available || 0) / 1024 / 1024 / 1024
+          ).toFixed(2);
+          data.memory.cached = Number(
+            (data.memory.cached || 0) / 1024 / 1024 / 1024
+          ).toFixed(2);
+          data.memory.free = Number(
+            (data.memory.free || 0) / 1024 / 1024 / 1024
+          ).toFixed(2);
+          data.memory.shared = Number(
+            (data.memory.shared || 0) / 1024 / 1024 / 1024
+          ).toFixed(2);
+          data.memory.total = Number(
+            (data.memory.total || 0) / 1024 / 1024 / 1024
+          ).toFixed(2);
+          data.memory.usedPercent = Number(
+            ((data.memory.total - data.memory.free - data.memory.cached) *
+              100) /
+              data.memory.total
+          ).toFixed(2);
+        }
+      }
+
+      // console.log(data);
+
+      this.systemInfo = data;
+      this.systemInfoLoading = false;
     },
   },
   created() {},
@@ -1287,5 +1456,21 @@ export default {
   cursor: pointer;
   line-height: 30px;
   vertical-align: -1px;
+}
+
+.system-info-line {
+  display: flex;
+}
+
+.system-info-line .system-info-lable {
+  width: 60px;
+  text-align: right;
+  padding-right: 5px;
+}
+
+.system-info-line .system-info-value {
+  flex: 1;
+  overflow: hidden;
+  word-wrap: break-word;
 }
 </style>
