@@ -7,6 +7,7 @@
     }"
   >
     <Header
+      ref="Header"
       :source="source"
       :mainItemsWorker="mainItemsWorker"
       :showTabGroupTitle="showTabGroupTitle"
@@ -141,7 +142,6 @@ export default {
       this.$refs.WorkspaceTabs.initTabs();
     },
     changeShowTabGroup(tabGroup) {
-      this.$refs.showTabGroupDropdown && this.$refs.showTabGroupDropdown.hide();
       if (tabGroup.isAll) {
         this.source.showTabGroups.forEach((one) => {
           if (!one.isAll) {
@@ -238,7 +238,8 @@ export default {
       }
       options.extend = extend;
       this.tool.openByOption(options);
-      this.$refs.terminalDropdown && this.$refs.terminalDropdown.hide();
+      this.$refs.Header.$refs.terminalDropdown &&
+        this.$refs.Header.$refs.terminalDropdown.hide();
     },
     openFileManager(place, placeData) {
       let options = {};
@@ -263,7 +264,8 @@ export default {
       }
       options.extend = extend;
       this.tool.openByOption(options);
-      this.$refs.fileManagerDropdown && this.$refs.fileManagerDropdown.hide();
+      this.$refs.Header.$refs.fileManagerDropdown &&
+        this.$refs.Header.$refs.fileManagerDropdown.hide();
     },
     addMainItem(item, fromItem) {
       this.mainItemsWorker.addItem(item, fromItem);
@@ -474,6 +476,7 @@ export default {
     this.tool.openFileManager = this.openFileManager;
     this.tool.openNodeNetProxyContext = this.openNodeNetProxyContext;
     this.tool.openNodeContext = this.openNodeContext;
+    this.tool.changeShowTabGroup = this.changeShowTabGroup;
   },
   mounted() {
     this.tool.openByOption = this.openByOption;
@@ -482,6 +485,7 @@ export default {
     this.tool.openFileManager = this.openFileManager;
     this.tool.openNodeNetProxyContext = this.openNodeNetProxyContext;
     this.tool.openNodeContext = this.openNodeContext;
+    this.tool.changeShowTabGroup = this.changeShowTabGroup;
 
     this.init();
   },
@@ -561,26 +565,6 @@ export default {
   top: 35px !important;
 }
 .workspace-header-dropdown-menu .menu-box a {
-  cursor: pointer;
-}
-
-.user-dropdown.el-dropdown {
-  color: unset;
-  font-size: unset;
-  display: flex;
-  white-space: nowrap;
-  align-items: center;
-}
-.user-dropdown-menu.el-dropdown-menu {
-  padding: 0;
-  margin: 0;
-  border: 0;
-  border-radius: 4px;
-  box-shadow: 0 0 0;
-  background: transparent;
-  top: 35px !important;
-}
-.user-dropdown-menu .menu-box a {
   cursor: pointer;
 }
 

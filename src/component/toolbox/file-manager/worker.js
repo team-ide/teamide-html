@@ -8,6 +8,7 @@ const newWorker = function (workerOption) {
         workerId: workerOption.workerId,
         place: workerOption.place,
         placeId: workerOption.placeId,
+        getWorkerByKey: workerOption.getWorkerByKey,
         selectPaths: [],
         fileList: null,
         dir: "",
@@ -289,17 +290,31 @@ const newWorker = function (workerOption) {
                 return true;
             }
         },
-        async move(oldPath, newPath) {
+        async move(options) {
             let param = worker.getParam();
-            param.oldPath = oldPath;
-            param.newPath = newPath;
+            Object.assign(param, options)
             let res = await server.fileManager.move(param);
             if (res.code != 0) {
                 tool.error(res.msg);
             } else {
-                let fileIndex = this.getFileIndex(oldPath);
-                if (fileIndex >= 0) {
-                    this.fileList.splice(fileIndex, 1);
+                if (options.oldFileWorkerKey == options.newFileWorkerKey) {
+                    let fileIndex = this.getFileIndex(options.oldPath);
+                    if (fileIndex >= 0) {
+                        this.fileList.splice(fileIndex, 1);
+                    }
+                } else {
+                    let worker = this.getWorkerByKey(options.oldFileWorkerKey);
+                    if (worker) {
+                        let file = worker.getFile(options.oldPath)
+                        let fileIndex = worker.getFileIndex(options.oldPath);
+                        if (fileIndex >= 0) {
+                            worker.fileList.splice(fileIndex, 1);
+                        }
+                        if (file) {
+                            file.path = options.newPath;
+                            this.onUploadFileInfo(file)
+                        }
+                    }
                 }
             }
             return res.data;
@@ -324,7 +339,7 @@ const newWorker = function (workerOption) {
                 place: this.place,
                 placeId: this.placeId,
                 dir: dir,
-                fullPath: fullPath,
+                fullPath: fullPath || "",
             };
             let form = new FormData();
             for (let key in param) {
@@ -377,15 +392,23 @@ const newWorker = function (workerOption) {
             url += "&path=" + encodeURIComponent(path);
             window.location.href = url;
         },
-        async copy(path, fromPlace, fromPlaceId, fromPath) {
+        async copy(options) {
             let param = worker.getParam();
-            param.path = path;
-            param.fromPlace = fromPlace;
-            param.fromPlaceId = fromPlaceId;
-            param.fromPath = fromPath;
+            Object.assign(param, options)
             let res = await server.fileManager.copy(param);
             if (res.code != 0) {
                 tool.error(res.msg);
+            } else {
+                if (options.fromFileWorkerKey != this.fileWorkerKey) {
+                    let worker = this.getWorkerByKey(options.fromFileWorkerKey);
+                    if (worker) {
+                        let file = worker.getFile(options.fromPath)
+                        if (!file.isDir) {
+                            file.path = options.path;
+                            this.onUploadFileInfo(file)
+                        }
+                    }
+                }
             }
             return res.data;
         },

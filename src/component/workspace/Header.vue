@@ -46,7 +46,13 @@
                 v-if="source.showTabGroups && source.showTabGroups.length > 0"
               >
                 <template v-for="(one, index) in source.showTabGroups">
-                  <MenuItem :key="index" @click="changeShowTabGroup(one)">
+                  <MenuItem
+                    :key="index"
+                    @click="
+                      tool.changeShowTabGroup(one);
+                      $refs.showTabGroupDropdown.hide();
+                    "
+                  >
                     <template v-if="one.select">
                       <Icon
                         class="color-green ft-20 mdi-circle-medium"
@@ -81,7 +87,7 @@
         <el-dropdown
           trigger="click"
           class="workspace-header-dropdown"
-          ref="terminalDropdown"
+          ref="nodeDropdown"
         >
           <span class="el-dropdown-link" style="padding: 5px 10px">
             节点|透传<i class="el-icon-arrow-down el-icon--right"></i>
@@ -93,12 +99,18 @@
             <MenuBox class="menu-mini">
               <MenuItem
                 v-if="source.hasPower('node')"
-                @click="tool.openNodeContext()"
+                @click="
+                  tool.openNodeContext();
+                  $refs.nodeDropdown.hide();
+                "
                 >节点</MenuItem
               >
               <MenuItem
                 v-if="source.hasPower('node/netProxy')"
-                @click="tool.openNodeNetProxyContext()"
+                @click="
+                  tool.openNodeNetProxyContext();
+                  $refs.nodeDropdown.hide();
+                "
                 >网络代理|透传</MenuItem
               >
             </MenuBox>
@@ -282,22 +294,42 @@
       </template>
       <template v-else>
         <div class="workspace-header-nav pdlr-0">
-          <el-dropdown trigger="click" class="user-dropdown" ref="userDropdown">
+          <el-dropdown
+            trigger="click"
+            class="workspace-header-dropdown"
+            ref="userDropdown"
+          >
             <span class="el-dropdown-link" style="padding: 5px 10px">
               {{ source.login.user.name }}
               <i class="el-icon-arrow-down el-icon--right"></i>
             </span>
-            <el-dropdown-menu slot="dropdown" class="user-dropdown-menu">
+            <el-dropdown-menu
+              slot="dropdown"
+              class="workspace-header-dropdown-menu"
+            >
               <MenuBox>
-                <MenuItem @click="tool.openPage('userCenter', '个人中心')">
+                <MenuItem
+                  @click="
+                    tool.openPage('userCenter', '个人中心');
+                    $refs.userDropdown.hide();
+                  "
+                >
                   个人中心
                 </MenuItem>
-                <MenuItem @click="tool.openPage('userSetting', '个人设置')">
+                <MenuItem
+                  @click="
+                    tool.openPage('userSetting', '个人设置');
+                    $refs.userDropdown.hide();
+                  "
+                >
                   个人设置
                 </MenuItem>
                 <MenuItem
                   v-if="source.hasPower('logout')"
-                  @click="tool.toLogout()"
+                  @click="
+                    tool.toLogout();
+                    $refs.userDropdown.hide();
+                  "
                 >
                   退出登录
                 </MenuItem>

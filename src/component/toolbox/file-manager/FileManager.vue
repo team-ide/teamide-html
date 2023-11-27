@@ -30,6 +30,7 @@
         </div>
         <div class="pdlr-10">
           <el-form size="mini" inline @submit.native.prevent>
+            <el-form-item :label="title" class="mgb-0"> </el-form-item>
             <el-form-item
               label="Filter"
               class="mgb-0 toolbox-file-manager-filter-input"
@@ -106,23 +107,29 @@
         </div>
       </tm-layout>
     </tm-layout>
-    <FileEdit
-      ref="FileEdit"
-      :source="source"
-      :toolboxWorker="toolboxWorker"
-      :fileWorker="fileWorker"
-    ></FileEdit>
+    <input
+      type="file"
+      multiple
+      id="input-for-upload"
+      @change="uploadInputChange"
+      ref="input-for-upload"
+      style="
+        width: 0px;
+        height: 0px;
+        position: fixed;
+        left: -100px;
+        top: -100px;
+      "
+    />
   </div>
 </template>
 
 
 <script>
-import FileEdit from "./FileEdit";
-
 import _worker from "./worker.js";
 
 export default {
-  components: { FileEdit },
+  components: {},
   props: [
     "source",
     "toolboxWorker",
@@ -130,6 +137,9 @@ export default {
     "placeId",
     "openDir",
     "onChangeOpenDir",
+    "title",
+    "getWorkerByKey",
+    "openFileEdit",
   ],
   data() {
     let fileWorker = _worker.newWorker({
@@ -137,6 +147,7 @@ export default {
       place: this.place,
       placeId: this.placeId,
       onChangeOpenDir: this.onChangeOpenDir,
+      getWorkerByKey: this.getWorkerByKey,
     });
     if (this.tool.isNotEmpty(this.openDir)) {
       fileWorker.dir = this.openDir;
@@ -153,9 +164,6 @@ export default {
   },
   methods: {
     init() {
-      this.toolboxWorker.onUploadFileInfo = (arg) => {
-        this.fileWorker.onUploadFileInfo(arg);
-      };
       this.fileWorker.refresh();
     },
     onFocus() {
@@ -171,7 +179,7 @@ export default {
       if (file.isDir) {
         this.fileWorker.openDir(file.path);
       } else {
-        this.$refs.FileEdit.show(file);
+        this.openFileEdit(this.fileWorker, file);
       }
     },
     setIsInputDir(isInputDir) {
@@ -281,6 +289,12 @@ export default {
           this.toInsertFile(false, files[0]);
         },
       });
+      menus.push({
+        text: "上传",
+        onClick: () => {
+          this.toClickUpload();
+        },
+      });
       if (files.length > 0) {
         menus.push({
           text: "删除",
@@ -314,6 +328,7 @@ export default {
       e.dataTransfer.setData("place", this.place);
       e.dataTransfer.setData("placeId", this.placeId);
       e.dataTransfer.setData("dir", this.fileWorker.dir);
+      e.dataTransfer.setData("fileWorkerKey", this.fileWorker.fileWorkerKey);
     },
     ondragend(e) {
       // e.preventDefault();
@@ -344,19 +359,24 @@ export default {
         let place = e.dataTransfer.getData("place");
         let placeId = e.dataTransfer.getData("placeId");
         let dir = e.dataTransfer.getData("dir");
+        let fileWorkerKey = e.dataTransfer.getData("fileWorkerKey");
         if (place == this.place && placeId == this.placeId && dir == putDir) {
           return;
         }
         let files = e.dataTransfer.getData("files");
         files = JSON.parse(files);
+        if (!putDir.endsWith("/")) {
+          putDir += "/";
+        }
         if (place != this.place || placeId != this.placeId) {
           files.forEach((one) => {
-            this.fileWorker.copy(
-              putDir + "/" + one.name,
-              place,
-              placeId,
-              one.path
-            );
+            this.fileWorker.copy({
+              path: putDir + one.name,
+              fromFileWorkerKey: fileWorkerKey,
+              fromPlace: place,
+              fromPlaceId: placeId,
+              fromPath: one.path,
+            });
           });
         } else {
           let names = [];
@@ -369,12 +389,16 @@ export default {
                 names.join(",") +
                 "]到[" +
                 putDir +
-                "/" +
                 "]后无法恢复，确定移动？"
             )
             .then(async () => {
               files.forEach((one) => {
-                this.fileWorker.move(one.path, putDir + "/" + one.name);
+                this.fileWorker.move({
+                  oldFileWorkerKey: fileWorkerKey,
+                  oldPath: one.path,
+                  newFileWorkerKey: this.fileWorker.fileWorkerKey,
+                  newPath: putDir + one.name,
+                });
               });
             })
             .catch((e) => {});
@@ -423,6 +447,27 @@ export default {
           }
         );
       }
+    },
+
+    toClickUpload() {
+      this.$refs["input-for-upload"].value = null;
+      this.$refs["input-for-upload"].click();
+    },
+    uploadInputChange() {
+      let upload = this.$refs["input-for-upload"];
+
+      this.doUpload(upload.files);
+    },
+    doUpload(files) {
+      let putDir = this.fileWorker.dir;
+      Array.prototype.forEach.call(files, async (one) => {
+        if (one.webkitGetAsEntry) {
+          let webkitGetAsEntry = one.webkitGetAsEntry();
+          this.uploadEntryFile(putDir, webkitGetAsEntry);
+          return;
+        }
+        this.fileWorker.uploadFile(putDir, one);
+      });
     },
     toRemove(files) {
       let names = [];
@@ -542,6 +587,9 @@ export default {
     },
     onKeydown(e) {
       if (this.tool.keyIsCtrlA()) {
+        if (this.fileWorker.getRenameFile() != null) {
+          return;
+        }
         this.tool.stopEvent();
         this.fileWorker.toSelectAll();
         return;
@@ -609,6 +657,7 @@ export default {
   user-select: none;
   position: relative;
   outline: none;
+  min-width: 400px;
 }
 .toolbox-file-manager-files-box {
   width: 100%;

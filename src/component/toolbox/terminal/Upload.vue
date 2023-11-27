@@ -37,6 +37,13 @@
       id="input-for-upload"
       @change="uploadInputChange"
       ref="input-for-upload"
+      style="
+        width: 0px;
+        height: 0px;
+        position: fixed;
+        left: -100px;
+        top: -100px;
+      "
     />
   </el-dialog>
 </template>
@@ -417,12 +424,5 @@ export default {
   text-align: center;
   border: 2px dashed #ddd;
   height: 100%;
-}
-#input-for-upload {
-  width: 0px;
-  height: 0px;
-  position: fixed;
-  left: -100px;
-  top: -100px;
 }
 </style>

@@ -63,7 +63,7 @@
 <script>
 export default {
   components: {},
-  props: ["source", "toolboxWorker", "fileWorker"],
+  props: ["source", "toolboxWorker"],
   data() {
     return {
       showDialog: false,
@@ -87,7 +87,8 @@ export default {
     },
   },
   methods: {
-    show(file) {
+    show(fileWorker, file) {
+      this.fileWorker = fileWorker;
       if (file == null || file.name == null) {
         this.tool.error("文件不存在");
         return;

@@ -151,7 +151,7 @@
 <script>
 export default {
   components: {},
-  props: ["source", "toolboxWorker"],
+  props: ["source", "toolboxWorker", "onUploadFileInfo"],
   data() {
     return {
       progressList: [],
@@ -264,12 +264,12 @@ export default {
       if (progress.isEnd && progress.work == "upload") {
         if (progress.data) {
           if (progress.data.fileInfo) {
-            this.toolboxWorker.onUploadFileInfo &&
-              this.toolboxWorker.onUploadFileInfo(progress.data.fileInfo);
+            this.onUploadFileInfo &&
+              this.onUploadFileInfo(progress, progress.data.fileInfo);
           }
           if (progress.data.fileDir) {
-            this.toolboxWorker.onUploadFileInfo &&
-              this.toolboxWorker.onUploadFileInfo(progress.data.fileDir);
+            this.onUploadFileInfo &&
+              this.onUploadFileInfo(progress, progress.data.fileDir);
           }
         }
       }
