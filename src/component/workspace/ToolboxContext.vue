@@ -1121,10 +1121,39 @@ export default {
   clear: both;
 }
 .toolbox-context-box .toolbox-type-one {
-  /* width: calc(25% - 12.5px); */
-  width: 290px;
+  width: 280;
   float: left;
   margin: 0px 0px 10px 10px;
+}
+@media screen and (min-width: 300px) {
+  .toolbox-context-box .toolbox-type-one {
+    width: calc(100% - 22px);
+  }
+}
+@media screen and (min-width: 700px) {
+  .toolbox-context-box .toolbox-type-one {
+    width: calc(50% - 16px);
+  }
+}
+@media screen and (min-width: 1000px) {
+  .toolbox-context-box .toolbox-type-one {
+    width: calc(33.33333% - 14px);
+  }
+}
+@media screen and (min-width: 1300px) {
+  .toolbox-context-box .toolbox-type-one {
+    width: calc(25% - 13px);
+  }
+}
+@media screen and (min-width: 1600px) {
+  .toolbox-context-box .toolbox-type-one {
+    width: calc(20% - 12.4px);
+  }
+}
+@media screen and (min-width: 1900px) {
+  .toolbox-context-box .toolbox-type-one {
+    width: calc(16.6666% - 12px);
+  }
 }
 
 .toolbox-context-box .toolbox-type-title {
