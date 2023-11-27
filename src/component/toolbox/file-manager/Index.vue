@@ -9,7 +9,7 @@
         >
           <span
             class="el-dropdown-link ft-12 color-green"
-            style="padding: 2px 5px 2px"
+            style="padding: 2px 5px 2px; cursor: pointer"
           >
             打开多个<i class="el-icon-arrow-down el-icon--right"></i>
           </span>

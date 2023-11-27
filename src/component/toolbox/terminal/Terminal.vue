@@ -262,6 +262,7 @@
               position: absolute;
               top: 0px;
               right: 3px;
+              z-index: 1;
             "
           >
             <span
@@ -274,25 +275,11 @@
           </div>
         </div>
         <div class="toolbox-terminal-file-manager-box-body">
-          <tm-layout height="100%">
-            <tm-layout height="auto">
-              <FileManager
-                :source="source"
-                :toolboxWorker="toolboxWorker"
-                :place="place"
-                :placeId="placeId"
-                :openDir="extend == null ? '' : extend.openDir"
-                :onChangeOpenDir="onChangeOpenDir"
-              ></FileManager>
-            </tm-layout>
-            <tm-layout-bar top></tm-layout-bar>
-            <tm-layout height="200px">
-              <Progress
-                :source="source"
-                :toolboxWorker="toolboxWorker"
-              ></Progress>
-            </tm-layout>
-          </tm-layout>
+          <FileManagerIndex
+            :source="source"
+            :toolboxWorker="toolboxWorker"
+            :extend="extend"
+          ></FileManagerIndex>
         </div>
       </div>
     </template>
@@ -351,8 +338,7 @@ import { CanvasAddon } from "xterm-addon-canvas";
 
 // https://juejin.cn/post/6918911964009725959
 
-import FileManager from "../file-manager/FileManager.vue";
-import Progress from "../file-manager/Progress.vue";
+import FileManagerIndex from "../file-manager/Index.vue";
 import Download from "./Download.vue";
 import Upload from "./Upload.vue";
 import ConfirmPaste from "./ConfirmPaste.vue";
@@ -360,8 +346,7 @@ import Logs from "./Logs.vue";
 
 export default {
   components: {
-    FileManager,
-    Progress,
+    FileManagerIndex,
     Download,
     Upload,
     ConfirmPaste,
@@ -1408,7 +1393,7 @@ export default {
 }
 
 .toolbox-terminal-file-manager-box-header {
-  height: 29px;
+  height: 0px;
 }
 .toolbox-terminal-file-manager-box-body {
   height: calc(100% - 30px);
