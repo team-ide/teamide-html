@@ -27,6 +27,9 @@
           <el-form-item label="异常继续" class="mgb-5">
             <el-switch v-model="form.errorContinue"> </el-switch>
           </el-form-item>
+          <el-form-item label="Profiling" class="mgb-5">
+            <el-switch v-model="form.openProfiling"> </el-switch>
+          </el-form-item>
           <el-form-item label="用户名" class="mgb-5" title="可以指定执行用户">
             <el-input v-model="form.execUsername" style="width: 80px">
             </el-input>
@@ -205,6 +208,7 @@ export default {
         execUsername: null,
         execPassword: null,
         showDataMaxSize: 500,
+        openProfiling: true,
       },
       executeList: [],
     };
@@ -241,6 +245,7 @@ export default {
       if (this.extend) {
         this.executeSQL = this.extend.executeSQL;
         this.form.ownerName = this.extend.ownerName;
+        console.log(this.extend);
       }
       this.autoSaveSql();
       this.ready = true;
