@@ -541,7 +541,7 @@ export default {
       }
       if (node.data.isOwnerTables) {
         let owner = node.data.owner;
-        let tables = await this.loadTables(owner.ownerName);
+        let tables = await this.toolboxWorker.loadTables(owner.ownerName);
         let list = [];
         tables.forEach((one) => {
           let table = {};
