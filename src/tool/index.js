@@ -268,6 +268,12 @@ tool.down = function (bean, name, value) {
         }
     }
 };
+tool.getSizeText = function (v) {
+    let data = {}
+    data.size = v || 0
+    tool.formatSize(data, "size", "size_", "size__")
+    return data["size_"] + " " + data["size__"]
+};
 tool.formatSize = function (data, name, sizeName, sizeUnitName) {
     data[name] = data[name] || 0;
     let sizeMap = [

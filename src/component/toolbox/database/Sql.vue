@@ -70,6 +70,27 @@
             >
               执行选中
             </div>
+
+            <div
+              v-if="hasSqlFile"
+              class="mgt-2 tm-btn tm-btn-sm bg-teal-8 ft-13"
+              @click="toSaveSqlFile"
+            >
+              保存SQL
+            </div>
+            <div
+              v-if="hasSqlFile"
+              class="mgt-2 tm-btn tm-btn-sm bg-teal-8 ft-13"
+              @click="initSqlFile"
+            >
+              刷新SQL
+            </div>
+            <div
+              class="mgt-2 tm-btn tm-btn-sm bg-teal-8 ft-13"
+              @click="toOpenSql"
+            >
+              打开其它SQL
+            </div>
           </el-form-item>
         </el-form>
       </tm-layout>
@@ -211,6 +232,8 @@ export default {
         openProfiling: true,
       },
       executeList: [],
+      extendId: null,
+      hasSqlFile: false,
     };
   },
   computed: {},
@@ -229,9 +252,11 @@ export default {
         return;
       }
       let keyValueMap = {};
-      if (this.lastSavedExecuteSQL != this.executeSQL) {
-        this.lastSavedExecuteSQL = this.executeSQL;
-        keyValueMap.executeSQL = this.executeSQL;
+      if (!this.hasSqlFile) {
+        if (this.lastSavedExecuteSQL != this.executeSQL) {
+          this.lastSavedExecuteSQL = this.executeSQL;
+          keyValueMap.executeSQL = this.executeSQL;
+        }
       }
       if (this.lastSavedDatabase != this.form.ownerName) {
         this.lastSavedDatabase = this.form.ownerName;
@@ -240,16 +265,57 @@ export default {
       await this.toolboxWorker.updateOpenTabExtend(this.tabId, keyValueMap);
       setTimeout(this.autoSaveSql, 300);
     },
-    init() {
+    async initSqlFile() {
+      if (this.extendId == null) {
+        return;
+      }
+      let param = this.toolboxWorker.getWorkParam({
+        extendId: this.extendId,
+      });
+
+      let res = await this.server.toolbox.extend.loadFile(param);
+      if (res.code != 0) {
+        this.tool.error(res.msg);
+        this.hasSqlFile = false;
+      } else {
+        this.executeSQL = res.data;
+        this.hasSqlFile = true;
+        this.$refs.Editor.setValue(this.executeSQL);
+      }
+    },
+    async toSaveSqlFile() {
+      let res = await this.server.toolbox.extend.saveFile({
+        extendId: this.extendId,
+        text: this.executeSQL || "",
+      });
+      if (res.code != 0) {
+        this.tool.error(res.msg);
+      } else {
+        this.tool.success("保存成功");
+      }
+    },
+    toOpenSql() {
+      this.toolboxWorker.showSqlFiles({
+        onOpen: (data) => {
+          this.extendId = data.extendId;
+          this.toolboxWorker.updateOpenTabExtend(this.tabId, {
+            extendId: this.extendId,
+          });
+          this.initSqlFile();
+        },
+      });
+    },
+    async init() {
       this.inited = true;
       if (this.extend) {
+        this.extendId = this.extend.extendId;
         this.executeSQL = this.extend.executeSQL;
         this.form.ownerName = this.extend.ownerName;
-        console.log(this.extend);
       }
       this.autoSaveSql();
       this.ready = true;
       this.$refs.Editor.setValue(this.executeSQL);
+      this.initSqlFile();
     },
     executeSQLChange(value) {
       this.executeSQL = value;

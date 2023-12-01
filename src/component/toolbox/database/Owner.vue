@@ -301,6 +301,42 @@ export default {
         this.toTableOpen(data);
       }
     },
+    toOpenSql(data, selectSql) {
+      let extend = {
+        name: "新建SQL",
+        title: "新建SQL",
+        type: "sql",
+      };
+      if (data) {
+        let owner = data;
+        if (data.isOwnerTables) {
+          owner = data.owner;
+        } else if (data.isTable) {
+          owner = data.owner;
+        }
+        if (data.isOwner || data.isOwnerTables) {
+          extend.name = "查询[" + owner.ownerName + "]库SQL";
+          extend.title = "查询[" + owner.ownerName + "]库SQL";
+          extend.ownerName = owner.ownerName;
+          extend.executeSQL = "SHOW TABLES;";
+        } else if (data.isTable) {
+          extend.name =
+            "查询[" + owner.ownerName + "]库[" + data.tableName + "]表SQL";
+          extend.title =
+            "查询[" + owner.ownerName + "]库[" + data.tableName + "]表SQL";
+          extend.ownerName = owner.ownerName;
+          extend.executeSQL =
+            "SELECT * FROM " + owner.ownerName + "." + data.tableName + ";";
+        }
+      }
+      this.toolboxWorker.showSqlFiles({
+        executeSQL: extend.executeSQL,
+        onOpen: (data) => {
+          extend["extendId"] = data.extendId;
+          this.toolboxWorker.openTabByExtend(extend);
+        },
+      });
+    },
     nodeContextmenu(event, data, node, nodeView) {
       let menus = [];
       if (data.isOwner || data.isOwnerTables) {
@@ -323,14 +359,7 @@ export default {
         menus.push({
           text: "新建SQL查询",
           onClick: () => {
-            let extend = {
-              name: "查询[" + owner.ownerName + "]库SQL",
-              title: "查询[" + owner.ownerName + "]库SQL",
-              type: "sql",
-              ownerName: owner.ownerName,
-              executeSQL: "SHOW TABLES;",
-            };
-            this.toolboxWorker.openTabByExtend(extend);
+            this.toOpenSql(data);
           },
         });
       }
@@ -344,29 +373,7 @@ export default {
         menus.push({
           text: "新建SQL查询",
           onClick: () => {
-            let extend = {
-              name:
-                "查询[" +
-                data.owner.ownerName +
-                "]库[" +
-                data.tableName +
-                "]表SQL",
-              title:
-                "查询[" +
-                data.owner.ownerName +
-                "]库[" +
-                data.tableName +
-                "]表SQL",
-              type: "sql",
-              ownerName: data.owner.ownerName,
-              executeSQL:
-                "SELECT * FROM " +
-                data.owner.ownerName +
-                "." +
-                data.tableName +
-                ";",
-            };
-            this.toolboxWorker.openTabByExtend(extend);
+            this.toOpenSql(data);
           },
         });
         menus.push({
@@ -444,14 +451,6 @@ export default {
         this.tool.showContextmenu(menus);
       }
     },
-    toOpenSql() {
-      let extend = {
-        name: "新建SQL",
-        title: "新建SQL",
-        type: "sql",
-      };
-      this.toolboxWorker.openTabByExtend(extend);
-    },
     toTableOpen(data) {
       let extend = {
         name: data.owner.ownerName + "." + data.tableName,
@@ -508,7 +507,7 @@ export default {
     },
     async loadNode(node, resolve) {
       if (node.level === 0) {
-        let owners = await this.loadOwners();
+        let owners = await this.toolboxWorker.loadOwners();
 
         let list = [];
         owners.forEach((one) => {
@@ -664,29 +663,6 @@ export default {
       };
       this.toolboxWorker.openTabByExtend(extend);
     },
-    async loadOwners() {
-      let param = this.toolboxWorker.getWorkParam({});
-      let res = await this.server.database.owners(param);
-      if (res.code != 0) {
-        this.tool.error(res.msg);
-      }
-      return res.data || [];
-    },
-    async loadTables(ownerName) {
-      let param = this.toolboxWorker.getWorkParam({
-        ownerName: ownerName,
-      });
-
-      let res = await this.server.database.tables(param);
-      if (res.code != 0) {
-        this.tool.error(res.msg);
-      }
-      return res.data || [];
-    },
-    async getTableDetail(ownerName, tableName) {
-      let res = await this.loadTableDetail(ownerName, tableName);
-      return res;
-    },
     async doOwnerDelete(ownerName) {
       let param = this.toolboxWorker.getWorkParam({
         ownerName: ownerName,
@@ -737,29 +713,10 @@ export default {
       this.tool.success("清空成功");
       return true;
     },
-    async loadTableDetail(ownerName, tableName) {
-      let param = this.toolboxWorker.getWorkParam({
-        ownerName: ownerName,
-        tableName: tableName,
-      });
-      let res = await this.server.database.tableDetail(param);
-      if (res.code != 0) {
-        this.tool.error(res.msg);
-        return null;
-      }
-      let tableDetail = res.data;
-      if (tableDetail) {
-        tableDetail.columnList = tableDetail.columnList || [];
-        tableDetail.indexList = tableDetail.indexList || [];
-      }
-      return tableDetail;
-    },
   },
+  updated() {},
   created() {},
   mounted() {
-    this.toolboxWorker.getTableDetail = this.getTableDetail;
-    this.toolboxWorker.loadOwners = this.loadOwners;
-    this.toolboxWorker.loadTables = this.loadTables;
     this.init();
   },
 };

@@ -51,6 +51,11 @@
       :source="source"
       :toolboxWorker="toolboxWorker"
     ></DataListExport>
+    <SqlFiles
+      ref="SqlFiles"
+      :source="source"
+      :toolboxWorker="toolboxWorker"
+    ></SqlFiles>
   </div>
 </template>
 
@@ -64,6 +69,7 @@ import OwnerCreate from "./OwnerCreate";
 import ShowInfo from "./ShowInfo";
 import SqlProfile from "./SqlProfile";
 import DataListExport from "./DataListExport";
+import SqlFiles from "./SqlFiles";
 
 export default {
   components: {
@@ -75,6 +81,7 @@ export default {
     ShowInfo,
     SqlProfile,
     DataListExport,
+    SqlFiles,
   },
   props: ["source", "toolboxWorker", "extend"],
   data() {
@@ -95,6 +102,7 @@ export default {
           this.openDateFormat = this.extend.openDateFormat;
         }
       }
+
       this.toolboxWorker.columnIsNumber = this.columnIsNumber;
       this.toolboxWorker.columnIsDate = this.columnIsDate;
       this.toolboxWorker.formatDateColumn = this.formatDateColumn;
@@ -265,12 +273,55 @@ export default {
       }
       return value;
     },
+    async loadOwners() {
+      let param = this.toolboxWorker.getWorkParam({});
+      let res = await this.server.database.owners(param);
+      if (res.code != 0) {
+        this.tool.error(res.msg);
+      }
+      return res.data || [];
+    },
+    async loadTables(ownerName) {
+      let param = this.toolboxWorker.getWorkParam({
+        ownerName: ownerName,
+      });
+
+      let res = await this.server.database.tables(param);
+      if (res.code != 0) {
+        this.tool.error(res.msg);
+      }
+      return res.data || [];
+    },
+    async getTableDetail(ownerName, tableName) {
+      let res = await this.loadTableDetail(ownerName, tableName);
+      return res;
+    },
+    async loadTableDetail(ownerName, tableName) {
+      let param = this.toolboxWorker.getWorkParam({
+        ownerName: ownerName,
+        tableName: tableName,
+      });
+      let res = await this.server.database.tableDetail(param);
+      if (res.code != 0) {
+        this.tool.error(res.msg);
+        return null;
+      }
+      let tableDetail = res.data;
+      if (tableDetail) {
+        tableDetail.columnList = tableDetail.columnList || [];
+        tableDetail.indexList = tableDetail.indexList || [];
+      }
+      return tableDetail;
+    },
     refresh() {
       this.$refs.Owner.refresh();
     },
   },
   created() {},
   mounted() {
+    this.toolboxWorker.loadOwners = this.loadOwners;
+    this.toolboxWorker.loadTables = this.loadTables;
+    this.toolboxWorker.getTableDetail = this.getTableDetail;
     this.init();
   },
   beforeDestroy() {

@@ -160,7 +160,7 @@
                         </el-table-column>
                       </template>
                       <el-table-column label="操作" width="200px">
-                        <template slot="header" s>
+                        <template slot="header">
                           <div
                             class="tm-link color-green mgl-10"
                             @click="listObjectMap[field.name].add({})"

@@ -1,51 +1,58 @@
 <template>
   <div class="toolbox-database-table">
-    <el-form class="pdlr-10" size="mini" inline>
-      <el-form-item label="库名">
-        <template v-if="!isInsert && tableDetail != null">
-          <el-input
-            v-model="tableDetail.ownerName"
-            style="width: 120px"
-            readonly
-          >
-          </el-input>
-        </template>
-        <template v-else>
-          <el-input v-model="form.ownerName" style="width: 120px"> </el-input>
-        </template>
-      </el-form-item>
-      <el-form-item label="新建表">
-        <el-switch v-model="isInsert" :readonly="tableDetail == null">
-        </el-switch>
-      </el-form-item>
-    </el-form>
-    <div style="height: calc(100% - 130px)">
-      <TableDetail
-        class="pd-10"
-        ref="TableDetail"
-        :source="source"
-        :toolboxWorker="toolboxWorker"
-        :onChange="onTableDetailChange"
-        :columnTypeInfoList="columnTypeInfoList"
-        :indexTypeInfoList="indexTypeInfoList"
-        :formData="form"
-        :getFormData="getFormData"
-        :isInsert="isInsert"
-        :onError="onError"
-      ></TableDetail>
-    </div>
-    <div class="" v-if="error != null">
-      <div class="bg-red ft-12 mglr-10 pd-5">{{ error }}</div>
-    </div>
-    <div class="pd-10">
-      <div
-        class="tm-btn bg-green ft-13"
-        @click="toExecuteSql"
-        :class="{ 'tm-disabled': executeSqlIng }"
-      >
-        执行
-      </div>
-    </div>
+    <tm-layout height="100%">
+      <tm-layout height="80px" class="">
+        <el-form class="pdlr-10" size="mini" inline>
+          <el-form-item label="库名">
+            <template v-if="!isInsert && tableDetail != null">
+              <el-input
+                v-model="tableDetail.ownerName"
+                style="width: 120px"
+                readonly
+              >
+              </el-input>
+            </template>
+            <template v-else>
+              <el-input v-model="form.ownerName" style="width: 120px">
+              </el-input>
+            </template>
+          </el-form-item>
+          <el-form-item label="新建表">
+            <el-switch v-model="isInsert" :readonly="tableDetail == null">
+            </el-switch>
+          </el-form-item>
+        </el-form>
+      </tm-layout>
+      <tm-layout height="auto" class="">
+        <TableDetail
+          class="pd-10"
+          ref="TableDetail"
+          :source="source"
+          :toolboxWorker="toolboxWorker"
+          :onChange="onTableDetailChange"
+          :columnTypeInfoList="columnTypeInfoList"
+          :indexTypeInfoList="indexTypeInfoList"
+          :formData="form"
+          :getFormData="getFormData"
+          :isInsert="isInsert"
+          :onError="onError"
+        ></TableDetail>
+      </tm-layout>
+      <tm-layout height="60px" class="">
+        <div class="" v-if="error != null">
+          <div class="bg-red ft-12 mglr-10 pd-5">{{ error }}</div>
+        </div>
+      </tm-layout>
+      <tm-layout height="40px" class="">
+        <div
+          class="tm-btn bg-green ft-13 mgl-10"
+          @click="toExecuteSql"
+          :class="{ 'tm-disabled': executeSqlIng }"
+        >
+          执行
+        </div>
+      </tm-layout>
+    </tm-layout>
   </div>
 </template>
 

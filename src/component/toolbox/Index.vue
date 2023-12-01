@@ -176,9 +176,27 @@ export default {
       this.bindEvented = true;
       this.$el.addEventListener("keydown", this.onKeyDown);
     },
+    async loadExtends(p) {
+      let param = this.toolboxWorker.getWorkParam(p || {});
+      let res = await this.server.toolbox.extend.query(param);
+      if (res.code != 0) {
+        this.tool.error(res.msg);
+      }
+      return res.data || [];
+    },
+    async loadAllExtends(p) {
+      let param = this.toolboxWorker.getWorkParam(p || {});
+      delete param.toolboxId;
+      let res = await this.server.toolbox.extend.query(param);
+      if (res.code != 0) {
+        this.tool.error(res.msg);
+      }
+      return res.data || [];
+    },
   },
   created() {},
   mounted() {
+    this.toolboxWorker.loadExtends = this.loadExtends;
     this.bindEvent();
   },
   beforeDestroy() {

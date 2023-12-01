@@ -105,7 +105,27 @@ let toolbox = {
                 return http.post('api/toolbox/database/export/download', param, { responseType: "blob" });
             },
         },
-    }
+    },
+    extend: {
+        get(param) {
+            return http.post('api/toolbox/extend/get', param);
+        },
+        query(param) {
+            return http.post('api/toolbox/extend/query', param);
+        },
+        save(param) {
+            return http.post('api/toolbox/extend/save', param);
+        },
+        delete(param) {
+            return http.post('api/toolbox/extend/delete', param);
+        },
+        saveFile(param) {
+            return http.post('api/toolbox/extend/saveFile', param);
+        },
+        loadFile(param) {
+            return http.post('api/toolbox/extend/loadFile', param);
+        },
+    },
 };
 
 
