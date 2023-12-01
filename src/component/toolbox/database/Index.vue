@@ -91,6 +91,7 @@ export default {
       columnTypeInfoList: [],
       indexTypeInfoList: [],
       openDateFormat: true,
+      info: null,
     };
   },
   computed: {},
@@ -103,6 +104,8 @@ export default {
         }
       }
 
+      this.toolboxWorker.getInfo = this.getInfo;
+      this.toolboxWorker.isMySql = this.isMySql;
       this.toolboxWorker.columnIsNumber = this.columnIsNumber;
       this.toolboxWorker.columnIsDate = this.columnIsDate;
       this.toolboxWorker.formatDateColumn = this.formatDateColumn;
@@ -118,6 +121,9 @@ export default {
       this.toolboxWorker.updateExtend({
         openDateFormat: openDateFormat,
       });
+    },
+    getInfo() {
+      return this.info;
     },
     getRowMenus(row, column, event) {
       let menus = [];
@@ -178,6 +184,7 @@ export default {
       let param = this.toolboxWorker.getWorkParam({});
       let res = await this.server.database.data(param);
       let data = res.data || {};
+      this.info = data.info;
       this.columnTypeInfoList = data.columnTypeInfoList || [];
       this.indexTypeInfoList = data.indexTypeInfoList || [];
     },
@@ -279,7 +286,39 @@ export default {
       if (res.code != 0) {
         this.tool.error(res.msg);
       }
-      return res.data || [];
+      let list = res.data || [];
+      let info = this.toolboxWorker.getInfo();
+      let owners = [];
+      list.forEach((one) => {
+        one.order = 1;
+        if (info != null) {
+          if (
+            info.database != null &&
+            info.database.toLowerCase() == one.ownerName.toLowerCase()
+          ) {
+            one.order = 0;
+          } else if (
+            info.dbName != null &&
+            info.dbName.toLowerCase() == one.ownerName.toLowerCase()
+          ) {
+            one.order = 0;
+          } else if (
+            info.username != null &&
+            info.username.toLowerCase() == one.ownerName.toLowerCase()
+          ) {
+            one.order = 0;
+          }
+        }
+        owners.push(one);
+      });
+      owners.sort(function (a, b) {
+        return a.order - b.order; //正序
+      });
+      return owners;
+    },
+    isMySql() {
+      let info = this.toolboxWorker.getInfo();
+      return info != null && info.dialectType == "mysql";
     },
     async loadTables(ownerName) {
       let param = this.toolboxWorker.getWorkParam({

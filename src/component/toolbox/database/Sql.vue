@@ -27,7 +27,11 @@
           <el-form-item label="异常继续" class="mgb-5">
             <el-switch v-model="form.errorContinue"> </el-switch>
           </el-form-item>
-          <el-form-item label="Profiling" class="mgb-5">
+          <el-form-item
+            v-if="toolboxWorker.isMySql()"
+            label="Profiling"
+            class="mgb-5"
+          >
             <el-switch v-model="form.openProfiling"> </el-switch>
           </el-form-item>
           <el-form-item label="用户名" class="mgb-5" title="可以指定执行用户">
@@ -307,6 +311,7 @@ export default {
     },
     async init() {
       this.inited = true;
+      this.form.openProfiling = this.toolboxWorker.isMySql();
       if (this.extend) {
         this.extendId = this.extend.extendId;
         this.executeSQL = this.extend.executeSQL;
