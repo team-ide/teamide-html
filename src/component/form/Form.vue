@@ -89,8 +89,15 @@
                       >
                         {{ formData[field.name] }}
                       </a>
+                      <div
+                        class="tm-link mgl-10 color-grey"
+                        @click="formData[field.name] = null"
+                      >
+                        清除
+                      </div>
                     </div>
                     <el-upload
+                      v-if="uploadReady"
                       :action="source.api + 'upload'"
                       :limit="1"
                       :data="{ place: 'other' }"
@@ -246,6 +253,7 @@ export default {
       jsonStringMap: null,
       jsonViewMap: null,
       listObjectMap: null,
+      uploadReady: true,
     };
   },
   // 计算属性 只有依赖数据发生改变，才会重新进行计算
@@ -298,6 +306,10 @@ export default {
         } else if (type == "file") {
           fileObjectMap[name] = {
             success: (response, file, fileList) => {
+              this.uploadReady = false;
+              this.$nextTick(() => {
+                this.uploadReady = true;
+              });
               if (response.code != 0) {
                 this.tool.error(response.msg);
                 return false;

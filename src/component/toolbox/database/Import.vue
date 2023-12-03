@@ -71,6 +71,7 @@
                   >
                   </el-input>
                   <el-upload
+                    v-if="uploadReady"
                     class="toolbox-database-import-upload-file"
                     :action="source.api + 'upload'"
                     :limit="1"
@@ -141,6 +142,7 @@
                       >
                       </el-input>
                       <el-upload
+                        v-if="uploadReady"
                         class="toolbox-database-import-upload-file"
                         :action="source.api + 'upload'"
                         :limit="1"
@@ -390,6 +392,7 @@ export default {
       tableImportNameLabel: "导入后表名称",
       taskId: null,
       task: null,
+      uploadReady: true,
     };
   },
   computed: {},
@@ -537,6 +540,10 @@ export default {
       }
     },
     onFileUpload(obj, response) {
+      this.uploadReady = false;
+      this.$nextTick(() => {
+        this.uploadReady = true;
+      });
       if (response.code != 0) {
         this.tool.error(response.msg);
         return false;

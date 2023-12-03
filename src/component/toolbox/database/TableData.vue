@@ -546,6 +546,11 @@ export default {
       data.pageNo = this.pageNo;
       data.pageSize = this.pageSize;
       this.dataList_loading = true;
+      if (this.tableDetail != null) {
+        data.charset =
+          this.tableDetail.tableCharacterSetName ||
+          this.tableDetail.tableCollationName;
+      }
 
       this.dataList = [];
       this.total = 0;

@@ -35,6 +35,7 @@
                 </div>
                 <div class="tm-btn tm-btn-sm bg-teal-8 ft-13">
                   <el-upload
+                    v-if="uploadReady"
                     :action="source.api + 'upload'"
                     :limit="1"
                     :data="{ place: 'sql-files' }"
@@ -152,6 +153,7 @@ export default {
       dataList: [],
       dataListLoading: false,
       onOpen: null,
+      uploadReady: true,
     };
   },
   computed: {},
@@ -195,6 +197,10 @@ export default {
     },
 
     async onFileUpload(response) {
+      this.uploadReady = false;
+      this.$nextTick(() => {
+        this.uploadReady = true;
+      });
       if (response.code != 0) {
         this.tool.error(response.msg);
         return false;
