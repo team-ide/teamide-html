@@ -86,7 +86,7 @@
                   <el-progress
                     :text-inside="true"
                     :stroke-width="16"
-                    :percentage="systemInfo.memory.usedPercent"
+                    :percentage="Number(systemInfo.memory.usedPercent)"
                   ></el-progress>
                 </div>
               </div>
@@ -110,7 +110,7 @@
                     <el-progress
                       :text-inside="true"
                       :stroke-width="16"
-                      :percentage="one.usedPercent"
+                      :percentage="Number(one.usedPercent)"
                     ></el-progress>
                   </div>
                 </div>
@@ -143,7 +143,7 @@
           </div>
         </template>
       </div>
-      <div style="height: 100%; flex: 1">
+      <div style="height: 100%; flex: 1; overflow: hidden">
         <div v-show="showSearch" class="terminal-search-box">
           <input
             ref="searchInput"
@@ -1302,7 +1302,7 @@ export default {
   overflow: hidden;
 }
 .toolbox-terminal-box .terminal-xterm-box-back {
-  width: calc(100% - 20px) !important;
+  /* width: calc(100% - 20px) !important; */
   height: 100%;
   position: absolute;
   left: 0px;
@@ -1315,52 +1315,52 @@ export default {
   height: 100% !important;
 }
 .toolbox-terminal-box .terminal-xterm-box .xterm-viewport {
-  width: 100% !important;
-  background-color: transparent !important;
+  /* width: 100% !important; */
+  /* background-color: transparent !important; */
 }
 .toolbox-terminal-box .terminal-xterm-box .xterm-screen {
-  width: calc(100% - 20px) !important;
+  /* width: calc(100% - 20px) !important; */
   height: 100% !important;
-  margin: 0px 5px;
+  /* margin: 0px 5px; */
 }
 .toolbox-terminal-box .terminal-xterm-box .xterm-text-layer {
-  width: 100% !important;
+  /* width: 100% !important; */
 }
 .toolbox-terminal-box .terminal-xterm-box .xterm-selection-layer {
-  width: 100% !important;
+  /* width: 100% !important; */
 }
 .toolbox-terminal-box .terminal-xterm-box .xterm-link-layer {
-  width: 100% !important;
+  /* width: 100% !important; */
 }
 .toolbox-terminal-box .terminal-xterm-box .xterm-cursor-layer {
-  width: 100% !important;
+  /* width: 100% !important; */
 }
 
 .toolbox-terminal-box
   .terminal-xterm-box
   .xterm
   .xterm-viewport::-webkit-scrollbar {
-  width: 10px;
-  height: 10px;
+  /* width: 10px;
+  height: 10px; */
 }
 .toolbox-terminal-box
   .terminal-xterm-box
   .xterm
   .xterm-viewport:hover::-webkit-scrollbar {
-  width: 10px;
-  height: 10px;
+  /* width: 10px;
+  height: 10px; */
 }
 .toolbox-terminal-box
   .terminal-xterm-box
   .xterm
   .xterm-viewport::-webkit-scrollbar-thumb {
-  border-radius: 0px;
+  /* border-radius: 0px; */
 }
 .toolbox-terminal-box
   .terminal-xterm-box
   .xterm
   .xterm-viewport::-webkit-scrollbar-track {
-  border-radius: 0;
+  /* border-radius: 0; */
 }
 
 .toolbox-terminal-file-manager-box {
