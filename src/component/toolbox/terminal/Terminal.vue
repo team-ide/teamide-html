@@ -16,13 +16,13 @@
           </div>
         </template>
         <template v-else>
-          <div class="pd-10">
+          <div class="pdlr-5 pdtb-3">
             <div class="tm-link color-grey ft-12" @click="loadSystemInfo()">
               刷新
             </div>
           </div>
           <div
-            class="ft-12 pdtb-10 pdlr-5"
+            class="ft-12 pdtb-3 pdlr-5"
             style="user-select: text; line-height: 20px"
           >
             <div
@@ -81,21 +81,20 @@
             </div>
             <template v-if="systemInfo.memory != null">
               <div class="system-info-line">
-                <div class="system-info-lable">内存总:</div>
+                <div class="system-info-lable">内存:</div>
                 <div class="system-info-value">
+                  <el-progress
+                    :text-inside="true"
+                    :stroke-width="16"
+                    :percentage="systemInfo.memory.usedPercent"
+                  ></el-progress>
+                </div>
+              </div>
+              <div class="system-info-line">
+                <div class="system-info-lable"></div>
+                <div class="system-info-value">
+                  {{ systemInfo.memory.free }} GB /
                   {{ systemInfo.memory.total }} GB
-                </div>
-              </div>
-              <div class="system-info-line">
-                <div class="system-info-lable">内存空闲:</div>
-                <div class="system-info-value">
-                  {{ systemInfo.memory.free }} GB
-                </div>
-              </div>
-              <div class="system-info-line">
-                <div class="system-info-lable">内存使用:</div>
-                <div class="system-info-value">
-                  {{ systemInfo.memory.usedPercent }} %
                 </div>
               </div>
             </template>
@@ -105,14 +104,20 @@
                   <div class="system-info-lable">路径-{{ index + 1 }}:</div>
                   <div class="system-info-value">{{ one.path }}</div>
                 </div>
-                <div :key="'total-' + index" class="system-info-line">
-                  <div class="system-info-lable"></div>
-                  <div class="system-info-value">{{ one.total }} GB</div>
-                </div>
                 <div :key="'used-' + index" class="system-info-line">
                   <div class="system-info-lable"></div>
                   <div class="system-info-value">
-                    {{ one.used }} GB {{ one.usedPercent }} %
+                    <el-progress
+                      :text-inside="true"
+                      :stroke-width="16"
+                      :percentage="one.usedPercent"
+                    ></el-progress>
+                  </div>
+                </div>
+                <div :key="'total-' + index" class="system-info-line">
+                  <div class="system-info-lable"></div>
+                  <div class="system-info-value">
+                    {{ one.used }} GB / {{ one.total }} GB
                   </div>
                 </div>
               </template>
