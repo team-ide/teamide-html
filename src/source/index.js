@@ -18,6 +18,14 @@ let defaultUserSetting = {
     keyTabClose: "Alt + 87",
     keySwitchTabUp: "Alt + 37",
     keySwitchTabDown: "Alt + 39",
+    headerColor: "",
+    headerBackgroudColor: "",
+    headerTabColor: "",
+    headerTabBackgroudColor: "",
+    bodyColor: "",
+    bodyBackgroudColor: "",
+    bodyTabColor: "",
+    bodyTabBackgroudColor: "",
 }
 source.defaultUserSetting = defaultUserSetting;
 source.userSetting = Object.assign({}, defaultUserSetting);

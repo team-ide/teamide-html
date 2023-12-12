@@ -80,8 +80,134 @@ export default {
     "source.userSetting.theme"() {
       this.initTheme();
     },
+    "source.userSetting.headerColor"() {
+      this.initStyle();
+    },
+    "source.userSetting.headerBackgroudColor"() {
+      this.initStyle();
+    },
+    "source.userSetting.headerTabColor"() {
+      this.initStyle();
+    },
+    "source.userSetting.headerTabBackgroudColor"() {
+      this.initStyle();
+    },
+    "source.userSetting.bodyColor"() {
+      this.initStyle();
+    },
+    "source.userSetting.bodyBackgroudColor"() {
+      this.initStyle();
+    },
+    "source.userSetting.bodyTabColor"() {
+      this.initStyle();
+    },
+    "source.userSetting.bodyTabBackgroudColor"() {
+      this.initStyle();
+    },
   },
   methods: {
+    initStyle() {
+      let styleText = "/** 设置用户自定义样式 **/\n";
+      if (this.tool.isNotEmpty(this.source.userSetting.headerColor)) {
+        styleText +=
+          ".workspace-container .workspace-header .workspace-header-nav{";
+        styleText += "color:" + this.source.userSetting.headerColor + ";";
+        styleText += "}\n";
+      }
+      if (this.tool.isNotEmpty(this.source.userSetting.headerBackgroudColor)) {
+        let color = this.tool.style.addColor(
+          this.source.userSetting.headerBackgroudColor
+        );
+        if (color) {
+          let colors = color.colors;
+          styleText += ".workspace-container .workspace-header{";
+          styleText += "background-color:" + colors[5] + ";";
+          styleText += "}\n";
+          styleText += ".workspace-container .workspace-header-nav:hover{";
+          styleText += "background-color:" + colors[3] + ";";
+          styleText += "}\n";
+        }
+      }
+      if (this.tool.isNotEmpty(this.source.userSetting.headerTabColor)) {
+        styleText += ".workspace-main-tabs-container>.workspace-tabs{";
+        styleText += "color:" + this.source.userSetting.headerTabColor + ";";
+        styleText += "}\n";
+      }
+      if (
+        this.tool.isNotEmpty(this.source.userSetting.headerTabBackgroudColor)
+      ) {
+        let color = this.tool.style.addColor(
+          this.source.userSetting.headerTabBackgroudColor
+        );
+        if (color) {
+          let colors = color.colors;
+          styleText +=
+            ".workspace-main-tabs-container>.workspace-tabs .workspace-tabs-one,";
+          styleText +=
+            ".workspace-main-tabs-container>.workspace-tabs .workspace-tabs-left,";
+          styleText +=
+            ".workspace-main-tabs-container>.workspace-tabs .workspace-tabs-right";
+          styleText += "{";
+          styleText += "background-color:" + colors[5] + ";";
+          styleText += "}\n";
+          styleText +=
+            ".workspace-main-tabs-container>.workspace-tabs .workspace-tabs-one.active{";
+          styleText += "background-color:" + colors[7] + ";";
+          styleText += "}\n";
+        }
+      }
+      if (this.tool.isNotEmpty(this.source.userSetting.bodyColor)) {
+        styleText += ".workspace-container .workspace-main {";
+        styleText += "color:" + this.source.userSetting.bodyColor + ";";
+        styleText += "}\n";
+      }
+      if (this.tool.isNotEmpty(this.source.userSetting.bodyBackgroudColor)) {
+        styleText += ".workspace-container .workspace-main{";
+        styleText +=
+          "background-color:" +
+          this.source.userSetting.bodyBackgroudColor +
+          ";";
+        styleText += "}\n";
+      }
+
+      if (this.tool.isNotEmpty(this.source.userSetting.bodyTabColor)) {
+        styleText += ".workspace-spans .workspace-tabs{";
+        styleText += "color:" + this.source.userSetting.bodyTabColor + ";";
+        styleText += "}\n";
+      }
+      if (this.tool.isNotEmpty(this.source.userSetting.bodyTabBackgroudColor)) {
+        let color = this.tool.style.addColor(
+          this.source.userSetting.bodyTabBackgroudColor
+        );
+        if (color) {
+          let colors = color.colors;
+          styleText += ".workspace-spans .workspace-tabs .workspace-tabs-one,";
+          styleText += ".workspace-spans .workspace-tabs .workspace-tabs-left,";
+          styleText += ".workspace-spans .workspace-tabs .workspace-tabs-right";
+          styleText += "{";
+          styleText += "background-color:" + colors[5] + ";";
+          styleText += "}\n";
+          styleText +=
+            ".workspace-spans .workspace-tabs .workspace-tabs-one.active{";
+          styleText += "background-color:" + colors[7] + ";";
+          styleText += "}\n";
+        }
+      }
+      let dom = this.tool._userStyleDom;
+      if (this.tool._userStyleDom == null) {
+        dom = document.createElement("style");
+        this.tool._userStyleDom = dom;
+        dom.setAttribute("type", "text/css");
+        document.head.appendChild(dom);
+      } else {
+      }
+      dom.childNodes.forEach((one) => {
+        dom.removeChild(one);
+      });
+      let textNode = document.createTextNode("");
+      dom.appendChild(textNode);
+      textNode.appendData(styleText);
+    },
     initTheme() {
       this.theme.isDark = this.source.userSetting.theme == "dark";
     },
@@ -90,6 +216,7 @@ export default {
       this.initShowTabGroup();
     },
     init() {
+      this.initStyle();
       this.initTheme();
       this.initUserData();
 

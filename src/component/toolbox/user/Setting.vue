@@ -7,7 +7,7 @@
       @submit.native.prevent
       label-width="200px"
     >
-      <div class="pd-5 color-grey-1">基础设置</div>
+      <div class="pd-5">基础设置</div>
       <el-form-item label="主题" class="mgb-5 mglr-10">
         <el-select
           placeholder="请选择主题"
@@ -21,7 +21,32 @@
           恢复默认
         </div>
       </el-form-item>
-      <div class="pd-5 color-grey-1">快捷键设置</div>
+      <div class="pd-5">配色</div>
+      <template v-for="(one, index) in cssPlaces">
+        <el-form-item :key="index" :label="one.text" class="mgb-5 mglr-10">
+          <el-input
+            v-model="userSetting[one.value]"
+            style="width: 200px"
+            placeholder="暂未设置，可以点击右侧选择颜色"
+            @change="toSave(one.value)"
+          >
+          </el-input>
+          <el-color-picker
+            v-model="userSetting[one.value]"
+            size="mini"
+            style="vertical-align: -10px; margin-left: 10px"
+            @change="toSave(one.value)"
+          >
+          </el-color-picker>
+          <div
+            class="mgl-10 tm-link color-orange"
+            @click="toSave(one.value, '')"
+          >
+            置空
+          </div>
+        </el-form-item>
+      </template>
+      <div class="pd-5">快捷键设置</div>
       <el-form-item label="关闭Tab页" class="mgb-5 mglr-10">
         <div
           class="mgl-10 tm-link color-green"
@@ -76,6 +101,16 @@ export default {
   data() {
     return {
       userSetting: null,
+      cssPlaces: [
+        { value: "headerColor", text: "头部颜色" },
+        { value: "headerBackgroudColor", text: "头部背景" },
+        { value: "headerTabColor", text: "头部Tab颜色" },
+        { value: "headerTabBackgroudColor", text: "头部Tab背景" },
+        { value: "bodyColor", text: "内容颜色" },
+        { value: "bodyBackgroudColor", text: "内容背景" },
+        { value: "bodyTabColor", text: "内容Tab颜色" },
+        { value: "bodyTabBackgroudColor", text: "内容Tab背景" },
+      ],
     };
   },
   computed: {},

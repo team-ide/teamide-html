@@ -77,6 +77,7 @@ export default {
         ownerName: "XXX_DB",
         ownerPassword: "",
         ownerCharacterSetName: "utf8mb4",
+        ownerCollationName: "",
       },
       error: null,
       executeSqlIng: false,
@@ -115,9 +116,11 @@ export default {
     async toLoad() {
       let showSQL = "";
       let sqlList = await this.loadSqls();
-      sqlList.forEach((sql) => {
-        showSQL += sql + ";\n\n";
-      });
+      if (sqlList && sqlList.forEach) {
+        sqlList.forEach((sql) => {
+          showSQL += sql + ";\n\n";
+        });
+      }
       this.showSQL = showSQL;
       this.$refs.Editor.setValue(showSQL);
     },
