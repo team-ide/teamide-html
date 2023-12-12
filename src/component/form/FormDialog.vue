@@ -21,6 +21,7 @@
       :saveText="saveText"
       :onSuccess="onSuccess"
       :formHeight="formHeight_"
+      :checkShowPlaintextBtn="checkShowPlaintextBtn_"
     >
       <slot></slot>
     </FormBox>
@@ -47,6 +48,7 @@ export default {
       saveBtnDisabled: false,
       title_: null,
       formHeight_: null,
+      checkShowPlaintextBtn_: null,
     };
   },
   computed: {},
@@ -76,6 +78,7 @@ export default {
       options = options || {};
       this.options = options;
 
+      this.checkShowPlaintextBtn_ = options.checkShowPlaintextBtn;
       this.title_ = options.title;
 
       let formConfigList = [];

@@ -13,6 +13,7 @@
             :source="source"
             :formBuild="formObject.formBuild"
             :formData="formObject.formData"
+            :checkShowPlaintextBtn="checkShowPlaintextBtn"
           >
           </Form>
         </div>
@@ -37,7 +38,14 @@
 <script>
 export default {
   components: {},
-  props: ["source", "onSave", "saveText", "onSuccess", "formHeight"],
+  props: [
+    "source",
+    "onSave",
+    "saveText",
+    "onSuccess",
+    "formHeight",
+    "checkShowPlaintextBtn",
+  ],
   data() {
     return {
       formObjectList: [],

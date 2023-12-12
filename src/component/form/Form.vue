@@ -31,7 +31,13 @@
                 >
                   <label class="el-form-item__label" slot="label">
                     {{ field.label }}
-                    <template v-if="field.showPlaintextBtn">
+                    <template
+                      v-if="
+                        field.showPlaintextBtn &&
+                        (checkShowPlaintextBtn == null ||
+                          checkShowPlaintextBtn(field, formData))
+                      "
+                    >
                       <div
                         class="tm-link color-grey mgl-10"
                         @click="showPlaintext(field, formData[field.name])"
@@ -244,7 +250,7 @@ var JSONbigString = JSONbig({});
 
 export default {
   components: {},
-  props: ["source", "formBuild", "formData"],
+  props: ["source", "formBuild", "formData", "checkShowPlaintextBtn"],
   data() {
     return {
       key: null,

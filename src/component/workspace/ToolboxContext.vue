@@ -286,6 +286,16 @@ export default {
     },
   },
   methods: {
+    checkShowPlaintextBtn(data) {
+      if (
+        data != null &&
+        this.source.login.user != null &&
+        data.userId == this.source.login.user.userId
+      ) {
+        return true;
+      }
+      return false;
+    },
     show() {
       this.showBox = true;
     },
@@ -683,6 +693,9 @@ export default {
           title: `查看[${toolboxType.text}]工具`,
           form: [this.form.toolbox, toolboxType.configForm],
           data: [toolboxData, optionsJSON],
+          checkShowPlaintextBtn: () => {
+            return this.checkShowPlaintextBtn(toolboxData);
+          },
         });
       } else {
         this.tool.error(res.msg);
@@ -712,6 +725,9 @@ export default {
         data: [toolboxData, optionsJSON],
         toolboxType,
         groupId: find.groupId,
+        checkShowPlaintextBtn: () => {
+          return this.checkShowPlaintextBtn(toolboxData);
+        },
       });
     },
     async toUpdate(toolboxType, toolboxData) {
@@ -734,6 +750,9 @@ export default {
         data: [toolboxData, optionsJSON],
         toolboxType,
         toolboxData,
+        checkShowPlaintextBtn: () => {
+          return this.checkShowPlaintextBtn(toolboxData);
+        },
       });
     },
     async toShare(toolboxType, toolboxData) {
