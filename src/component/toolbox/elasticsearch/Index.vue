@@ -8,12 +8,18 @@
             :source="source"
             :toolboxWorker="toolboxWorker"
             :extend="extend"
+            :indexesChange="indexesChange"
           >
           </Indexes>
         </tm-layout>
         <tm-layout-bar right></tm-layout-bar>
         <tm-layout width="auto">
-          <Tabs :source="source" :toolboxWorker="toolboxWorker"> </Tabs>
+          <Tabs
+            :source="source"
+            :toolboxWorker="toolboxWorker"
+            :indexes="indexes"
+          >
+          </Tabs>
         </tm-layout>
       </tm-layout>
       <ReindexForm :source="source" :toolboxWorker="toolboxWorker">
@@ -22,6 +28,8 @@
       <MappingForm :source="source" :toolboxWorker="toolboxWorker">
       </MappingForm>
       <ShowInfo :source="source" :toolboxWorker="toolboxWorker"> </ShowInfo>
+      <RequestRecords :source="source" :toolboxWorker="toolboxWorker">
+      </RequestRecords>
     </template>
   </div>
 </template>
@@ -34,6 +42,7 @@ import ReindexForm from "./ReindexForm";
 import MappingForm from "./MappingForm";
 import DataForm from "./DataForm";
 import ShowInfo from "./ShowInfo";
+import RequestRecords from "./RequestRecords";
 export default {
   components: {
     Indexes,
@@ -42,11 +51,13 @@ export default {
     MappingForm,
     DataForm,
     ShowInfo,
+    RequestRecords,
   },
   props: ["source", "toolboxWorker", "extend"],
   data() {
     return {
       ready: false,
+      indexes: [],
     };
   },
   computed: {},
@@ -57,6 +68,9 @@ export default {
     },
     refresh() {
       this.$refs.Indexes.refresh();
+    },
+    indexesChange(indexes) {
+      this.indexes = indexes || [];
     },
   },
   created() {},

@@ -4,9 +4,6 @@
       <tm-layout height="100%">
         <tm-layout height="80px">
           <el-form class="pdt-10 pdlr-10" size="mini" inline>
-            <el-form-item label="搜索" class="mgb-5">
-              <el-input v-model="searchForm.pattern" style="width: 300px" />
-            </el-form-item>
             <el-form-item label="" class="mgb-5">
               <div class="tm-btn tm-btn-xs bg-grey-6" @click="loadIndexes">
                 刷新
@@ -14,6 +11,10 @@
               <div class="tm-btn tm-btn-xs bg-teal-8" @click="toInsert">
                 新建索引
               </div>
+              <div class="tm-btn tm-btn-xs bg-teal-8" @click="toOpenRequest()">
+                Http请求
+              </div>
+
               <div class="tm-btn tm-btn-xs bg-grey" @click="toImport()">
                 导入
               </div>
@@ -26,6 +27,9 @@
               >
                 信息
               </div>
+            </el-form-item>
+            <el-form-item label="搜索" class="mgb-5">
+              <el-input v-model="searchForm.pattern" style="width: 300px" />
             </el-form-item>
           </el-form>
         </tm-layout>
@@ -81,7 +85,7 @@
 <script>
 export default {
   components: {},
-  props: ["source", "toolboxWorker", "extend"],
+  props: ["source", "toolboxWorker", "extend", "indexesChange"],
   data() {
     return {
       ready: false,
@@ -132,6 +136,13 @@ export default {
       let menus = [];
       menus.push({
         header: data.indexName,
+      });
+
+      menus.push({
+        text: "Http请求",
+        onClick: () => {
+          this.toOpenRequest(data);
+        },
       });
       menus.push({
         text: "数据",
@@ -205,6 +216,25 @@ export default {
       };
       this.toolboxWorker.openTabByExtend(extend);
       return;
+    },
+    toOpenRequest(data, selectSql) {
+      let extend = {
+        name: "Http请求",
+        title: "Http请求",
+        type: "request",
+      };
+      if (data) {
+        extend.name += "-" + data.indexName;
+        extend.title += "-" + data.indexName;
+        extend.indexName = data.indexName;
+      }
+      this.toolboxWorker.showRequestRecords({
+        indexName: extend.indexName,
+        onOpen: (data) => {
+          extend["extendId"] = data.extendId;
+          this.toolboxWorker.openTabByExtend(extend);
+        },
+      });
     },
     toInsert() {
       let data = {};
@@ -312,6 +342,7 @@ export default {
       }
       res.data = res.data || [];
       this.indexes = res.data || [];
+      this.indexesChange && this.indexesChange(this.indexes);
     },
     async getMapping(indexName) {
       let param = this.toolboxWorker.getWorkParam({

@@ -160,8 +160,9 @@
             </ul>
           </tm-layout>
         </tm-layout>
-        <tm-layout height="30px">
-          <div class="pdl-10">
+        <tm-layout-bar bottom></tm-layout-bar>
+        <tm-layout height="35px">
+          <div class="pdl-10 pdt-4">
             <div
               class="tm-btn tm-btn-sm bg-teal-8 ft-13"
               @click="toSearch"

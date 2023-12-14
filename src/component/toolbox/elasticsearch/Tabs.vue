@@ -29,6 +29,17 @@
             >
             </Import>
           </template>
+          <template v-if="item.extend.type == 'request'">
+            <Request
+              :source="source"
+              :toolboxWorker="toolboxWorker"
+              :indexName="item.extend.indexName"
+              :extendId="item.extend.extendId"
+              :extend="item.extend"
+              :indexes="indexes"
+            >
+            </Request>
+          </template>
         </template>
       </WorkspaceSpans>
     </div>
@@ -39,10 +50,11 @@
 <script>
 import IndexData from "./IndexData";
 import Import from "./Import";
+import Request from "./Request";
 
 export default {
-  components: { Import, IndexData },
-  props: ["source", "toolboxWorker"],
+  components: { Import, IndexData, Request },
+  props: ["source", "toolboxWorker", "indexes"],
   data() {
     return {};
   },
