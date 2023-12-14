@@ -203,15 +203,15 @@ export default {
 
 
 .workspace-container .toolbox-editor .tm-layout>.tm-layout-bar {
-    background-color: bodyBackgroudColor6;
+    background-color: bodyBackgroudColor3;
 }
 
 .workspace-container .toolbox-editor .tm-layout-bar>.tm-layout-bar-part {
-    background-color: bodyBackgroudColor6;
+    background-color: bodyBackgroudColor3;
 }
 
 .workspace-container .toolbox-editor .toolbox-layout-header {
-    border-bottom: 1px solid bodyBackgroudColor6;
+    border-bottom: 1px solid bodyBackgroudColor3;
 }
 
 
