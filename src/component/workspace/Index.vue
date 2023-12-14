@@ -51,6 +51,7 @@
 <script>
 import ToolboxContext from "./ToolboxContext";
 import Header from "./Header";
+import themeCustom from "./theme-custom.js";
 
 import "./theme-dark.css";
 import "./theme-light.css";
@@ -80,6 +81,12 @@ export default {
     "source.userSetting.theme"() {
       this.initTheme();
     },
+    "source.userSetting.color"() {
+      this.initStyle();
+    },
+    "source.userSetting.backgroudColor"() {
+      this.initStyle();
+    },
     "source.userSetting.headerColor"() {
       this.initStyle();
     },
@@ -107,91 +114,58 @@ export default {
   },
   methods: {
     initStyle() {
-      let styleText = "/** 设置用户自定义样式 **/\n";
-      if (this.tool.isNotEmpty(this.source.userSetting.headerColor)) {
-        styleText +=
-          ".workspace-container .workspace-header .workspace-header-nav{";
-        styleText += "color:" + this.source.userSetting.headerColor + ";";
-        styleText += "}\n";
+      let cssData = {};
+      let styleText = themeCustom.css;
+      let userSetting = this.source.userSetting;
+      if (this.tool.isNotEmpty(userSetting.color)) {
+        // cssData["color"] = userSetting.color;
+        cssData["headerColor"] = userSetting.color;
+        cssData["headerTabColor"] = userSetting.color;
+        cssData["bodyColor"] = userSetting.color;
+        cssData["bodyTabColor"] = userSetting.color;
       }
-      if (this.tool.isNotEmpty(this.source.userSetting.headerBackgroudColor)) {
-        let color = this.tool.style.addColor(
-          this.source.userSetting.headerBackgroudColor
-        );
-        if (color) {
-          let colors = color.colors;
-          styleText += ".workspace-container .workspace-header{";
-          styleText += "background-color:" + colors[5] + ";";
-          styleText += "}\n";
-          styleText += ".workspace-container .workspace-header-nav:hover{";
-          styleText += "background-color:" + colors[3] + ";";
-          styleText += "}\n";
-        }
+      if (this.tool.isNotEmpty(userSetting.backgroudColor)) {
+        // cssData["backgroudColor"] = userSetting.backgroudColor;
+        cssData["headerBackgroudColor"] = userSetting.backgroudColor;
+        cssData["headerTabBackgroudColor"] = userSetting.backgroudColor;
+        cssData["bodyBackgroudColor"] = userSetting.backgroudColor;
+        cssData["bodyTabBackgroudColor"] = userSetting.backgroudColor;
       }
-      if (this.tool.isNotEmpty(this.source.userSetting.headerTabColor)) {
-        styleText += ".workspace-main-tabs-container>.workspace-tabs{";
-        styleText += "color:" + this.source.userSetting.headerTabColor + ";";
-        styleText += "}\n";
+      if (this.tool.isNotEmpty(userSetting.headerColor)) {
+        cssData["headerColor"] = userSetting.headerColor;
       }
-      if (
-        this.tool.isNotEmpty(this.source.userSetting.headerTabBackgroudColor)
-      ) {
-        let color = this.tool.style.addColor(
-          this.source.userSetting.headerTabBackgroudColor
-        );
-        if (color) {
-          let colors = color.colors;
-          styleText +=
-            ".workspace-main-tabs-container>.workspace-tabs .workspace-tabs-one,";
-          styleText +=
-            ".workspace-main-tabs-container>.workspace-tabs .workspace-tabs-left,";
-          styleText +=
-            ".workspace-main-tabs-container>.workspace-tabs .workspace-tabs-right";
-          styleText += "{";
-          styleText += "background-color:" + colors[5] + ";";
-          styleText += "}\n";
-          styleText +=
-            ".workspace-main-tabs-container>.workspace-tabs .workspace-tabs-one.active{";
-          styleText += "background-color:" + colors[7] + ";";
-          styleText += "}\n";
-        }
+      if (this.tool.isNotEmpty(userSetting.headerBackgroudColor)) {
+        cssData["headerBackgroudColor"] = userSetting.headerBackgroudColor;
       }
-      if (this.tool.isNotEmpty(this.source.userSetting.bodyColor)) {
-        styleText += ".workspace-container .workspace-main {";
-        styleText += "color:" + this.source.userSetting.bodyColor + ";";
-        styleText += "}\n";
+      if (this.tool.isNotEmpty(userSetting.headerTabColor)) {
+        cssData["headerTabColor"] = userSetting.headerTabColor;
       }
-      if (this.tool.isNotEmpty(this.source.userSetting.bodyBackgroudColor)) {
-        styleText += ".workspace-container .workspace-main{";
-        styleText +=
-          "background-color:" +
-          this.source.userSetting.bodyBackgroudColor +
-          ";";
-        styleText += "}\n";
+      if (this.tool.isNotEmpty(userSetting.headerTabBackgroudColor)) {
+        cssData["headerTabBackgroudColor"] =
+          userSetting.headerTabBackgroudColor;
+      }
+      if (this.tool.isNotEmpty(userSetting.bodyColor)) {
+        cssData["bodyColor"] = userSetting.bodyColor;
+      }
+      if (this.tool.isNotEmpty(userSetting.bodyBackgroudColor)) {
+        cssData["bodyBackgroudColor"] = userSetting.bodyBackgroudColor;
       }
 
-      if (this.tool.isNotEmpty(this.source.userSetting.bodyTabColor)) {
-        styleText += ".workspace-spans .workspace-tabs{";
-        styleText += "color:" + this.source.userSetting.bodyTabColor + ";";
-        styleText += "}\n";
+      if (this.tool.isNotEmpty(userSetting.bodyTabColor)) {
+        cssData["bodyTabColor"] = userSetting.bodyTabColor;
       }
-      if (this.tool.isNotEmpty(this.source.userSetting.bodyTabBackgroudColor)) {
-        let color = this.tool.style.addColor(
-          this.source.userSetting.bodyTabBackgroudColor
-        );
+      if (this.tool.isNotEmpty(userSetting.bodyTabBackgroudColor)) {
+        cssData["bodyTabBackgroudColor"] = userSetting.bodyTabBackgroudColor;
+      }
+      for (let k in cssData) {
+        let v = cssData[k];
+        let color = this.tool.style.addColor(v);
         if (color) {
-          let colors = color.colors;
-          styleText += ".workspace-spans .workspace-tabs .workspace-tabs-one,";
-          styleText += ".workspace-spans .workspace-tabs .workspace-tabs-left,";
-          styleText += ".workspace-spans .workspace-tabs .workspace-tabs-right";
-          styleText += "{";
-          styleText += "background-color:" + colors[5] + ";";
-          styleText += "}\n";
-          styleText +=
-            ".workspace-spans .workspace-tabs .workspace-tabs-one.active{";
-          styleText += "background-color:" + colors[7] + ";";
-          styleText += "}\n";
+          color.colors.forEach((one, inde) => {
+            styleText = styleText.replaceAll(k + inde, one);
+          });
         }
+        styleText = styleText.replaceAll(k, v);
       }
       let dom = this.tool._userStyleDom;
       if (this.tool._userStyleDom == null) {

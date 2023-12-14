@@ -20,6 +20,10 @@
     background: #2a2a2a;
 }
 
+.workspace-tabs .el-dropdown {
+    color: unset;
+}
+
 .workspace-theme-dark .workspace-tabs-left .workspace-tabs-nav {
     border-right: 1px solid #404040;
 }
@@ -106,22 +110,13 @@
     border-bottom: 1px solid #404040;
 }
 
-.workspace-theme-dark .toolbox-editor .el-table th,
-.workspace-theme-dark .toolbox-editor .el-table td {
-    background: #172029;
-}
-
-.workspace-theme-dark .toolbox-editor .el-table__fixed-right-patch {
-    background-color: #172029;
-}
-
-.workspace-theme-dark .toolbox-editor .el-table tr {
-    background: #172029;
-}
-
 .workspace-theme-dark .toolbox-editor .el-table--border th.el-table__cell,
 .workspace-theme-dark .toolbox-editor .el-table__fixed-right-patch {
     border-bottom: 1px solid #404040;
+}
+
+.workspace-theme-dark .toolbox-editor .el-table__fixed {
+    background-color: #172029;
 }
 
 .workspace-theme-dark .toolbox-editor .el-table .el-table__row:hover td.el-table__cell,
@@ -144,10 +139,6 @@
     border-bottom: 1px solid #404040;
 }
 
-.workspace-theme-dark .toolbox-editor .el-table input {
-    color: #ddd;
-}
-
 .workspace-theme-dark .toolbox-editor .el-table .el-switch .el-switch__core {
     background-color: #4f4f4f;
 }
@@ -157,16 +148,14 @@
 }
 
 .workspace-theme-dark .toolbox-editor .el-table__body-wrapper::-webkit-scrollbar-thumb {
-    box-shadow: inset 0 0 10px #333333;
     background: #333333;
 }
 
-.workspace-theme-dark .toolbox-editor .el-table__body-wrapper:hover::-webkit-scrollbar-track {
-    box-shadow: inset 0 0 10px #262626;
+.workspace-theme-dark .toolbox-editor .el-table__body-wrapper::-webkit-scrollbar-track {
     background: #262626;
 }
 
-.workspace-theme-dark .toolbox-editor .el-table__body-wrapper:hover::-webkit-scrollbar-corner {
+.workspace-theme-dark .toolbox-editor .el-table__body-wrapper::-webkit-scrollbar-track-piece {
     background: #262626;
 }
 
@@ -227,8 +216,14 @@
 .workspace-theme-dark .toolbox-editor select:focus,
 .workspace-theme-dark .toolbox-editor textarea,
 .workspace-theme-dark .toolbox-editor textarea:focus {
-    color: #d9d9d9;
+    color: unset;
     border: 1px solid #4e4e4e;
+}
+
+.workspace-theme-dark .el-input__prefix,
+.workspace-theme-dark .el-input__suffix,
+.workspace-theme-dark .el-select .el-input .el-select__caret {
+    color: unset;
 }
 
 .workspace-theme-dark .toolbox-editor select option {
@@ -273,12 +268,10 @@
 
 
 .workspace-theme-dark .app-scroll-bar:hover::-webkit-scrollbar-thumb {
-    box-shadow: inset 0 0 10px #333333;
     background: #333333;
 }
 
 .workspace-theme-dark .app-scroll-bar:hover::-webkit-scrollbar-track {
-    box-shadow: inset 0 0 10px #262626;
     background: #262626;
 }
 
@@ -287,12 +280,10 @@
 }
 
 .workspace-theme-dark .app-scroll-bar-textarea textarea::-webkit-scrollbar-thumb {
-    box-shadow: inset 0 0 10px #333333;
     background: #333333;
 }
 
 .workspace-theme-dark .app-scroll-bar-textarea textarea:hover::-webkit-scrollbar-track {
-    box-shadow: inset 0 0 10px #262626;
     background: #262626;
 }
 
@@ -309,17 +300,24 @@
     background-color: #1c2431;
 }
 
+/* 整个滚动条 */
+.workspace-theme-dark .terminal-xterm-box .xterm .xterm-viewport::-webkit-scrollbar {
+    width: 10px;
+}
 
+/* 滚动条上的滚动滑块 */
 .workspace-theme-dark .terminal-xterm-box .xterm .xterm-viewport::-webkit-scrollbar-thumb {
-    background: #6b6b6b;
+    background-color: #262626;
 }
 
+/* 滚动条轨道 */
 .workspace-theme-dark .terminal-xterm-box .xterm .xterm-viewport::-webkit-scrollbar-track {
-    background: #383838;
+    background-color: #333333;
 }
 
-.workspace-theme-dark .terminal-xterm-box .xterm .xterm-viewport::-webkit-scrollbar-corner {
-    background: #ddd;
+/* 滚动条没有滑块的轨道部分 */
+.workspace-theme-dark .terminal-xterm-box .xterm .xterm-viewport::-webkit-scrollbar-track-piece {
+    background-color: #333333;
 }
 
 

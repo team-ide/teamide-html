@@ -18,6 +18,8 @@ let defaultUserSetting = {
     keyTabClose: "Alt + 87",
     keySwitchTabUp: "Alt + 37",
     keySwitchTabDown: "Alt + 39",
+    color: "",
+    backgroudColor: "",
     headerColor: "",
     headerBackgroudColor: "",
     headerTabColor: "",

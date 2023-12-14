@@ -234,6 +234,23 @@
     color: unset;
 }
 
+.toolbox-editor .el-table thead {
+    color: unset;
+}
+
+.toolbox-editor .el-table th,
+.toolbox-editor .el-table td {
+    background: unset;
+}
+
+.toolbox-editor .el-table__fixed-right-patch {
+    background: unset;
+}
+
+.toolbox-editor .el-table tr {
+    background: unset;
+}
+
 .toolbox-editor .el-table--mini td,
 .toolbox-editor .el-table--mini th {
     padding: 3px 0;
@@ -266,6 +283,7 @@
     outline: none;
     font-size: 12px;
     line-height: 25px;
+    color: unset;
 }
 
 .toolbox-editor .el-table .el-switch {
@@ -300,13 +318,13 @@
 }
 
 .toolbox-editor .el-table__body-wrapper::-webkit-scrollbar {
-    width: 15px;
-    height: 15px;
+    width: 10px;
+    height: 10px;
 }
 
 .toolbox-editor .el-table__body-wrapper:hover::-webkit-scrollbar {
-    width: 15px;
-    height: 15px;
+    width: 10px;
+    height: 10px;
 }
 
 .toolbox-editor .el-table__body-wrapper::-webkit-scrollbar-thumb {

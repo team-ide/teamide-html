@@ -1,18 +1,13 @@
 <template>
-  <div class="setting-page">
-    <el-form
-      v-if="userSetting != null"
-      class="pdt-10 pdlr-10"
-      size="mini"
-      @submit.native.prevent
-      label-width="200px"
-    >
-      <div class="pd-5">基础设置</div>
+  <div class="setting-page" v-if="userSetting != null">
+    <div class="pd-10">基础设置</div>
+    <el-form size="mini" @submit.native.prevent label-width="200px">
       <el-form-item label="主题" class="mgb-5 mglr-10">
         <el-select
           placeholder="请选择主题"
           v-model="userSetting.theme"
           @change="toSave('theme')"
+          style="width: 200px"
         >
           <el-option label="暗色" value="dark"> </el-option>
           <el-option label="亮色" value="light"></el-option>
@@ -21,13 +16,15 @@
           恢复默认
         </div>
       </el-form-item>
-      <div class="pd-5">配色</div>
+    </el-form>
+    <div class="pd-10">配色</div>
+    <el-form size="mini" @submit.native.prevent label-width="200px" inline>
       <template v-for="(one, index) in cssPlaces">
         <el-form-item :key="index" :label="one.text" class="mgb-5 mglr-10">
           <el-input
             v-model="userSetting[one.value]"
             style="width: 200px"
-            placeholder="暂未设置，可以点击右侧选择颜色"
+            placeholder="可以点击右侧选择颜色"
             @change="toSave(one.value)"
           >
           </el-input>
@@ -45,8 +42,11 @@
             置空
           </div>
         </el-form-item>
+        <br v-if="(index + 1) % 2 == 0" :key="'br-' + index" />
       </template>
-      <div class="pd-5">快捷键设置</div>
+    </el-form>
+    <div class="pd-10">快捷键设置</div>
+    <el-form size="mini" @submit.native.prevent label-width="200px">
       <el-form-item label="关闭Tab页" class="mgb-5 mglr-10">
         <div
           class="mgl-10 tm-link color-green"
@@ -102,6 +102,8 @@ export default {
     return {
       userSetting: null,
       cssPlaces: [
+        { value: "color", text: "颜色" },
+        { value: "backgroudColor", text: "背景" },
         { value: "headerColor", text: "头部颜色" },
         { value: "headerBackgroudColor", text: "头部背景" },
         { value: "headerTabColor", text: "头部Tab颜色" },

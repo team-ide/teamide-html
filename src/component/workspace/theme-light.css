@@ -85,8 +85,6 @@
 }
 
 
-
-
 .workspace-theme-light .toolbox-editor .tm-layout>.tm-layout-bar {
     background-color: #dedede;
 }
@@ -97,23 +95,6 @@
 
 .workspace-theme-light .toolbox-editor .toolbox-layout-header {
     border-bottom: 1px solid #dedede;
-}
-
-
-.workspace-theme-light .toolbox-editor .el-table th {
-    background-color: #dedede;
-}
-
-.workspace-theme-light .toolbox-editor .el-table td {
-    /* background-color: #e3e3e3; */
-}
-
-.workspace-theme-light .toolbox-editor .el-table__fixed-right-patch {
-    background-color: #dedede;
-}
-
-.workspace-theme-light .toolbox-editor .el-table tr {
-    /* background-color: #dedede; */
 }
 
 
@@ -129,6 +110,67 @@
     background: #ddd;
 }
 
+.workspace-theme-light .toolbox-editor .el-table__fixed {
+    background-color: #ddd;
+}
+
+
+.workspace-theme-light .toolbox-editor .el-table__body-wrapper::-webkit-scrollbar-thumb {
+    background: #ddd;
+}
+
+.workspace-theme-light .toolbox-editor .el-table__body-wrapper::-webkit-scrollbar-track {
+    background: #eee;
+}
+
+.workspace-theme-light .toolbox-editor .el-table__body-wrapper::-webkit-scrollbar-track-piece {
+    background: #eee;
+}
+
+
+.workspace-theme-light .app-scroll-bar:hover::-webkit-scrollbar-thumb {
+    background: #ddd;
+}
+
+.workspace-theme-light .app-scroll-bar:hover::-webkit-scrollbar-track {
+    background: #eee;
+}
+
+.workspace-theme-light .app-scroll-bar:hover::-webkit-scrollbar-corner {
+    background: #eee;
+}
+
+.workspace-theme-light .app-scroll-bar-textarea textarea::-webkit-scrollbar-thumb {
+    background: #ddd;
+}
+
+.workspace-theme-light .app-scroll-bar-textarea textarea:hover::-webkit-scrollbar-track {
+    background: #eee;
+}
+
+.workspace-theme-light .app-scroll-bar-textarea textarea:hover::-webkit-scrollbar-corner {
+    background: #eee;
+}
+
+/* 整个滚动条 */
+.workspace-theme-light .terminal-xterm-box .xterm .xterm-viewport::-webkit-scrollbar {
+    width: 10px;
+}
+
+/* 滚动条上的滚动滑块 */
+.workspace-theme-light .terminal-xterm-box .xterm .xterm-viewport::-webkit-scrollbar-thumb {
+    background-color: #ddd;
+}
+
+/* 滚动条轨道 */
+.workspace-theme-light .terminal-xterm-box .xterm .xterm-viewport::-webkit-scrollbar-track {
+    background-color: #eee;
+}
+
+/* 滚动条没有滑块的轨道部分 */
+.workspace-theme-light .terminal-xterm-box .xterm .xterm-viewport::-webkit-scrollbar-track-piece {
+    background-color: #eee;
+}
 
 .workspace-theme-light .toolbox-editor .el-tree {
     border: 1px dotted #dedede;
@@ -158,20 +200,6 @@
 .workspace-theme-light .toolbox-terminal-box .terminal-xterm-box {
     border: 1px solid #ddd;
 }
-
-.workspace-theme-light .terminal-xterm-box .xterm .xterm-viewport::-webkit-scrollbar-thumb {
-    background: #b3b3b3;
-}
-
-.workspace-theme-light .terminal-xterm-box .xterm .xterm-viewport::-webkit-scrollbar-track {
-    background: #c4c4c4;
-}
-
-.workspace-theme-light .terminal-xterm-box .xterm .xterm-viewport::-webkit-scrollbar-corner {
-    background: #8f8f8f;
-}
-
-
 
 
 .workspace-theme-light .toolbox-file-manager-file-box:hover {

@@ -1193,7 +1193,7 @@ export default {
           window.setTimeout(() => {
             this.changeSizeTimerIng = false;
             this.changeSizeTimer();
-          }, 100);
+          }, 300);
         }
       });
     },
@@ -1302,7 +1302,7 @@ export default {
   overflow: hidden;
 }
 .toolbox-terminal-box .terminal-xterm-box-back {
-  /* width: calc(100% - 20px) !important; */
+  width: 100% !important;
   height: 100%;
   position: absolute;
   left: 0px;
@@ -1336,12 +1336,9 @@ export default {
   /* width: 100% !important; */
 }
 
-.toolbox-terminal-box
-  .terminal-xterm-box
-  .xterm
-  .xterm-viewport::-webkit-scrollbar {
-  /* width: 10px;
-  height: 10px; */
+.terminal-xterm-box .xterm .xterm-viewport::-webkit-scrollbar {
+  width: 10px;
+  /* height: 10px; */
 }
 .toolbox-terminal-box
   .terminal-xterm-box
