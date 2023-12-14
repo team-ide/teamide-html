@@ -119,8 +119,38 @@ function recomposeColor(color) {
 		values[2] = "".concat(values[2], "%");
 	}
 
-	return "".concat(color.type, "(").concat(values.join(', '), ")");
+
+	return colorRgbToHex("".concat(color.type, "(").concat(values.join(', '), ")"));
 }
+
+/*RGB转换为16进制*/
+const colorRgbToHex = (rgbStr) => {
+	//十六进制颜色值的正则表达式
+	const reg = /^#([0-9a-fA-f]{3}|[0-9a-fA-f]{6}|[0-9a-fA-f]{8}|[0-9a-fA-f]{6}[0-9]{2})$/;
+	if (reg.test(rgbStr)) {
+		return rgbStr
+	} else {
+		const rgbArray = rgbStr.replace(/(?:\(|\)|rgba|rgb|RGBA|RGB)*/g, "").split(",");
+		let strHex = "#";
+		for (let i = 0; i < rgbArray.length; i++) {
+			if (i !== 3) {
+				if (rgbArray[i] == "0") {
+					strHex += "00"
+				} else {
+					let newItem = Number(rgbArray[i]).toString(16)
+					if (newItem.length < 2) {
+						newItem = "0" + newItem
+					}
+					strHex += newItem
+				}
+			} else {
+				strHex += rgbArray[i] == "0" ? "" : Number(rgbArray[i]) * 100
+			}
+		}
+		return strHex;
+	}
+}
+
 /**
  * 计算两种颜色之间的对比度。
  */

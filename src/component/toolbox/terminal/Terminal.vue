@@ -677,7 +677,7 @@ export default {
     },
     getTheme() {
       let theme = {
-        background: "#1c2431",
+        background: "#016F80",
         foreground: "#cccccc",
         selectionBackground: "#399ef440",
         black: "#666666",
@@ -721,6 +721,9 @@ export default {
           white: "#555555",
           yellow: "#949800",
         };
+      }
+      if (this.source.cssData && this.source.cssData.bodyBackgroudColor6) {
+        theme.background = this.source.cssData.bodyBackgroudColor6;
       }
       return theme;
     },

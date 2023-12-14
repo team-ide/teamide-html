@@ -157,16 +157,18 @@ export default {
       if (this.tool.isNotEmpty(userSetting.bodyTabBackgroudColor)) {
         cssData["bodyTabBackgroudColor"] = userSetting.bodyTabBackgroudColor;
       }
-      for (let k in cssData) {
+      Object.keys(cssData).forEach((k) => {
         let v = cssData[k];
         let color = this.tool.style.addColor(v);
         if (color) {
           color.colors.forEach((one, inde) => {
+            cssData[k + inde] = one;
             styleText = styleText.replaceAll(k + inde, one);
           });
         }
         styleText = styleText.replaceAll(k, v);
-      }
+      });
+      this.source.cssData = cssData;
       let dom = this.tool._userStyleDom;
       if (this.tool._userStyleDom == null) {
         dom = document.createElement("style");

@@ -46,6 +46,20 @@ export default {
       if (this.source.userSetting.theme == "light") {
         theme = "vs-light";
       }
+
+      if (this.source.cssData && this.source.cssData.bodyBackgroudColor6) {
+        let monaco = window.monaco;
+        monaco.editor.defineTheme("my-theme", {
+          base: theme, //指定父级主题
+          inherit: true, //继承父级主题中未定义的颜色值
+          rules: [],
+          colors: {
+            //定义新颜色值
+            "editor.background": this.source.cssData.bodyBackgroudColor6, //编辑器背景色
+          },
+        });
+        theme = "my-theme";
+      }
       return theme;
     },
     getValue() {

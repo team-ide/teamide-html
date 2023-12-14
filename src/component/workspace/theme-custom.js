@@ -114,6 +114,26 @@ export default {
     background: bodyBackgroudColor6;
 }
 
+/* 整个滚动条 */
+.workspace-container .terminal-xterm-box .xterm .xterm-viewport::-webkit-scrollbar {
+    width: 10px;
+}
+
+/* 滚动条上的滚动滑块 */
+.workspace-container .terminal-xterm-box .xterm .xterm-viewport::-webkit-scrollbar-thumb {
+    background-color: bodyBackgroudColor7;
+}
+
+/* 滚动条轨道 */
+.workspace-container .terminal-xterm-box .xterm .xterm-viewport::-webkit-scrollbar-track {
+    background-color: bodyBackgroudColor4;
+}
+
+/* 滚动条没有滑块的轨道部分 */
+.workspace-container .terminal-xterm-box .xterm .xterm-viewport::-webkit-scrollbar-track-piece {
+    background-color: bodyBackgroudColor4;
+}
+
 
 .workspace-container .toolbox-editor .el-tree {
     border: 1px dotted bodyBackgroudColor2;
