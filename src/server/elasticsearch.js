@@ -22,6 +22,9 @@ let elasticsearch = {
     getMapping(param) {
         return http.post('api/elasticsearch/getMapping', param);
     },
+    request(param) {
+        return http.post('api/elasticsearch/request', param);
+    },
     putMapping(param) {
         return http.post('api/elasticsearch/putMapping', param);
     },

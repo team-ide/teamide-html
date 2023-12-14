@@ -75,6 +75,9 @@
             </div>
           </el-form-item>
         </el-form>
+        <div class="color-red ft-12 pdlr-10" v-if="tool.isNotEmpty(error)">
+          {{ error }}
+        </div>
       </tm-layout>
       <tm-layout height="300px" class="" style="overflow: hidden">
         <Editor
@@ -108,6 +111,7 @@ export default {
       ready: false,
       body: null,
       doRequestIng: false,
+      error: null,
       form: {
         url: "/_search",
         indexName: null,
@@ -157,16 +161,23 @@ export default {
       this.body = value;
     },
     async toRequest() {
-      await this.doExecuteSql();
+      await this.doRequest();
     },
     async doRequest() {
       this.doRequestIng = true;
       let param = this.toolboxWorker.getWorkParam(Object.assign({}, this.form));
 
+      let url = param.url;
+      if (this.tool.isNotEmpty(param.indexName)) {
+        url = "/" + param.indexName + "/" + url;
+      }
+      param.url = url;
       param.body = this.body;
-      let res = await this.server.database.executeSQL(param);
+      this.error = null;
+      let res = await this.server.elasticsearch.request(param);
       if (res.code != 0) {
         this.tool.error(res.msg);
+        this.error = res.msg;
       }
       let data = res.data || {};
       this.doRequestIng = false;
