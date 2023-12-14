@@ -72,7 +72,7 @@ export default {
     border-bottom: 1px solid bodyBackgroudColor2;
 }
 .workspace-container .toolbox-editor .el-table__fixed {
-    background-color: bodyBackgroudColor6;
+    background-color: bodyBackgroudColor5;
 }
 .workspace-container .toolbox-editor .el-table .el-table__row:hover td.el-table__cell,
 .workspace-container .toolbox-editor .el-table .el-table__row:hover td.el-table__cell,
