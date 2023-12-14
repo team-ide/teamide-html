@@ -71,7 +71,8 @@ export default {
 .workspace-container .toolbox-editor .el-table__fixed-right-patch {
     border-bottom: 1px solid bodyBackgroudColor2;
 }
-.workspace-container .toolbox-editor .el-table__fixed {
+.workspace-container .toolbox-editor .el-table__fixed,
+.workspace-container .toolbox-editor .el-table__fixed-right {
     background-color: bodyBackgroudColor5;
 }
 .workspace-container .toolbox-editor .el-table .el-table__row:hover td.el-table__cell,
@@ -126,12 +127,12 @@ export default {
 
 /* 滚动条轨道 */
 .workspace-container .terminal-xterm-box .xterm .xterm-viewport::-webkit-scrollbar-track {
-    background-color: bodyBackgroudColor4;
+    background-color: bodyBackgroudColor5;
 }
 
 /* 滚动条没有滑块的轨道部分 */
 .workspace-container .terminal-xterm-box .xterm .xterm-viewport::-webkit-scrollbar-track-piece {
-    background-color: bodyBackgroudColor4;
+    background-color: bodyBackgroudColor5;
 }
 
 

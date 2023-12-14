@@ -110,7 +110,8 @@
     background: #ddd;
 }
 
-.workspace-theme-light .toolbox-editor .el-table__fixed {
+.workspace-theme-light .toolbox-editor .el-table__fixed,
+.workspace-theme-light .toolbox-editor .el-table__fixed-right {
     background-color: #fff;
 }
 

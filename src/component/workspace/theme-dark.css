@@ -115,7 +115,8 @@
     border-bottom: 1px solid #404040;
 }
 
-.workspace-theme-dark .toolbox-editor .el-table__fixed {
+.workspace-theme-dark .toolbox-editor .el-table__fixed,
+.workspace-theme-dark .toolbox-editor .el-table__fixed-right {
     background-color: #383838;
 }
 
