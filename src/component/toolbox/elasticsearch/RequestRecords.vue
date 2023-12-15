@@ -54,19 +54,19 @@
               size="mini"
               v-loading="dataListLoading"
             >
-              <el-table-column label="连接" width="140">
+              <el-table-column label="路径" width="200">
                 <template slot-scope="scope">
-                  {{ scope.row.extend.url }}
+                  {{ scope.row.extend && scope.row.extend.path }}
                 </template>
               </el-table-column>
               <el-table-column label="方法" width="80">
                 <template slot-scope="scope">
-                  {{ scope.row.extend.method }}
+                  {{ scope.row.extend && scope.row.extend.method }}
                 </template>
               </el-table-column>
-              <el-table-column label="请求">
+              <el-table-column label="请求内容">
                 <template slot-scope="scope">
-                  {{ scope.row.extend.body }}
+                  {{ scope.row.extend && scope.row.extend.body }}
                 </template>
               </el-table-column>
               <el-table-column width="140" label="创建时间">
@@ -180,10 +180,7 @@ export default {
         name: name,
         extend: {
           indexName: this.indexName || "",
-          url: "/_search",
-          method: "POST",
-          body: "{\n\n\n}",
-          header: {},
+          body: "{\n}",
         },
       });
       let res = await this.server.toolbox.extend.save(param);

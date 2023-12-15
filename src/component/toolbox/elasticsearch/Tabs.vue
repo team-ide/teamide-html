@@ -37,6 +37,7 @@
               :extendId="item.extend.extendId"
               :extend="item.extend"
               :indexes="indexes"
+              :tabId="item.tabId"
             >
             </Request>
           </template>
