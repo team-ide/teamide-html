@@ -47,12 +47,6 @@
           <el-form-item label="格式化结果" class="mgb-5">
             <el-switch v-model="form.pretty"> </el-switch>
           </el-form-item>
-          <el-form-item label="From" class="mgb-5">
-            <el-input v-model="form.from" style="width: 50px"> </el-input>
-          </el-form-item>
-          <el-form-item label="Size" class="mgb-5">
-            <el-input v-model="form.size" style="width: 50px"> </el-input>
-          </el-form-item>
           <el-form-item label="方法" class="mgb-5">
             <el-select
               v-model="form.method"
@@ -179,8 +173,6 @@ export default {
         path: "",
         method: "POST",
         pretty: true,
-        from: 0,
-        size: 10,
       },
       params: [],
       actions: [
@@ -281,8 +273,6 @@ export default {
           this.form.action = extend.action || "/_search";
           this.form.path = extend.path;
           this.form.method = extend.method || "POST";
-          this.form.from = extend.from || 0;
-          this.form.size = extend.size || 10;
           this.form.pretty = extend.pretty || true;
           this.params = extend.params || [];
           this.body = extend.body;
@@ -303,12 +293,6 @@ export default {
       param.params = param.params || {};
       if (param.pretty) {
         param.params["pretty"] = ["true"];
-      }
-      if (param.from) {
-        param.params["from"] = ["" + param.from];
-      }
-      if (param.size) {
-        param.params["size"] = ["" + param.size];
       }
       this.params.forEach((one) => {
         if (this.tool.isNotEmpty(one.name)) {
