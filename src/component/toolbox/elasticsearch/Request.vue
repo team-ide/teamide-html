@@ -299,7 +299,9 @@ export default {
           param.params[one.name] = [one.value];
         }
       });
-      param.body = this.body;
+      if (param.method != "GET") {
+        param.body = this.body;
+      }
       this.error = null;
       let res = await this.server.elasticsearch.request(param);
       if (res.code != 0) {
