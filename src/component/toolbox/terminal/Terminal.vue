@@ -759,6 +759,8 @@ export default {
 
       this.fitAddon = new FitAddon();
       // window.term = this.term;
+      // term._core.coreService._bufferService.buffers.active.lines.get(3).getTrimmedLength()
+      // term._core.coreService._bufferService.buffers.active.lines.get(3).getString(24)
       this.term.loadAddon(this.fitAddon);
 
       this.canvasAddon = new CanvasAddon();
