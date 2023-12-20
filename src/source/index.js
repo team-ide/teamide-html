@@ -28,6 +28,7 @@ let defaultUserSetting = {
     bodyBackgroudColor: "",
     bodyTabColor: "",
     bodyTabBackgroudColor: "",
+    terminalScrollback: 10000, // 终端 记录的历史行数，默认 10000行
 }
 source.defaultUserSetting = defaultUserSetting;
 source.userSetting = Object.assign({}, defaultUserSetting);

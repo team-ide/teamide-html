@@ -45,6 +45,23 @@
         <br v-if="(index + 1) % 2 == 0" :key="'br-' + index" />
       </template>
     </el-form>
+    <div class="pd-10">终端设置</div>
+    <el-form size="mini" @submit.native.prevent label-width="200px">
+      <el-form-item label="关闭Tab页" class="mgb-5 mglr-10">
+        <el-input
+          v-model="userSetting.terminalScrollback"
+          style="width: 200px"
+          @change="toSave('terminalScrollback')"
+        >
+        </el-input>
+        <div
+          class="mgl-10 tm-link color-orange"
+          @click="toSave('terminalScrollback', '')"
+        >
+          恢复默认
+        </div>
+      </el-form-item>
+    </el-form>
     <div class="pd-10">快捷键设置</div>
     <el-form size="mini" @submit.native.prevent label-width="200px">
       <el-form-item label="关闭Tab页" class="mgb-5 mglr-10">

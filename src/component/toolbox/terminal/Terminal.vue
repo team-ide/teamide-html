@@ -207,14 +207,14 @@
       <div class="pdt-2 pdlr-10">
         <div
           v-if="!terminalInfoOpen"
-          class="ft-12 tm-link color-grey mglr-5"
+          class="ft-12 tm-link color-grey mgr-5"
           @click="showTerminalInfo()"
         >
           显示终端信息
         </div>
         <div
           v-else
-          class="ft-12 tm-link color-grey mglr-5"
+          class="ft-12 tm-link color-grey mgr-5"
           @click="hideTerminalInfo()"
         >
           隐藏终端信息
@@ -225,8 +225,14 @@
         <div class="ft-12 tm-link color-grey mglr-5" @click="openLogs()">
           终端历史记录
         </div>
+        <div class="ft-12 tm-link color-grey mglr-5" @click="showCommandBox()">
+          历史/快捷命令
+        </div>
         <div class="ft-12 tm-link color-grey mglr-5" @click="reconnect()">
           重新连接
+        </div>
+        <div class="ft-12 tm-link color-grey mglr-5" @click="termClean()">
+          清屏
         </div>
         <span
           v-if="tool.isNotEmpty(worker.lastUser)"
@@ -326,6 +332,41 @@
     >
       有文件正在上传，可以使用`Ctrl+C`停止
     </div>
+    <div v-show="commandShow" class="terminal-command-box">
+      <div class="terminal-command-header">
+        <div class="terminal-command-input">
+          <input placeholder="输入搜索" />
+        </div>
+        <i
+          class="mdi-icon mdi mdi-close"
+          @click="hideCommandBox()"
+          style="cursor: pointer; position: absolute; right: 10px; top: 5px"
+        ></i>
+      </div>
+      <div class="terminal-command-list">
+        <template v-for="(command, index) in commands">
+          <div :key="index" class="terminal-command-one">
+            <div class="terminal-command-text">{{ command }}</div>
+            <div class="terminal-command-btn">
+              <div
+                v-if="quickCommands.indexOf(command) < 0"
+                class="ft-12 tm-link color-grey mgr-5"
+                @click="addQuickCommand(command)"
+              >
+                添加到快捷
+              </div>
+              <div
+                v-if="!isHistory"
+                class="ft-12 tm-link color-grey mgr-5"
+                @click="deleteQuickCommand(command)"
+              >
+                删除
+              </div>
+            </div>
+          </div>
+        </template>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -377,6 +418,13 @@ export default {
       systemInfo: null,
       systemInfoLoading: false,
 
+      commandCount: 0,
+      historyCommands: [],
+      quickCommands: [],
+      commandShow: false,
+      isHistory: false,
+      commands: [],
+
       isOpenFTP: false,
       isShowFTP: true,
       showSearch: false,
@@ -422,10 +470,19 @@ export default {
         this.worker.lastUser = this.extend.lastUser;
         this.worker.lastDir = this.extend.lastDir;
       }
+      await this.initHistoryCommand();
       this.$nextTick(() => {
         this.initTerm();
         this.worker.init();
       });
+    },
+    hideCommandBox() {
+      this.commandShow = false;
+      this.term && this.term.focus();
+    },
+    showCommandBox() {
+      this.commandShow = true;
+      this.commands = this.historyCommands;
     },
     showTerminalInfo() {
       this.terminalInfoOpen = true;
@@ -595,6 +652,9 @@ export default {
       }
       this.$nextTick(this.bindDrapFTPEvent);
     },
+    termClean() {
+      this.term.clear();
+    },
     unbindDrapFTPEvent() {
       this.$refs["ftpBoxLeftLine"] &&
         this.$refs["ftpBoxLeftLine"].removeEventListener(
@@ -677,7 +737,7 @@ export default {
     },
     getTheme() {
       let theme = {
-        background: "#016F80",
+        background: "#2a2a2a",
         foreground: "#cccccc",
         selectionBackground: "#399ef440",
         black: "#666666",
@@ -727,20 +787,105 @@ export default {
       }
       return theme;
     },
+    getTermLineStr(line, x) {
+      let trimmedLength = line.getTrimmedLength();
+      let str = "";
+      let start = x || 0;
+      for (let i = start; i < trimmedLength; i++) {
+        str += line.getString(i);
+      }
+      return str;
+    },
+    addHistoryCommand(command) {
+      let index = this.historyCommands.indexOf(command);
+      if (index >= 0) {
+        this.historyCommands.splice(index, 1);
+      }
+      this.historyCommands.splice(0, 0, command);
+    },
+    async initHistoryCommand() {
+      let param = this.worker.getParam();
+      let res = await this.server.terminal.command.query(param);
+      let list = res.data || [];
+      this.commandCount = list.length;
+      list.forEach((one) => {
+        this.addHistoryCommand(one.command);
+      });
+    },
+    checkAndSaveLastCommand() {
+      try {
+        let active = this.getTermActive();
+        if (!active) {
+          return;
+        }
+        // let lastTitleX = this.lastTitleX;
+        let lastTitleY = this.lastTitleY;
+        delete this.lastTitleY;
+        if (lastTitleY == null || lastTitleY == undefined) {
+          return;
+        }
+        // console.log("checkAndSaveLastCommand lastTitleY:", lastTitleY);
+        let lastTitleStr = this.lastTitleStr;
+
+        let line = active.lines.get(lastTitleY);
+        if (line == null) {
+          return;
+        }
+        let lineStr = this.getTermLineStr(line);
+        // console.log("checkAndSaveLastCommand lineStr:", lineStr);
+        let command = null;
+        if (this.tool.isEmpty(lastTitleStr)) {
+          let e1 = lineStr.indexOf("#");
+          let e2 = lineStr.indexOf("$");
+          if (e1 > 0) {
+            command = lineStr.substring(e1 + 1);
+          } else if (e2 > 0) {
+            command = lineStr.substring(e2 + 1);
+          }
+        } else {
+          if (lineStr.indexOf(lastTitleStr) == 0) {
+            command = lineStr.substring(lastTitleStr.length);
+          }
+        }
+        if (this.tool.isNotEmpty(command)) {
+          command = command.trim();
+          if (this.tool.isNotEmpty(command)) {
+            let param = this.worker.getParam();
+            param.command = command;
+            this.server.terminal.command.insert(param);
+            this.commandCount++;
+            this.addHistoryCommand(command);
+          }
+        }
+      } catch (e) {
+        console.error(e);
+      }
+    },
     initTerm() {
       if (this.term != null) {
         this.term.dispose();
       }
       let box = this.$refs.terminalXtermBox;
+      let terminalScrollback = 10000;
+      if (
+        this.source.userSetting &&
+        this.source.userSetting.terminalScrollback
+      ) {
+        terminalScrollback = Number(this.source.userSetting.terminalScrollback);
+      }
+      if (terminalScrollback < 0) {
+        terminalScrollback = 10000;
+      }
 
       this.term = new Terminal({
+        // logLevel: "error",
         useStyle: true,
         cursorBlink: true, //光标闪烁
         cursorStyle: "underline", // 光标样式 'block' | 'underline' | 'bar'
         width: 500,
         height: 400,
         windowsMode: true,
-        scrollback: 100000000, //终端中的回滚量
+        scrollback: terminalScrollback, //终端中的回滚量
         // rows: this.rows, //行数
         // cols: this.cols, // 不指定行数，自动回车后光标从下一行开始
         convertEol: true, //启用时，光标将设置为下一行的开头
@@ -758,7 +903,7 @@ export default {
       this.term.setBindKeysAfter(this.bindKeysAfter);
 
       this.fitAddon = new FitAddon();
-      // window.term = this.term;
+      window.term = this.term;
       // term._core.coreService._bufferService.buffers.active.lines.get(3).getTrimmedLength()
       // term._core.coreService._bufferService.buffers.active.lines.get(3).getString(24)
       this.term.loadAddon(this.fitAddon);
@@ -779,10 +924,62 @@ export default {
           this.worker.sendDataToWS(data);
         }
       });
-      // this.term.onBell((arg1, arg2, arg3) => {
-      //   console.log("onBell:", arg1, arg2, arg3);
-      // });
+      // if (this.term.onBell) {
+      //   this.term.onBell((arg1, arg2, arg3) => {
+      //     console.log("onBell:", arg1, arg2, arg3);
+      //   });
+      // }
+      if (this.term.onLineFeed) {
+        this.term.onLineFeed(() => {
+          // console.log("onLineFeed");
+          this.checkAndSaveLastCommand();
+        });
+      }
+      // if (this.term.onCursorMove) {
+      //   this.term.onCursorMove((arg1, arg2, arg3) => {
+      //     console.log("onCursorMove:", arg1, arg2, arg3);
+      //   });
+      // }
+      // if (this.term.onA11yTab) {
+      //   this.term.onA11yTab((arg1, arg2, arg3) => {
+      //     console.log("onA11yTab:", arg1, arg2, arg3);
+      //   });
+      // }
+      // if (this.term.onA11yChar) {
+      //   this.term.onA11yChar((arg1, arg2, arg3) => {
+      //     console.log("onA11yChar:", arg1, arg2, arg3);
+      //   });
+      // }
+      // if (this.term.onRequestReset) {
+      //   this.term.onRequestReset((arg1, arg2, arg3) => {
+      //     console.log("onRequestReset:", arg1, arg2, arg3);
+      //   });
+      // }
+      // let _windowOptions = this.term._core._inputHandler.windowOptions;
+      // this.term._core._inputHandler.windowOptions = function (params) {
+      //   console.log("windowOptions", params);
+      //   return _windowOptions(params);
+      // };
       this.term.onTitleChange((title) => {
+        let active = this.getTermActive();
+        if (active) {
+          let lastTitleY = active.ybase + active.y;
+          let lastTitleX = active.x;
+          this.lastTitleY = lastTitleY;
+          this.lastTitleX = lastTitleX;
+          let str = null;
+          if (lastTitleX > 0) {
+            let line = active.lines.get(lastTitleY);
+            if (line) {
+              str = "";
+              for (let i = 0; i < lastTitleX; i++) {
+                str += line.getString(i);
+              }
+            }
+          }
+          this.lastTitleStr = str;
+          // console.log("onTitleChange lastTitleY:", lastTitleY);
+        }
         if (this.tool.isEmpty(title)) {
           return;
         }
@@ -846,18 +1043,6 @@ export default {
           this.toolboxWorker.updateExtend(keyValueMap);
         }
       });
-      // this.term.onLineFeed((arg1, arg2, arg3) => {
-      //   console.log("onLineFeed:", arg1, arg2, arg3);
-      // });
-      // this.term.onCursorMove((arg1, arg2, arg3) => {
-      //   console.log("onCursorMove:", arg1, arg2, arg3);
-      // });
-      // this.term.onWriteParsed((arg1, arg2, arg3) => {
-      //   console.log("onWriteParsed:", arg1, arg2, arg3);
-      // });
-      // this.term.onRender((arg1, arg2, arg3) => {
-      //   console.log("onRender:", arg1, arg2, arg3);
-      // });
       this.term.onBinary((data) => {
         if (this.checkIsExit(data)) {
           this.worker.sendDataToWS(data);
@@ -886,6 +1071,15 @@ export default {
       this.changeSizeTimer();
 
       // this.xtermRows = box.getElementsByClassName("xterm-rows")[0];
+    },
+    getTermActive() {
+      if (
+        this.term &&
+        this.term._core.coreService._bufferService.buffers &&
+        this.term._core.coreService._bufferService.buffers._activeBuffer
+      ) {
+        return this.term._core.coreService._bufferService.buffers._activeBuffer;
+      }
     },
     bindKeysBefore() {
       // console.log("bindKeysBefore", this.term.textarea);
@@ -967,6 +1161,12 @@ export default {
         // 发送的处理程序 到终端对象的流量。接收可迭代对象（例如，数组）包含八位字节数。
         to_terminal: (octets) => {
           this.term.write(octets);
+          // console.log(
+          //   "on data:",
+          //   Array.prototype.map
+          //     .call(octets, (e) => String.fromCharCode(e))
+          //     .join("")
+          // );
         },
         // 属于 Zmodem 相关流
         // 处理程序检测事件。接收新的检测对象。
@@ -1426,5 +1626,31 @@ export default {
   flex: 1;
   overflow: hidden;
   word-wrap: break-word;
+}
+
+.terminal-command-box {
+  position: fixed;
+  bottom: 10px;
+  left: 50px;
+  right: 50px;
+  height: 300px;
+  background: #333333;
+  user-select: text;
+  z-index: 3;
+}
+
+.terminal-command-one {
+  display: flex;
+  padding: 2px 10px;
+  font-size: 13px;
+}
+.terminal-command-text {
+  flex: 1;
+  overflow: hidden;
+  word-wrap: break-word;
+}
+.terminal-command-btn {
+  width: 140px;
+  text-align: right;
 }
 </style>
