@@ -129,6 +129,8 @@ export default {
         { value: "bodyBackgroudColor", text: "内容背景" },
         { value: "bodyTabColor", text: "内容Tab颜色" },
         { value: "bodyTabBackgroudColor", text: "内容Tab背景" },
+        { value: "editorBackgroudColor", text: "编辑器背景" },
+        { value: "terminalBackgroudColor", text: "终端背景" },
       ],
     };
   },

@@ -226,7 +226,7 @@
           终端历史记录
         </div>
         <div class="ft-12 tm-link color-grey mglr-5" @click="showCommandBox()">
-          历史/快捷命令
+          历史/收藏命令
         </div>
         <div class="ft-12 tm-link color-grey mglr-5" @click="reconnect()">
           重新连接
@@ -332,41 +332,14 @@
     >
       有文件正在上传，可以使用`Ctrl+C`停止
     </div>
-    <div v-show="commandShow" class="terminal-command-box">
-      <div class="terminal-command-header">
-        <div class="terminal-command-input">
-          <input placeholder="输入搜索" />
-        </div>
-        <i
-          class="mdi-icon mdi mdi-close"
-          @click="hideCommandBox()"
-          style="cursor: pointer; position: absolute; right: 10px; top: 5px"
-        ></i>
-      </div>
-      <div class="terminal-command-list">
-        <template v-for="(command, index) in commands">
-          <div :key="index" class="terminal-command-one">
-            <div class="terminal-command-text">{{ command }}</div>
-            <div class="terminal-command-btn">
-              <div
-                v-if="quickCommands.indexOf(command) < 0"
-                class="ft-12 tm-link color-grey mgr-5"
-                @click="addQuickCommand(command)"
-              >
-                添加到快捷
-              </div>
-              <div
-                v-if="!isHistory"
-                class="ft-12 tm-link color-grey mgr-5"
-                @click="deleteQuickCommand(command)"
-              >
-                删除
-              </div>
-            </div>
-          </div>
-        </template>
-      </div>
-    </div>
+    <CommandBox
+      ref="CommandBox"
+      :source="source"
+      :toolboxWorker="toolboxWorker"
+      :worker="worker"
+      :writeCommand="writeCommand"
+      :onFocus="onFocus"
+    ></CommandBox>
   </div>
 </template>
 
@@ -389,6 +362,7 @@ import Download from "./Download.vue";
 import Upload from "./Upload.vue";
 import ConfirmPaste from "./ConfirmPaste.vue";
 import Logs from "./Logs.vue";
+import CommandBox from "./CommandBox.vue";
 
 export default {
   components: {
@@ -397,6 +371,7 @@ export default {
     Upload,
     ConfirmPaste,
     Logs,
+    CommandBox,
   },
   props: ["source", "toolboxWorker", "place", "placeId", "extend"],
   data() {
@@ -417,13 +392,6 @@ export default {
       terminalInfoOpen: false,
       systemInfo: null,
       systemInfoLoading: false,
-
-      commandCount: 0,
-      historyCommands: [],
-      quickCommands: [],
-      commandShow: false,
-      isHistory: false,
-      commands: [],
 
       isOpenFTP: false,
       isShowFTP: true,
@@ -470,19 +438,14 @@ export default {
         this.worker.lastUser = this.extend.lastUser;
         this.worker.lastDir = this.extend.lastDir;
       }
-      await this.initHistoryCommand();
       this.$nextTick(() => {
         this.initTerm();
         this.worker.init();
       });
     },
-    hideCommandBox() {
-      this.commandShow = false;
-      this.term && this.term.focus();
-    },
     showCommandBox() {
-      this.commandShow = true;
-      this.commands = this.historyCommands;
+      this.$refs.CommandBox.show();
+      this.onFocus();
     },
     showTerminalInfo() {
       this.terminalInfoOpen = true;
@@ -782,8 +745,17 @@ export default {
           yellow: "#949800",
         };
       }
-      if (this.source.cssData && this.source.cssData.bodyBackgroudColor6) {
-        theme.background = this.source.cssData.bodyBackgroudColor6;
+      let color = this.source.userSetting.terminalBackgroudColor;
+      if (
+        this.tool.isEmpty(color) &&
+        this.source.cssData &&
+        this.source.cssData.bodyBackgroudColor6
+      ) {
+        color = this.source.cssData.bodyBackgroudColor6;
+      }
+
+      if (this.tool.isNotEmpty(color)) {
+        theme.background = color;
       }
       return theme;
     },
@@ -795,22 +767,6 @@ export default {
         str += line.getString(i);
       }
       return str;
-    },
-    addHistoryCommand(command) {
-      let index = this.historyCommands.indexOf(command);
-      if (index >= 0) {
-        this.historyCommands.splice(index, 1);
-      }
-      this.historyCommands.splice(0, 0, command);
-    },
-    async initHistoryCommand() {
-      let param = this.worker.getParam();
-      let res = await this.server.terminal.command.query(param);
-      let list = res.data || [];
-      this.commandCount = list.length;
-      list.forEach((one) => {
-        this.addHistoryCommand(one.command);
-      });
     },
     checkAndSaveLastCommand() {
       try {
@@ -850,11 +806,7 @@ export default {
         if (this.tool.isNotEmpty(command)) {
           command = command.trim();
           if (this.tool.isNotEmpty(command)) {
-            let param = this.worker.getParam();
-            param.command = command;
-            this.server.terminal.command.insert(param);
-            this.commandCount++;
-            this.addHistoryCommand(command);
+            this.$refs.CommandBox.addHistoryCommand(command);
           }
         }
       } catch (e) {
@@ -1305,6 +1257,10 @@ export default {
         this.tool.warn("粘贴失败，请允许访问剪贴板！");
       }
     },
+    writeCommand(txt) {
+      this.worker.sendDataToWS(txt);
+      this.onFocus();
+    },
     toPaste(text) {
       if (this.tool.isEmpty(text)) {
         return;
@@ -1626,31 +1582,5 @@ export default {
   flex: 1;
   overflow: hidden;
   word-wrap: break-word;
-}
-
-.terminal-command-box {
-  position: fixed;
-  bottom: 10px;
-  left: 50px;
-  right: 50px;
-  height: 300px;
-  background: #333333;
-  user-select: text;
-  z-index: 3;
-}
-
-.terminal-command-one {
-  display: flex;
-  padding: 2px 10px;
-  font-size: 13px;
-}
-.terminal-command-text {
-  flex: 1;
-  overflow: hidden;
-  word-wrap: break-word;
-}
-.terminal-command-btn {
-  width: 140px;
-  text-align: right;
 }
 </style>

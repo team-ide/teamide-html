@@ -34,14 +34,17 @@ let terminal = {
         },
     },
     command: {
-        insert(param) {
-            return http.post('api/terminal/command/insert', param);
+        save(param) {
+            return http.post('api/terminal/command/save', param);
         },
         query(param) {
             return http.post('api/terminal/command/query', param);
         },
         count(param) {
             return http.post('api/terminal/command/count', param);
+        },
+        delete(param) {
+            return http.post('api/terminal/command/delete', param);
         },
         clean(param) {
             return http.post('api/terminal/command/clean', param);

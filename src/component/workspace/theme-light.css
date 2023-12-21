@@ -41,6 +41,9 @@
 }
 
 
+.workspace-theme-light .terminal-command-box {
+    background-color: #eee;
+}
 
 
 .workspace-theme-light .toolbox-context-box {

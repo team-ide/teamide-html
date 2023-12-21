@@ -20,6 +20,10 @@
     background: #2a2a2a;
 }
 
+.workspace-theme-dark .terminal-command-box {
+    background-color: #383838;
+}
+
 .workspace-tabs .el-dropdown {
     color: unset;
 }

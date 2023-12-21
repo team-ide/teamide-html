@@ -52,6 +52,9 @@ export default {
     background-color: bodyTabBackgroudColor7;
 } 
 
+.workspace-container .terminal-command-box {
+    background-color: bodyBackgroudColor;
+}
 .workspace-container .toolbox-editor input, .workspace-container .toolbox-editor input:focus, .workspace-container .toolbox-editor select, .workspace-container .toolbox-editor select:focus, .workspace-container .toolbox-editor textarea, .workspace-container .toolbox-editor textarea:focus{
     border-color: bodyBackgroudColor2;
 }
