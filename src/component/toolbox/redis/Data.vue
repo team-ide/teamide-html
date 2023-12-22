@@ -12,7 +12,7 @@
               <el-select
                 placeholder="请选择类型"
                 v-model="form.valueType"
-                style="width: 200px"
+                style="width: 100px"
               >
                 <el-option label="string" value="string"> </el-option>
                 <el-option label="list" value="list"></el-option>
