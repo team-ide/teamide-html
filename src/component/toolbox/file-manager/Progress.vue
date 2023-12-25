@@ -132,7 +132,10 @@
               </template>
             </template>
             <template v-else-if="one.isEnd">
-              <span class="color-green">完成</span>
+              <span class="color-green" v-if="one.data.sameFile"
+                >文件相同，跳过</span
+              >
+              <span class="color-green" v-else>完成</span>
             </template>
             <template v-else>
               <span class="tm-link mgl-5 color-red-4" @click="doCallStop(one)">
@@ -151,7 +154,7 @@
 <script>
 export default {
   components: {},
-  props: ["source", "toolboxWorker", "onUploadFileInfo"],
+  props: ["source", "toolboxWorker", "onAddFileInfo", "getWorkerByKey"],
   data() {
     return {
       progressList: [],
@@ -261,15 +264,22 @@ export default {
         }
       }
 
-      if (progress.isEnd && progress.work == "upload") {
-        if (progress.data) {
-          if (progress.data.fileInfo) {
-            this.onUploadFileInfo &&
-              this.onUploadFileInfo(progress, progress.data.fileInfo);
+      if (progress.isEnd) {
+        if (progress.work == "upload") {
+          if (progress.data) {
+            if (progress.data.fileInfo) {
+              this.onAddFileInfo &&
+                this.onAddFileInfo(progress, progress.data.fileInfo);
+            }
+            if (progress.data.fileDir) {
+              this.onAddFileInfo &&
+                this.onAddFileInfo(progress, progress.data.fileDir);
+            }
           }
-          if (progress.data.fileDir) {
-            this.onUploadFileInfo &&
-              this.onUploadFileInfo(progress, progress.data.fileDir);
+        } else if (progress.work == "copy") {
+          if (progress.data && progress.data.fileInfo) {
+            this.onAddFileInfo &&
+              this.onAddFileInfo(progress, progress.data.fileInfo);
           }
         }
       }

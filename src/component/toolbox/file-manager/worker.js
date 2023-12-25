@@ -312,7 +312,7 @@ const newWorker = function (workerOption) {
                         }
                         if (file) {
                             file.path = options.newPath;
-                            this.onUploadFileInfo(file)
+                            this.onAddFileInfo(file)
                         }
                     }
                 }
@@ -367,7 +367,7 @@ const newWorker = function (workerOption) {
                 return true;
             }
         },
-        onUploadFileInfo(fileInfo) {
+        onAddFileInfo(fileInfo) {
             if (fileInfo == null) {
                 return
             }
@@ -398,17 +398,6 @@ const newWorker = function (workerOption) {
             let res = await server.fileManager.copy(param);
             if (res.code != 0) {
                 tool.error(res.msg);
-            } else {
-                if (options.fromFileWorkerKey != this.fileWorkerKey) {
-                    let worker = this.getWorkerByKey(options.fromFileWorkerKey);
-                    if (worker) {
-                        let file = worker.getFile(options.fromPath)
-                        if (!file.isDir) {
-                            file.path = options.path;
-                            this.onUploadFileInfo(file)
-                        }
-                    }
-                }
             }
             return res.data;
         },

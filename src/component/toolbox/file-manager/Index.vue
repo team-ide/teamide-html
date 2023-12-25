@@ -107,7 +107,8 @@
         <Progress
           :source="source"
           :toolboxWorker="toolboxWorker"
-          :onUploadFileInfo="onUploadFileInfo"
+          :onAddFileInfo="onAddFileInfo"
+          :getWorkerByKey="getWorkerByKey"
         ></Progress>
       </tm-layout>
     </tm-layout>
@@ -136,11 +137,11 @@ export default {
   computed: {},
   watch: {},
   methods: {
-    onUploadFileInfo(progress, file) {
+    onAddFileInfo(progress, file) {
       if (this.$refs["FileManager"] && this.$refs["FileManager"].forEach) {
         this.$refs["FileManager"].forEach((one) => {
           if (one.place == progress.place && one.placeId == progress.placeId) {
-            one.fileWorker.onUploadFileInfo(file);
+            one.fileWorker.onAddFileInfo(file);
           }
         });
       }

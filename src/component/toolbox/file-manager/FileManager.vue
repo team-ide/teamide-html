@@ -369,15 +369,24 @@ export default {
           putDir += "/";
         }
         if (place != this.place || placeId != this.placeId) {
+          let names = [];
           files.forEach((one) => {
-            this.fileWorker.copy({
-              path: putDir + one.name,
-              fromFileWorkerKey: fileWorkerKey,
-              fromPlace: place,
-              fromPlaceId: placeId,
-              fromPath: one.path,
-            });
+            names.push(one.name);
           });
+          this.tool
+            .confirm("复制 [" + names.join(",") + "] 到 [" + putDir + "] ？")
+            .then(async () => {
+              files.forEach((one) => {
+                this.fileWorker.copy({
+                  path: putDir + one.name,
+                  fromFileWorkerKey: fileWorkerKey,
+                  fromPlace: place,
+                  fromPlaceId: placeId,
+                  fromPath: one.path,
+                });
+              });
+            })
+            .catch((e) => {});
         } else {
           let names = [];
           files.forEach((one) => {
@@ -385,11 +394,7 @@ export default {
           });
           this.tool
             .confirm(
-              "移动[" +
-                names.join(",") +
-                "]到[" +
-                putDir +
-                "]后无法恢复，确定移动？"
+              "移动 [ " + names.join(",") + " ] 到 [ " + putDir + " ] ？"
             )
             .then(async () => {
               files.forEach((one) => {
