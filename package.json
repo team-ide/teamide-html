@@ -31,6 +31,7 @@
     "marked": "^4.3.0",
     "teamide-xterm": "^5.3.3",
     "vue": "^2.6.14",
+    "vue-router": "^3.5.1",
     "vue-template-compiler": "2.6.14",
     "vuedraggable": "^2.24.3",
     "xterm-addon-attach": "^0.9.0",

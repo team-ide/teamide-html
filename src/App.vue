@@ -4,7 +4,13 @@
       <InfoBox :source="source"></InfoBox>
       <SystemInfoBox :source="source"></SystemInfoBox>
       <AlertBox :source="source"></AlertBox>
-      <Index :source="source"></Index>
+      <div class="workspace-page" v-if="openWorkspace">
+        <Workspace :source="source"> </Workspace>
+      </div>
+      <div class="dialog-page" v-if="openDialogPage">
+        <DialogPage :source="source"> </DialogPage>
+      </div>
+
       <Login v-show="source.login.show" :source="source"></Login>
       <Register v-show="source.register.show" :source="source"></Register>
       <UpdateCheck :source="source"></UpdateCheck>
@@ -54,10 +60,12 @@
 <script>
 import source from "@/source";
 
-import Index from "@/views/Index.vue";
 import Login from "@/views/Login.vue";
 import Register from "@/views/Register.vue";
 import UpdateCheck from "@/views/UpdateCheck.vue";
+import Workspace from "@/views/workspace/Index.vue";
+
+import DialogPage from "@/views/dialog/Page";
 
 import JSONDataDialog from "@/views/dialog/JSONDataDialog";
 import MarkdownDialog from "@/views/dialog/MarkdownDialog";
@@ -68,7 +76,6 @@ import TextDialog from "@/views/dialog/TextDialog";
 
 export default {
   components: {
-    Index,
     Login,
     Register,
     UpdateCheck,
@@ -78,10 +85,17 @@ export default {
     JavascriptFuncDialog,
     JavascriptExampleDialog,
     TextDialog,
+    Workspace,
+    DialogPage,
   },
   props: [],
   data() {
-    return { source, contextmenu: { menus: [] } };
+    return {
+      source,
+      contextmenu: { menus: [] },
+      openWorkspace: false,
+      openDialogPage: false,
+    };
   },
   computed: {},
   watch: {
@@ -113,6 +127,12 @@ export default {
       this.tool.showMarkdownView = this.$refs.MarkdownViewDialog.show;
       this.tool.showJavascriptFunc = this.$refs.JavascriptFuncDialog.show;
       this.tool.showJavascriptExample = this.$refs.JavascriptExampleDialog.show;
+
+      if (this.$route.path == "/dialog") {
+        this.openDialogPage = true;
+      } else {
+        this.openWorkspace = true;
+      }
 
       // this.tool.copyByEditor = (text) => {
       //   if (this.monacoInstance == null) {
@@ -245,6 +265,14 @@ body {
   transform: scale(0);
   width: 100px;
   height: 100px;
+}
+
+.workspace-page {
+  width: 100%;
+  height: 100%;
+  margin: 0px;
+  padding: 0px;
+  position: relative;
 }
 
 .app-dialog {

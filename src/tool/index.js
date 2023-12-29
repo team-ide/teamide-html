@@ -32,6 +32,22 @@ tool.init = function () {
         source.init();
     })
 };
+if (window.electron && window.electron.ipcRenderer) {
+    let ipcRenderer = window.electron.ipcRenderer;
+    tool.electronExecuteScript = (script) => {
+        return new Promise(function (resolve, reject) {
+            ipcRenderer.once('ipc-example', (args) => {
+                args = args || []
+                if (args.length == 2 && args[0] == 'script-execute-result') {
+                    resolve && resolve(args[1])
+                }
+            });
+            ipcRenderer.sendMessage('ipc-example', ["script-execute", script]);
+        });
+
+
+    }
+}
 var sessionLoadding = false;
 var refreshSessionStart = false;
 function refreshSession() {

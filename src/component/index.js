@@ -22,8 +22,6 @@ Vue.component('AlertBox', AlertBox);
 import DataTable from './dataTable/Index.vue'
 Vue.component('DataTable', DataTable);
 
-import Workspace from './workspace/Index.vue'
-Vue.component('Workspace', Workspace);
 import WorkspaceTabs from './workspace/Tabs.vue'
 Vue.component('WorkspaceTabs', WorkspaceTabs);
 import WorkspaceSpans from './workspace/Spans.vue'

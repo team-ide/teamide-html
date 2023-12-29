@@ -45,6 +45,41 @@
         <br v-if="(index + 1) % 2 == 0" :key="'br-' + index" />
       </template>
     </el-form>
+    <div class="pd-10">窗口设置</div>
+    <el-form size="mini" @submit.native.prevent label-width="200px">
+      <el-form-item label="始终显示最前" class="mgb-5 mglr-10">
+        <el-switch
+          v-model="userSetting.mainWindowAlwaysOnTop"
+          style="width: 200px"
+          @change="toSave('mainWindowAlwaysOnTop')"
+          active-value="true"
+          inactive-value="false"
+        >
+        </el-switch>
+        <div
+          class="mgl-10 tm-link color-orange"
+          @click="toSave('mainWindowAlwaysOnTop', '')"
+        >
+          恢复默认
+        </div>
+      </el-form-item>
+      <el-form-item label="新窗口打开弹窗" class="mgb-5 mglr-10">
+        <el-switch
+          v-model="userSetting.useNewWindowOpenDialog"
+          style="width: 200px"
+          @change="toSave('useNewWindowOpenDialog')"
+          active-value="true"
+          inactive-value="false"
+        >
+        </el-switch>
+        <div
+          class="mgl-10 tm-link color-orange"
+          @click="toSave('useNewWindowOpenDialog', '')"
+        >
+          恢复默认
+        </div>
+      </el-form-item>
+    </el-form>
     <div class="pd-10">终端设置</div>
     <el-form size="mini" @submit.native.prevent label-width="200px">
       <el-form-item label="关闭Tab页" class="mgb-5 mglr-10">

@@ -111,8 +111,20 @@ export default {
     "source.userSetting.bodyTabBackgroudColor"() {
       this.initStyle();
     },
+    "source.userSetting.mainWindowAlwaysOnTop"() {
+      this.initMainWindow();
+    },
   },
   methods: {
+    async initMainWindow() {
+      if (this.source.hasElectron) {
+        await this.tool.electronExecuteScript(
+          `context.window.mainWindow.setAlwaysOnTop(` +
+            this.source.userSetting.mainWindowAlwaysOnTop +
+            `);`
+        );
+      }
+    },
     initStyle() {
       let cssData = {};
       let styleText = themeCustom.css;
@@ -192,6 +204,7 @@ export default {
       this.initShowTabGroup();
     },
     init() {
+      this.initMainWindow();
       this.initStyle();
       this.initTheme();
       this.initUserData();

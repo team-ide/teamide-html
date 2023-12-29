@@ -1,5 +1,6 @@
 import Vue from 'vue'
 import App from '@/App.vue'
+import Router from 'vue-router'
 
 //去除谷歌浏览器的scroll、wheel等事件警告
 (function () {
@@ -42,7 +43,12 @@ import form from "@/form";
 
 Vue.prototype.form = form;
 
+Vue.use(Router)
+
+let router = new Router({})
+
 new Vue({
+  router,
   render: h => h(App),
   created() {
     this.tool.$bvToast = this.$bvToast;

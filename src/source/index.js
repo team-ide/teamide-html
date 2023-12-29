@@ -13,6 +13,7 @@ source.filesUrl = null;
 source.hasNewVersion = false;
 source.isServer = true;
 source.setting = {};
+source.hasElectron = window.electron && window.electron.ipcRenderer;
 let defaultUserSetting = {
     theme: "dark",
     keyTabClose: "Alt + 87",
@@ -31,6 +32,8 @@ let defaultUserSetting = {
     terminalScrollback: 10000, // 终端 记录的历史行数，默认 10000行
     editorBackgroudColor: "",
     terminalBackgroudColor: "",
+    mainWindowAlwaysOnTop: "false",
+    useNewWindowOpenDialog: "true",
 }
 source.defaultUserSetting = defaultUserSetting;
 source.userSetting = Object.assign({}, defaultUserSetting);
