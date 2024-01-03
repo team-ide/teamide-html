@@ -1,7 +1,7 @@
 <template>
   <el-dialog
     ref="modal"
-    :title="title || '数据'"
+    :title="title || 'Markdown Editor'"
     :close-on-click-modal="false"
     :close-on-press-escape="true"
     :show-close="true"
@@ -12,79 +12,57 @@
     :fullscreen="true"
     class="app-dialog"
   >
-    <div class="pd-10" style="height: calc(100% - 60px)">
-      <div style="height: 100%">
-        <Editor
-          ref="Editor"
-          :source="source"
-          :value="text"
-          language="markdown"
-        ></Editor>
-      </div>
-    </div>
-    <div class="pd-10">
-      <div
-        v-if="onSave != null"
-        class="tm-btn bg-teal-8 ft-13 mgr-10"
-        @click="doSave"
-      >
-        确认
-      </div>
-      <div class="tm-btn bg-teal-8 ft-13" @click="toView">预览</div>
+    <div class="" style="height: 100%">
+      <Markdown :source="source" :data="data"> </Markdown>
     </div>
   </el-dialog>
 </template>
 
 <script>
+import Markdown from "./Markdown";
+
 export default {
-  components: {},
+  components: { Markdown },
   props: ["source"],
   data() {
     return {
       showDialog: false,
-      text: null,
+      data: null,
       title: null,
-      onSave: null,
-      onCancel: null,
     };
   },
-  // 计算属性 只有依赖数据发生改变，才会重新进行计算
   computed: {},
-  // 计算属性 数据变，直接会触发相应的操作
   watch: {},
   methods: {
     async show(data, options) {
       options = options || {};
-      this.onSave = options.onSave;
-      this.onCancel = options.onCancel;
       this.title = options.title;
+
+      if (this.tool.isUseNewWindowOpenDialog()) {
+        this.tool.newDialogWindow({
+          type: "Markdown",
+          title: this.title || "Markdown Editor",
+          cacheKey: this.tool.getNumber(),
+          cacheData: data,
+        });
+        return;
+      }
       this.showDialog = true;
       this.$nextTick(() => {
-        this.text = data;
-        this.$refs.Editor.setValue(this.text);
+        this.data = data;
       });
-    },
-    toView() {
-      let text = this.$refs.Editor.getValue();
-      this.tool.showMarkdownView(text);
     },
     hide() {
       this.showDialog = false;
-      this.onCancel && this.onCancel();
-    },
-    doSave() {
-      this.showDialog = false;
-      let text = this.$refs.Editor.getValue();
-      this.onSave &&
-        this.onSave({
-          text: text,
-        });
     },
   },
-  // 在实例创建完成后被立即调用
   created() {},
-  // el 被新创建的 vm.$el 替换，并挂载到实例上去之后调用
-  mounted() {},
+  updated() {
+    this.tool.showMarkdown = this.show;
+  },
+  mounted() {
+    this.tool.showMarkdown = this.show;
+  },
 };
 </script>
 

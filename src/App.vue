@@ -7,13 +7,11 @@
       <div class="workspace-page" v-if="openWorkspace">
         <Workspace :source="source"> </Workspace>
       </div>
-      <div class="dialog-page" v-if="openDialogPage">
-        <DialogPage :source="source"> </DialogPage>
-      </div>
+      <DialogPage :source="source" v-if="openDialogPage"> </DialogPage>
 
       <Login v-show="source.login.show" :source="source"></Login>
       <Register v-show="source.register.show" :source="source"></Register>
-      <UpdateCheck :source="source"></UpdateCheck>
+      <UpdateCheck :source="source" v-if="openWorkspace"></UpdateCheck>
     </template>
     <template v-else>
       <div v-if="source.status == 'connecting'"></div>
@@ -38,21 +36,12 @@
       </div>
     </template>
     <Contextmenu :contextmenu="contextmenu" ref="Contextmenu"></Contextmenu>
-    <JSONDataDialog ref="JSONDataDialog" :source="source"></JSONDataDialog>
-    <MarkdownDialog ref="MarkdownDialog" :source="source"></MarkdownDialog>
-    <MarkdownViewDialog
-      ref="MarkdownViewDialog"
-      :source="source"
-    ></MarkdownViewDialog>
-    <JavascriptFuncDialog
-      ref="JavascriptFuncDialog"
-      :source="source"
-    ></JavascriptFuncDialog>
-    <JavascriptExampleDialog
-      ref="JavascriptExampleDialog"
-      :source="source"
-    ></JavascriptExampleDialog>
-    <TextDialog ref="TextDialog" :source="source"></TextDialog>
+    <JSONDataDialog :source="source"></JSONDataDialog>
+    <MarkdownDialog :source="source"></MarkdownDialog>
+    <MarkdownViewDialog :source="source"></MarkdownViewDialog>
+    <JavascriptFuncDialog :source="source"></JavascriptFuncDialog>
+    <JavascriptExampleDialog :source="source"></JavascriptExampleDialog>
+    <TextDialog :source="source"></TextDialog>
     <div class="editor-for-copy" ref="editorForCopy"></div>
   </div>
 </template>
@@ -120,19 +109,55 @@ export default {
     },
   },
   methods: {
-    init() {
-      this.tool.showJSONData = this.$refs.JSONDataDialog.show;
-      this.tool.showText = this.$refs.TextDialog.show;
-      this.tool.showMarkdown = this.$refs.MarkdownDialog.show;
-      this.tool.showMarkdownView = this.$refs.MarkdownViewDialog.show;
-      this.tool.showJavascriptFunc = this.$refs.JavascriptFuncDialog.show;
-      this.tool.showJavascriptExample = this.$refs.JavascriptExampleDialog.show;
-
+    async testElectronDo() {
+      if (this.tool.electronDo == null) {
+        return;
+      }
+      try {
+        let res = await this.tool.electronDo({
+          method: "set-cache",
+          key: "key1",
+          value: "key1-value",
+        });
+        console.log(res);
+        res = await this.tool.electronDo({
+          method: "get-cache",
+          key: "key1",
+        });
+        console.log(res);
+        res = await this.tool.electronDo({
+          method: "remove-cache",
+          key: "key1",
+        });
+        console.log(res);
+      } catch (e) {
+        console.error(e);
+      }
+    },
+    async init() {
       if (this.$route.path == "/dialog") {
         this.openDialogPage = true;
       } else {
         this.openWorkspace = true;
       }
+      this.testElectronDo();
+      this.tool.newDialogWindow = async (options) => {
+        options = options || {};
+        options.url = this.source.url + "#/dialog?type=" + options.type;
+        if (options.title) {
+          options.url += "&title=" + options.title;
+        }
+        if (options.cacheKey) {
+          options.url += "&cacheKey=" + options.cacheKey;
+        }
+        if (options.listenKeys) {
+          options.url += "&listenKeys=" + JSON.stringify(options.listenKeys);
+        }
+        return await this.tool.electronDo({
+          method: "new-window",
+          options: options,
+        });
+      };
 
       // this.tool.copyByEditor = (text) => {
       //   if (this.monacoInstance == null) {
@@ -217,6 +242,9 @@ export default {
   },
   // 在实例创建完成后被立即调用
   created() {},
+  updated() {
+    this.tool.showContextmenu = this.showContextmenu;
+  },
   // el 被新创建的 vm.$el 替换，并挂载到实例上去之后调用
   mounted() {
     this.tool.showContextmenu = this.showContextmenu;

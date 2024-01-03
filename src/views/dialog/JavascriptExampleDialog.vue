@@ -13,100 +13,20 @@
     class="app-dialog"
   >
     <div class="pd-10" style="height: 100%">
-      <div style="height: 100%">
-        <Editor
-          ref="Editor"
-          :source="source"
-          :value="text"
-          language="js"
-        ></Editor>
-      </div>
+      <JavascriptExample :source="source"> </JavascriptExample>
     </div>
   </el-dialog>
 </template>
 
 <script>
+import JavascriptExample from "./JavascriptExample";
+
 export default {
-  components: {},
+  components: { JavascriptExample },
   props: ["source"],
   data() {
     return {
       showDialog: false,
-      text: `
-let config = {
-	address:"127.0.0.1:6379",
-	auth:"",
-};
-start = util.GetNowMilli()
-let redisService = redis.newService(config);
-end = util.GetNowMilli()
-logger.info("new redisService use:",(end-start))
-
-let key = "xx";
-
-start = util.GetNowMilli()
-res = redisService.get(key)
-end = util.GetNowMilli()
-logger.info("redis get", logger.any("key",key), logger.any("value",res), logger.any("use",(end-start)))
-
-
-start = util.GetNowMilli()
-redisService.set(key,"这是一个UUID:" + util.getUUID())
-end = util.GetNowMilli()
-logger.info("redis set", logger.any("key",key), logger.any("use",(end-start)))
-
-start = util.GetNowMilli()
-res = redisService.get(key)
-end = util.GetNowMilli()
-logger.info("redis get", logger.any("key",key), logger.any("value",res), logger.any("use",(end-start)))
-
-config = {
-	address:"127.0.0.1:2181",
-};
-start = util.GetNowMilli()
-let zookeeperService = zookeeper.newService(config);
-end = util.GetNowMilli()
-logger.info("new zookeeperService", logger.any("use",(end-start)))
-
-
-let path = "/xx";
-
-start = util.GetNowMilli()
-exists = zookeeperService.exists(path)
-end = util.GetNowMilli()
-logger.info("zookeeper exists", logger.any("path",path), logger.any("exists",exists), logger.any("use",(end-start)))
-
-if(!exists){
-	start = util.GetNowMilli()
-	zookeeperService.create(path, "这是一个UUID:" + util.getUUID())
-	end = util.GetNowMilli()
-	logger.info("zookeeper create", logger.any("path",path), logger.any("use",(end-start)))
-}
-
-start = util.GetNowMilli()
-res = zookeeperService.get(path)
-end = util.GetNowMilli()
-logger.info("zookeeper get", logger.any("path",path), logger.any("value", res), logger.any("use",(end-start)))
-
-wait = util.newWaitGroup()
-wait.Add(1)
-let watchChildrenCount = 0
-start = util.GetNowMilli()
-zookeeperService.watchChildren(path, function(event){
-	watchChildrenCount++
-	logger.info("zookeeper watchChildren", logger.any("path",path), logger.any("event", util.objToJson(event)))
-	if(watchChildrenCount >= 2){
-		wait.Done();
-	}
-	return false;
-})
-end = util.GetNowMilli()
-logger.info("zookeeper watchChildren start", logger.any("path",path), logger.any("use",(end-start)))
-wait.Wait()
-end = util.GetNowMilli()
-logger.info("zookeeper watchChildren end", logger.any("path",path), logger.any("use",(end-start)))
-      
-`,
       title: null,
     };
   },
@@ -116,6 +36,13 @@ logger.info("zookeeper watchChildren end", logger.any("path",path), logger.any("
   watch: {},
   methods: {
     async show() {
+      if (this.tool.isUseNewWindowOpenDialog()) {
+        this.tool.newDialogWindow({
+          type: "JavascriptExample",
+          title: this.title || "示例代码",
+        });
+        return;
+      }
       this.showDialog = true;
     },
     hide() {
@@ -124,8 +51,12 @@ logger.info("zookeeper watchChildren end", logger.any("path",path), logger.any("
   },
   // 在实例创建完成后被立即调用
   created() {},
-  // el 被新创建的 vm.$el 替换，并挂载到实例上去之后调用
-  mounted() {},
+  updated() {
+    this.tool.showJavascriptExample = this.show;
+  },
+  mounted() {
+    this.tool.showJavascriptExample = this.show;
+  },
 };
 </script>
 

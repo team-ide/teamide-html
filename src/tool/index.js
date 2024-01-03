@@ -34,19 +34,63 @@ tool.init = function () {
 };
 if (window.electron && window.electron.ipcRenderer) {
     let ipcRenderer = window.electron.ipcRenderer;
-    tool.electronExecuteScript = (script) => {
-        return new Promise(function (resolve, reject) {
-            ipcRenderer.once('ipc-example', (args) => {
+    let doCallback = {};
+    let once = () => {
+        ipcRenderer.once('ipc-example', (args) => {
+            try {
                 args = args || []
-                if (args.length == 2 && args[0] == 'script-execute-result') {
-                    resolve && resolve(args[1])
+                if (args.length > 1 && args[0] == 'do-result') {
+                    let resolve = doCallback[args[1]]
+                    delete doCallback[args[1]]
+                    resolve && resolve(args[2])
+                } else if (args.length > 1 && args[0] == 'on-listen') {
+                    let resolve = listenCache[args[1]]
+                    delete listenCache[args[1]]
+                    resolve && resolve(args[2])
+                } else if (args.length > 1 && args[0] == 'remove-listen') {
+                    let resolve = listenCache[args[1]]
+                    delete listenCache[args[1]]
+                    resolve && resolve()
                 }
-            });
-            ipcRenderer.sendMessage('ipc-example', ["script-execute", script]);
+            } catch (e) {
+                console.error('ipcRenderer.once error', e)
+            } finally {
+                once()
+            }
         });
-
-
     }
+    once()
+    tool.electronDo = (param) => {
+        return new Promise(function (resolve, reject) {
+            let id = tool.getNumber();
+            doCallback[id] = resolve
+            // console.log('electronDo start ', id, param)
+            ipcRenderer.sendMessage('ipc-example', ["do", id, param]);
+        });
+    }
+    let listenCache = {};
+    tool.electronOnListen = (param) => {
+        return new Promise(function (resolve, reject) {
+            let id = tool.getNumber();
+            listenCache[param.listenKey] = resolve
+            param.method = "on-listen"
+            tool.electronDo(param);
+        });
+    }
+    tool.electronNotifyListen = (param) => {
+        return new Promise(function (resolve, reject) {
+            let id = tool.getNumber();
+            doCallback[id] = resolve
+            param.method = "notify-listen"
+            tool.electronDo(param);
+        });
+    }
+}
+tool.isUseNewWindowOpenDialog = () => {
+    if (tool.electronDo && tool.isTrue(source.userSetting.useNewWindowOpenDialog)) {
+        return true;
+    }
+    return false;
 }
 var sessionLoadding = false;
 var refreshSessionStart = false;

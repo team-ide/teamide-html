@@ -1,7 +1,7 @@
 <template>
   <el-dialog
     ref="modal"
-    :title="title || '数据'"
+    :title="title || 'Markdown View'"
     :close-on-click-modal="false"
     :close-on-press-escape="true"
     :show-close="true"
@@ -12,85 +12,60 @@
     class="app-dialog"
     :fullscreen="true"
   >
-    <div class="" style="height: calc(100% - 0px)">
-      <article
-        class="markdown-body"
-        style="text-align: left"
-        v-html="text"
-      ></article>
+    <div class="" style="height: 100%">
+      <MarkdownView :source="source" :data="data"> </MarkdownView>
     </div>
   </el-dialog>
 </template>
 
 <script>
-import marked from "marked";
+import MarkdownView from "./MarkdownView";
 
 export default {
-  components: {},
+  components: { MarkdownView },
   props: ["source"],
   data() {
     return {
       showDialog: false,
-      text: null,
+      data: null,
       title: null,
-      onSave: null,
-      onCancel: null,
     };
   },
-  // 计算属性 只有依赖数据发生改变，才会重新进行计算
   computed: {},
-  // 计算属性 数据变，直接会触发相应的操作
   watch: {},
   methods: {
     async show(data, options) {
       options = options || {};
-      this.onSave = options.onSave;
-      this.onCancel = options.onCancel;
       this.title = options.title;
+
+      if (this.tool.isUseNewWindowOpenDialog()) {
+        this.tool.newDialogWindow({
+          type: "MarkdownView",
+          title: this.title || "Markdown View",
+          cacheKey: this.tool.getNumber(),
+          cacheData: data,
+        });
+        return;
+      }
+
       this.showDialog = true;
       this.$nextTick(() => {
-        // let blog = marked(data);
-        this.text = marked.parse(data);
+        this.data = data;
       });
     },
     hide() {
       this.showDialog = false;
-      this.onCancel && this.onCancel();
     },
   },
-  // 在实例创建完成后被立即调用
   created() {},
-  // el 被新创建的 vm.$el 替换，并挂载到实例上去之后调用
-  mounted() {},
+  updated() {
+    this.tool.showMarkdownView = this.show;
+  },
+  mounted() {
+    this.tool.showMarkdownView = this.show;
+  },
 };
 </script>
 
 <style>
-.markdown-body {
-  box-sizing: border-box;
-  /* max-width: 980px; */
-  /* padding: 45px; */
-  max-width: 100%;
-  margin: 0 auto;
-  box-shadow: 2px 4px 6px gray;
-  padding-left: 0px;
-  padding-right: 0px;
-  padding-top: 0px;
-  padding-bottom: 0px;
-  margin-bottom: 0px;
-}
-
-.markdown-body {
-  box-sizing: border-box;
-  min-width: 200px;
-  max-width: 100%;
-  margin: 0 auto;
-  padding: 45px;
-}
-
-@media (max-width: 767px) {
-  .markdown-body {
-    padding: 15px;
-  }
-}
 </style>

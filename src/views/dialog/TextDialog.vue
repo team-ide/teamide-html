@@ -111,8 +111,12 @@ export default {
   },
   // 在实例创建完成后被立即调用
   created() {},
-  // el 被新创建的 vm.$el 替换，并挂载到实例上去之后调用
-  mounted() {},
+  updated() {
+    this.tool.showText = this.show;
+  },
+  mounted() {
+    this.tool.showText = this.show;
+  },
 };
 </script>
 

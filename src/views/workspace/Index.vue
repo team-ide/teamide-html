@@ -117,12 +117,15 @@ export default {
   },
   methods: {
     async initMainWindow() {
-      if (this.source.hasElectron) {
-        await this.tool.electronExecuteScript(
-          `context.window.mainWindow.setAlwaysOnTop(` +
+      if (this.tool.electronDo) {
+        await this.tool.electronDo({
+          method: "script-execute",
+          script:
+            `context.window.mainWindow.setAlwaysOnTop(` +
             this.source.userSetting.mainWindowAlwaysOnTop +
-            `);`
-        );
+            `);`,
+        });
+        // console.log("script-execute result:", res);
       }
     },
     initStyle() {
