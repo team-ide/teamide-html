@@ -38,7 +38,7 @@ export default {
     async show(data, options) {
       options = options || {};
       this.title = options.title;
-
+      this.onSave = null;
       if (this.tool.isUseNewWindowOpenDialog()) {
         let listenKey = "" + this.tool.getNumber();
         this.tool.newDialogWindow({
@@ -53,14 +53,19 @@ export default {
             listenKey: listenKey,
           });
           if (res != null && res.data != null) {
-            options.onSave(res.data);
+            options.onSave(JSON.parse(res.data));
           }
         }
         return;
       }
 
       this.showDialog = true;
-      this.onSave = options.onSave;
+      if (options.onSave) {
+        this.onSave = (arg) => {
+          this.hide();
+          options.onSave(arg);
+        };
+      }
       this.$nextTick(() => {
         this.data = data;
       });

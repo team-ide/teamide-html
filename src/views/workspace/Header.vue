@@ -103,16 +103,18 @@
                   tool.openNodeContext();
                   $refs.nodeDropdown.hide();
                 "
-                >节点</MenuItem
               >
+                节点
+              </MenuItem>
               <MenuItem
                 v-if="source.hasPower('node/netProxy')"
                 @click="
                   tool.openNodeNetProxyContext();
                   $refs.nodeDropdown.hide();
                 "
-                >网络代理|透传</MenuItem
               >
+                网络代理|透传
+              </MenuItem>
             </MenuBox>
           </el-dropdown-menu>
         </el-dropdown>
@@ -275,6 +277,45 @@
       >
         系统设置
       </div>
+
+      <div v-if="source.hasElectron" class="workspace-header-nav pdlr-0">
+        <el-dropdown
+          trigger="click"
+          class="workspace-header-dropdown"
+          ref="otherServerDropdown"
+        >
+          <span class="el-dropdown-link" style="padding: 5px 10px">
+            其它服务<i class="el-icon-arrow-down el-icon--right"></i>
+          </span>
+          <el-dropdown-menu
+            slot="dropdown"
+            class="workspace-header-dropdown-menu"
+          >
+            <MenuBox class="menu-mini">
+              <template v-for="(server, index) in source.otherServers">
+                <MenuItem
+                  :key="index"
+                  @click="
+                    tool.openOtherServer(server);
+                    $refs.otherServerDropdown.hide();
+                  "
+                  :title="`新窗口打开${server.name}`"
+                >
+                  {{ server.name }}
+                </MenuItem>
+              </template>
+              <MenuItem
+                @click="
+                  tool.showOtherServers();
+                  $refs.nodeDropdown.hide();
+                "
+              >
+                管理
+              </MenuItem>
+            </MenuBox>
+          </el-dropdown-menu>
+        </el-dropdown>
+      </div>
       <div style="flex: 1"></div>
       <template v-if="source.login.user == null">
         <div
@@ -362,7 +403,9 @@ export default {
   components: {},
   props: ["source", "mainItemsWorker", "showTabGroupTitle"],
   data() {
-    return {};
+    return {
+      otherServers: [],
+    };
   },
   computed: {},
   watch: {},

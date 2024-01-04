@@ -23,7 +23,6 @@ tool.init = function () {
             let data = res.data;
             source.init(data);
             server.listenStart()
-            tool.initSession();
         } else {
             tool.error(res.msg);
             source.init();
@@ -83,6 +82,25 @@ if (window.electron && window.electron.ipcRenderer) {
             doCallback[id] = resolve
             param.method = "notify-listen"
             tool.electronDo(param);
+        });
+    }
+    tool.electronSetCache = (key, value) => {
+        return tool.electronDo({
+            method: "set-cache",
+            key: key,
+            value: value,
+        });
+    }
+    tool.electronGetCache = (key) => {
+        return tool.electronDo({
+            method: "get-cache",
+            key: key,
+        });
+    }
+    tool.electronRemoveCache = (key) => {
+        return tool.electronDo({
+            method: "remove-cache",
+            key: key,
         });
     }
 }
@@ -240,6 +258,9 @@ tool.setJWT = function (jwt) {
         tool.setCookie("team-ide-jwt", jwt, 60);
     } else {
         tool.setCookie("team-ide-jwt", jwt, 0);
+    }
+    if (tool.electronSetCache && !source.isOtherWindow) {
+        tool.electronSetCache(source.mainWindowKey, jwt || "")
     }
 }
 tool.getJWT = function () {

@@ -45,11 +45,13 @@
       :source="source"
       :openByOption="openByOption"
     ></ToolboxContext>
+    <OtherServer v-if="source.hasElectron" :source="source"></OtherServer>
   </div>
 </template>
 
 <script>
 import ToolboxContext from "./ToolboxContext";
+import OtherServer from "./OtherServer";
 import Header from "./Header";
 import themeCustom from "./theme-custom.js";
 
@@ -57,7 +59,7 @@ import "./theme-dark.css";
 import "./theme-light.css";
 
 export default {
-  components: { ToolboxContext, Header },
+  components: { ToolboxContext, OtherServer, Header },
   props: ["source"],
   data() {
     let mainItemsWorker = this.tool.newItemsWorker({

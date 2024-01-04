@@ -109,41 +109,27 @@ export default {
     },
   },
   methods: {
-    async testElectronDo() {
-      if (this.tool.electronDo == null) {
-        return;
-      }
-      try {
-        let res = await this.tool.electronDo({
-          method: "set-cache",
-          key: "key1",
-          value: "key1-value",
-        });
-        console.log(res);
-        res = await this.tool.electronDo({
-          method: "get-cache",
-          key: "key1",
-        });
-        console.log(res);
-        res = await this.tool.electronDo({
-          method: "remove-cache",
-          key: "key1",
-        });
-        console.log(res);
-      } catch (e) {
-        console.error(e);
-      }
-    },
     async init() {
       if (this.$route.path == "/dialog") {
         this.openDialogPage = true;
       } else {
         this.openWorkspace = true;
       }
-      this.testElectronDo();
+      if (!this.openWorkspace) {
+        if (this.$route.query.mainWindowKey) {
+          this.source.isOtherWindow = true;
+          this.source.mainWindowKey = this.$route.query.mainWindowKey;
+          let jwt = await this.tool.electronGetCache(source.mainWindowKey);
+          this.tool.setJWT(jwt);
+        }
+      }
+      await this.tool.initSession();
       this.tool.newDialogWindow = async (options) => {
         options = options || {};
+        options.windowKey = this.tool.generatekey(20);
         options.url = this.source.url + "#/dialog?type=" + options.type;
+        options.url += "&mainWindowKey=" + this.source.mainWindowKey;
+        options.url += "&windowKey=" + this.source.windowKey;
         if (options.title) {
           options.url += "&title=" + options.title;
         }
@@ -153,6 +139,13 @@ export default {
         if (options.listenKeys) {
           options.url += "&listenKeys=" + JSON.stringify(options.listenKeys);
         }
+        return await this.tool.electronDo({
+          method: "new-window",
+          options: options,
+        });
+      };
+      this.tool.newWindow = async (options) => {
+        options = options || {};
         return await this.tool.electronDo({
           method: "new-window",
           options: options,

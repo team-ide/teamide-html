@@ -70,8 +70,9 @@ export default {
         this.onSave = (data) => {
           this.tool.electronNotifyListen({
             listenKey: this.listenKeys[0],
-            data: data,
+            data: JSON.stringify(data),
           });
+          window.close();
         };
       }
     },

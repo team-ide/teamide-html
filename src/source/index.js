@@ -13,7 +13,9 @@ source.filesUrl = null;
 source.hasNewVersion = false;
 source.isServer = true;
 source.setting = {};
+source.mainWindowKey = tool.generatekey(20)
 source.hasElectron = window.electron && window.electron.ipcRenderer;
+source.otherServers = [];
 let defaultUserSetting = {
     theme: "dark",
     keyTabClose: "Alt + 87",
