@@ -181,69 +181,6 @@
         </div>
       </div>
     </template>
-    <FormDialog
-      ref="ShowToolboxInfo"
-      :source="source"
-      title="查看Toolbox"
-    ></FormDialog>
-    <FormDialog
-      ref="InsertToolbox"
-      :source="source"
-      title="新增Toolbox"
-      :onSave="doInsert"
-      formHeight="calc(100% - 100px)"
-    >
-      <div class="tm-link color-blue-8 ft-14 mgt-10" @click="toTestForInsert()">
-        <span v-if="checking">测试中...</span>
-        <span v-else> 测试 </span>
-      </div>
-      <span
-        class="mgl-10 color-red"
-        v-if="checkError != null"
-        style="user-select: text"
-      >
-        异常：{{ checkError }}
-      </span>
-      <span class="mgl-10 color-green" v-if="checkOk"> 测试成功 </span>
-    </FormDialog>
-    <FormDialog
-      ref="UpdateToolbox"
-      :source="source"
-      title="编辑Toolbox"
-      :onSave="doUpdate"
-      formHeight="calc(100% - 100px)"
-    >
-      <div class="tm-link color-blue-8 ft-14 mgt-10" @click="toTestForUpdate()">
-        <span v-if="checking">测试中...</span>
-        <span v-else> 测试 </span>
-      </div>
-      <span
-        class="mgl-10 color-red"
-        v-if="checkError != null"
-        style="user-select: text"
-      >
-        异常：{{ checkError }}
-      </span>
-      <span class="mgl-10 color-green" v-if="checkOk"> 测试成功 </span>
-    </FormDialog>
-    <FormDialog
-      ref="ShareToolbox"
-      :source="source"
-      title="分享Toolbox"
-      :onSave="doShare"
-    ></FormDialog>
-    <FormDialog
-      ref="InsertToolboxGroup"
-      :source="source"
-      title="新增工具分组"
-      :onSave="doInsertGroup"
-    ></FormDialog>
-    <FormDialog
-      ref="UpdateToolboxGroup"
-      :source="source"
-      title="编辑工具分组"
-      :onSave="doUpdateGroup"
-    ></FormDialog>
   </div>
 </template>
 
@@ -262,9 +199,6 @@ export default {
       showToolboxContext: null,
 
       toolboxGroups: [],
-      checking: false,
-      checkError: null,
-      checkOk: false,
     };
   },
   // 计算属性 只有依赖数据发生改变，才会重新进行计算
@@ -286,16 +220,6 @@ export default {
     },
   },
   methods: {
-    checkShowPlaintextBtn(data) {
-      if (
-        data != null &&
-        this.source.login.user != null &&
-        data.userId == this.source.login.user.userId
-      ) {
-        return true;
-      }
-      return false;
-    },
     show() {
       this.showBox = true;
     },
@@ -378,6 +302,7 @@ export default {
         groupList.push({
           groupId: one.groupId,
           name: one.name,
+          comment: one.comment,
         });
       });
       let selectGroup = groupList[0];
@@ -550,12 +475,6 @@ export default {
             this.toCopy(toolboxType, toolboxData);
           },
         });
-        // menus.push({
-        //   text: "分享工具",
-        //   onClick: () => {
-        //     this.toShare(toolboxType, toolboxData);
-        //   },
-        // });
         menus.push({
           text: "复制到剪切板",
           onClick: () => {
@@ -582,19 +501,55 @@ export default {
       }
     },
     toInsert(toolboxType, selectGroup) {
-      this.checkError = null;
-      this.checkOk = false;
-
       this.tool.stopEvent();
       let toolboxData = {};
       let optionsJSON = {};
 
-      this.$refs.InsertToolbox.show({
+      let groupId = null;
+      if (selectGroup) {
+        groupId = selectGroup.groupId;
+      }
+
+      this.tool.showForm({
+        formType: "toolbox",
+        param: {},
         title: `新增[${toolboxType.text}]工具`,
-        form: [this.form.toolbox, toolboxType.configForm],
         data: [toolboxData, optionsJSON],
         toolboxType,
-        selectGroup,
+        groupId,
+        onSave: (res) => {
+          if (res) {
+            this.tool.success("新增成功");
+            this.initData();
+          }
+        },
+      });
+    },
+    async toUpdate(toolboxType, toolboxData) {
+      this.tool.stopEvent();
+
+      let find = await this.getToolbox(toolboxData.toolboxId);
+      if (find == null) {
+        return;
+      }
+      Object.assign(toolboxData, find);
+
+      let optionsJSON = this.tool.getOptionJSON(toolboxData.option);
+
+      this.tool.showForm({
+        formType: "toolbox",
+        param: {},
+        title: `编辑[${toolboxType.text}][${toolboxData.name}]工具`,
+        data: [toolboxData, optionsJSON],
+        toolboxType,
+        toolboxData,
+        toolboxId: toolboxData.toolboxId,
+        onSave: (res) => {
+          if (res) {
+            this.tool.success("编辑成功");
+            this.initData();
+          }
+        },
       });
     },
     async toCopyToClipboard(toolboxType, data) {
@@ -665,12 +620,19 @@ export default {
 
         let optionsJSON = this.tool.getOptionJSON(toolboxData.option);
 
-        this.$refs.InsertToolbox.show({
+        this.tool.showForm({
+          formType: "toolbox",
+          param: {},
           title: `新增[${toolboxType.text}]工具`,
-          form: [this.form.toolbox, toolboxType.configForm],
           data: [toolboxData, optionsJSON],
           toolboxType,
           selectGroup: this.selectGroup,
+          onSave: (res) => {
+            if (res) {
+              this.tool.success("新增成功");
+              this.initData();
+            }
+          },
         });
       } catch (e) {
         this.tool.warn("不是有效工具箱数据！");
@@ -689,22 +651,20 @@ export default {
           return;
         }
         let optionsJSON = this.tool.getOptionJSON(toolboxData.option);
-        this.$refs.ShowToolboxInfo.show({
+
+        this.tool.showForm({
+          formType: "toolbox",
+          param: {},
           title: `查看[${toolboxType.text}]工具`,
-          form: [this.form.toolbox, toolboxType.configForm],
           data: [toolboxData, optionsJSON],
-          checkShowPlaintextBtn: () => {
-            return this.checkShowPlaintextBtn(toolboxData);
-          },
+          toolboxType,
+          toolboxData,
         });
       } else {
         this.tool.error(res.msg);
       }
     },
     async toCopy(toolboxType, copy) {
-      this.checkError = null;
-      this.checkOk = false;
-
       this.tool.stopEvent();
 
       let find = await this.getToolbox(copy.toolboxId);
@@ -719,76 +679,21 @@ export default {
 
       let optionsJSON = this.tool.getOptionJSON(toolboxData.option);
 
-      this.$refs.InsertToolbox.show({
+      this.tool.showForm({
+        formType: "toolbox",
+        param: {},
         title: `新增[${toolboxType.text}]工具`,
-        form: [this.form.toolbox, toolboxType.configForm],
         data: [toolboxData, optionsJSON],
         toolboxType,
+        toolboxData,
         groupId: find.groupId,
-        checkShowPlaintextBtn: () => {
-          return this.checkShowPlaintextBtn(toolboxData);
+        onSave: (res) => {
+          if (res) {
+            this.tool.success("新增成功");
+            this.initData();
+          }
         },
       });
-    },
-    async toUpdate(toolboxType, toolboxData) {
-      this.checkError = null;
-      this.checkOk = false;
-
-      this.tool.stopEvent();
-
-      let find = await this.getToolbox(toolboxData.toolboxId);
-      if (find == null) {
-        return;
-      }
-      Object.assign(toolboxData, find);
-
-      let optionsJSON = this.tool.getOptionJSON(toolboxData.option);
-
-      this.$refs.UpdateToolbox.show({
-        title: `编辑[${toolboxType.text}][${toolboxData.name}]工具`,
-        form: [this.form.toolbox, toolboxType.configForm],
-        data: [toolboxData, optionsJSON],
-        toolboxType,
-        toolboxData,
-        checkShowPlaintextBtn: () => {
-          return this.checkShowPlaintextBtn(toolboxData);
-        },
-      });
-    },
-    async toShare(toolboxType, toolboxData) {
-      this.tool.stopEvent();
-
-      let find = await this.getToolbox(toolboxData.toolboxId);
-      if (find == null) {
-        return;
-      }
-      Object.assign(toolboxData, find);
-
-      this.$refs.ShareToolbox.show({
-        title: `分享[${toolboxType.text}][${toolboxData.name}]工具`,
-        form: [this.form.toolbox.share],
-        data: [{}],
-        toolboxType,
-        toolboxData,
-      });
-    },
-    async doShare(dataList, config) {
-      let data = dataList[0];
-      data.toolboxId = config.toolboxData.toolboxId;
-      let res = await this.server.toolbox.share(data);
-      if (res.code == 0) {
-        res.data = res.data || {};
-        let clipboardWriteRes = await this.tool.clipboardWrite(res.data.url);
-        if (clipboardWriteRes.success) {
-          this.tool.success("分享成功，连接已复制到剪切板！");
-        } else {
-          this.tool.alert("分享失败，请允许访问剪贴板！");
-        }
-        return true;
-      } else {
-        this.tool.error(res.msg);
-        return false;
-      }
     },
     async getToolbox(toolboxId) {
       let res = await this.server.toolbox.get({
@@ -830,128 +735,39 @@ export default {
         return false;
       }
     },
-    async doUpdate(dataList, config) {
-      let toolboxData = dataList[0];
-      let optionJSON = dataList[1];
-      let toolboxType = config.toolboxType;
-      toolboxData.toolboxType = toolboxType.name;
-      toolboxData.toolboxId = config.toolboxData.toolboxId;
-      toolboxData.option = JSON.stringify(optionJSON);
-      let res = await this.server.toolbox.update(toolboxData);
-      if (res.code == 0) {
-        this.initData();
-        this.tool.success("修改成功");
-        return true;
-      } else {
-        this.tool.error(res.msg);
-        return false;
-      }
-    },
-    async doInsert(dataList, config) {
-      let toolboxData = dataList[0];
-      let optionJSON = dataList[1];
-      let toolboxType = config.toolboxType;
-      toolboxData.toolboxType = toolboxType.name;
-      if (config.selectGroup) {
-        toolboxData.groupId = config.selectGroup.groupId;
-      } else if (config.groupId) {
-        toolboxData.groupId = config.groupId;
-      }
-      toolboxData.option = JSON.stringify(optionJSON);
-      let res = await this.server.toolbox.insert(toolboxData);
-      if (res.code == 0) {
-        this.initData();
-        this.tool.success("新增成功");
-        return true;
-      } else {
-        this.tool.error(res.msg);
-        return false;
-      }
-    },
 
-    async toTestForInsert() {
-      this.toTest(
-        this.$refs.InsertToolbox.options.toolboxType,
-        this.$refs.InsertToolbox.$refs.FormBox
-      );
-    },
-    async toTestForUpdate() {
-      this.toTest(
-        this.$refs.UpdateToolbox.options.toolboxType,
-        this.$refs.UpdateToolbox.$refs.FormBox
-      );
-    },
-    async toTest(toolboxType, formBox) {
-      if (this.checking) {
-        this.tool.warn("测试中请稍后！");
-        return;
-      }
-      let validateResult = await formBox.validateForm(1);
-      if (!validateResult.valid) {
-        return;
-      }
-      this.checking = true;
-      this.checkError = null;
-      this.checkOk = false;
-      try {
-        let dataList = formBox.getDataList();
-        let toolboxData = Object.assign({}, dataList[0]);
-        toolboxData.toolboxToTest = "1";
-        toolboxData.toolboxType = toolboxType.name;
-
-        toolboxData.option = JSON.stringify(dataList[1]);
-        let res = { code: -1, msg: "暂不支持该工具测试" };
-        if (toolboxData.toolboxType == "database") {
-          res = await this.server.database.check(toolboxData);
-        } else if (toolboxData.toolboxType == "redis") {
-          res = await this.server.redis.check(toolboxData);
-        } else if (toolboxData.toolboxType == "zookeeper") {
-          res = await this.server.zookeeper.check(toolboxData);
-        } else if (toolboxData.toolboxType == "elasticsearch") {
-          res = await this.server.elasticsearch.check(toolboxData);
-        } else if (toolboxData.toolboxType == "kafka") {
-          res = await this.server.kafka.check(toolboxData);
-        } else if (toolboxData.toolboxType == "ssh") {
-          res = await this.server.terminal.check(toolboxData);
-        }
-        if (res.code == 0) {
-          this.checkOk = true;
-          this.tool.success("测试成功");
-          return true;
-        } else {
-          this.checkError = res.msg;
-          this.tool.error("测试失败：" + res.msg);
-          return false;
-        }
-      } catch (e) {
-        this.checkError = e.message;
-        this.tool.error("测试失败：" + e.message);
-      } finally {
-        this.checking = false;
-      }
-    },
     toInsertGroup() {
       this.tool.stopEvent();
       let data = {};
-      let optionsJSON = {};
 
-      this.$refs.InsertToolboxGroup.show({
+      this.tool.showForm({
+        formType: "toolbox-group",
+        param: {},
         title: `新增工具分组`,
-        form: [this.form.toolbox.group, this.form.toolbox.group.option],
-        data: [data, optionsJSON],
+        data: [data],
+        onSave: (res) => {
+          if (res) {
+            this.tool.success("新增成功");
+            this.initData();
+          }
+        },
       });
     },
     async toUpdateGroup(data) {
       this.tool.stopEvent();
 
-      this.updateGroupData = data;
-
-      let optionsJSON = this.tool.getOptionJSON(data.option);
-
-      this.$refs.UpdateToolboxGroup.show({
+      this.tool.showForm({
+        formType: "toolbox-group",
+        param: {},
         title: `编辑[${data.name}]工具分组`,
-        form: [this.form.toolbox.group, this.form.toolbox.group.option],
-        data: [data, optionsJSON],
+        data: [data],
+        groupId: data.groupId,
+        onSave: (res) => {
+          if (res) {
+            this.tool.success("编辑成功");
+            this.initData();
+          }
+        },
       });
     },
     toDeleteGroup(data) {
@@ -969,35 +785,6 @@ export default {
       let res = await this.server.toolbox.group.delete(data);
       if (res.code == 0) {
         this.tool.success("删除分组成功");
-        this.initData();
-        return true;
-      } else {
-        this.tool.error(res.msg);
-        return false;
-      }
-    },
-    async doUpdateGroup(dataList, config) {
-      let data = dataList[0];
-      let optionJSON = dataList[1];
-      data.groupId = this.updateGroupData.groupId;
-      data.option = JSON.stringify(optionJSON);
-      let res = await this.server.toolbox.group.update(data);
-      if (res.code == 0) {
-        this.tool.success("修改分组成功");
-        this.initData();
-        return true;
-      } else {
-        this.tool.error(res.msg);
-        return false;
-      }
-    },
-    async doInsertGroup(dataList, config) {
-      let data = dataList[0];
-      let optionJSON = dataList[1];
-      data.option = JSON.stringify(optionJSON);
-      let res = await this.server.toolbox.group.insert(data);
-      if (res.code == 0) {
-        this.tool.success("新增分组成功");
         this.initData();
         return true;
       } else {

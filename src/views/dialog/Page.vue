@@ -62,6 +62,9 @@ export default {
   methods: {
     async init() {
       this.type = this.$route.query.type;
+      if (this.type == "Form") {
+        await this.source.initUserToolboxSSHList();
+      }
       if (this.$route.query.title) {
         document.title = this.$route.query.title;
       }
@@ -72,6 +75,7 @@ export default {
           key: this.$route.query.cacheKey,
         });
         this.cacheData = cacheData;
+        // console.log(this.cacheData);
       }
       if (this.$route.query.listenKeys) {
         // console.log(this.$route.query.listenKeys);

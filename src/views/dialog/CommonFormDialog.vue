@@ -40,27 +40,32 @@ export default {
   computed: {},
   watch: {},
   methods: {
+    async listen(onSave, listenKey) {
+      let res = await this.tool.electronOnListen({
+        listenKey: listenKey,
+      });
+      if (res != null && res.data != null) {
+        onSave(res.data);
+      }
+    },
     async show(options) {
       options = options || {};
       let onSave = options.onSave;
       delete options.onSave;
       if (this.tool.isUseNewWindowOpenDialog()) {
-        let listenKey = "" + this.tool.getNumber();
+        let listenKeys = [];
+        if (onSave != null) {
+          let listenKey = "" + this.tool.getNumber();
+          listenKeys.push(listenKey);
+          this.listen(onSave, listenKey);
+        }
         this.tool.newDialogWindow({
           type: "Form",
           title: options.title || "表单",
           cacheKey: this.tool.getNumber(),
           cacheData: options,
-          listenKeys: [listenKey],
+          listenKeys: listenKeys,
         });
-        if (onSave != null) {
-          let res = await this.tool.electronOnListen({
-            listenKey: listenKey,
-          });
-          if (res != null && res.data != null) {
-            onSave(res.data);
-          }
-        }
         return;
       }
       let dialog = {};

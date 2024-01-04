@@ -210,10 +210,6 @@ let toolbox = {
                 ],
             },
         ],
-        option: {
-            fields: [
-            ],
-        },
     },
 };
 

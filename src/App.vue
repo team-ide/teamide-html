@@ -132,7 +132,7 @@ export default {
         options.windowKey = this.tool.generatekey(20);
         options.url = this.source.url + "#/dialog?type=" + options.type;
         options.url += "&mainWindowKey=" + this.source.mainWindowKey;
-        options.url += "&windowKey=" + this.source.windowKey;
+        options.url += "&windowKey=" + options.windowKey;
         if (options.title) {
           options.url += "&title=" + options.title;
         }

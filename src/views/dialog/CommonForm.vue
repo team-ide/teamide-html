@@ -9,6 +9,20 @@
     :formHeight="formHeight"
     :checkShowPlaintextBtn="checkShowPlaintextBtn"
   >
+    <template v-if="options.formType == 'toolbox'">
+      <div class="tm-link color-blue-8 ft-14 mgt-10" @click="toTestToolbox()">
+        <span v-if="checking">测试中...</span>
+        <span v-else> 测试 </span>
+      </div>
+      <span
+        class="mgl-10 color-red"
+        v-if="checkError != null"
+        style="user-select: text"
+      >
+        异常：{{ checkError }}
+      </span>
+      <span class="mgl-10 color-green" v-if="checkOk"> 测试成功 </span>
+    </template>
   </FormBox>
 </template>
 
@@ -20,12 +34,77 @@ export default {
     return {
       formHeight: "100%",
       doSave: null,
+      checkShowPlaintextBtn: null,
+      checking: false,
+      checkOk: false,
+      checkError: null,
     };
   },
   computed: {},
   watch: {},
   methods: {
-    checkShowPlaintextBtn() {},
+    toolboxPlaintextBtn() {
+      let data = this.options.toolboxData;
+      if (
+        data != null &&
+        this.source.login.user != null &&
+        data.userId == this.source.login.user.userId
+      ) {
+        return true;
+      }
+      return false;
+    },
+    async toTestToolbox() {
+      let toolboxType = this.options.toolboxType;
+      let formBox = this.$refs.FormBox;
+      if (this.checking) {
+        this.tool.warn("测试中请稍后！");
+        return;
+      }
+      let validateResult = await formBox.validateForm(1);
+      if (!validateResult.valid) {
+        return;
+      }
+      this.checking = true;
+      this.checkError = null;
+      this.checkOk = false;
+      try {
+        let dataList = formBox.getDataList();
+        let toolboxData = Object.assign({}, dataList[0]);
+        toolboxData.toolboxToTest = "1";
+        toolboxData.toolboxType = toolboxType.name;
+
+        toolboxData.option = JSON.stringify(dataList[1]);
+        let res = { code: -1, msg: "暂不支持该工具测试" };
+        if (toolboxData.toolboxType == "database") {
+          res = await this.server.database.check(toolboxData);
+        } else if (toolboxData.toolboxType == "redis") {
+          res = await this.server.redis.check(toolboxData);
+        } else if (toolboxData.toolboxType == "zookeeper") {
+          res = await this.server.zookeeper.check(toolboxData);
+        } else if (toolboxData.toolboxType == "elasticsearch") {
+          res = await this.server.elasticsearch.check(toolboxData);
+        } else if (toolboxData.toolboxType == "kafka") {
+          res = await this.server.kafka.check(toolboxData);
+        } else if (toolboxData.toolboxType == "ssh") {
+          res = await this.server.terminal.check(toolboxData);
+        }
+        if (res.code == 0) {
+          this.checkOk = true;
+          this.tool.success("测试成功");
+          return true;
+        } else {
+          this.checkError = res.msg;
+          this.tool.error("测试失败：" + res.msg);
+          return false;
+        }
+      } catch (e) {
+        this.checkError = e.message;
+        this.tool.error("测试失败：" + e.message);
+      } finally {
+        this.checking = false;
+      }
+    },
     async getFormList() {
       if (this.options.formType == "es-index") {
         return [this.form.toolbox.elasticsearch.index];
@@ -37,6 +116,13 @@ export default {
         return [this.form.toolbox.kafka.push];
       } else if (this.options.formType == "kafka-delete-record") {
         return [this.form.toolbox.kafka.deleteRecord];
+      } else if (this.options.formType == "toolbox") {
+        if (this.options.toolboxData) {
+          this.checkShowPlaintextBtn = this.toolboxPlaintextBtn;
+        }
+        return [this.form.toolbox, this.options.toolboxType.configForm];
+      } else if (this.options.formType == "toolbox-group") {
+        return [this.form.toolbox.group];
       } else if (this.options.formType == "other-server") {
         return [
           {
@@ -73,6 +159,9 @@ export default {
       if (this.onSave != null) {
         this.formHeight = "calc(100% - 60px)";
         this.doSave = this.doSave_;
+      }
+      if (this.options.formType == "toolbox") {
+        this.formHeight = "calc(100% - 100px)";
       }
       let options = this.options;
       let formConfigList = [];
@@ -116,6 +205,31 @@ export default {
         param.partition = Number(param.partition);
         param.offset = Number(param.offset);
         res = await this.server.kafka.deleteRecords(param);
+      } else if (this.options.formType == "toolbox") {
+        let toolboxData = dataList[0];
+        let optionJSON = dataList[1];
+        let toolboxType = this.options.toolboxType;
+        toolboxData.toolboxType = toolboxType.name;
+        if (this.options.selectGroup) {
+          toolboxData.groupId = this.options.selectGroup.groupId;
+        } else if (this.options.groupId) {
+          toolboxData.groupId = this.options.groupId;
+        }
+        toolboxData.option = JSON.stringify(optionJSON);
+        if (this.options.toolboxId) {
+          toolboxData.toolboxId = this.options.toolboxId;
+          res = await this.server.toolbox.update(toolboxData);
+        } else {
+          res = await this.server.toolbox.insert(toolboxData);
+        }
+      } else if (this.options.formType == "toolbox-group") {
+        Object.assign(param, data);
+        if (this.options.groupId) {
+          param.groupId = this.options.groupId;
+          res = await this.server.toolbox.group.update(param);
+        } else {
+          res = await this.server.toolbox.group.insert(param);
+        }
       } else if (this.options.formType == "other-server") {
         Object.assign(param, data);
 

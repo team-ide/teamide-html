@@ -35,6 +35,14 @@ export default {
   computed: {},
   watch: {},
   methods: {
+    async listen(onSave, listenKey) {
+      let res = await this.tool.electronOnListen({
+        listenKey: listenKey,
+      });
+      if (res != null && res.data != null) {
+        onSave(JSON.parse(res.data));
+      }
+    },
     async show(data, options) {
       options = options || {};
       this.title = options.title;
@@ -47,12 +55,7 @@ export default {
         if (onSave != null) {
           let listenKey = "" + this.tool.getNumber();
           listenKeys.push(listenKey);
-          let res = await this.tool.electronOnListen({
-            listenKey: listenKey,
-          });
-          if (res != null && res.data != null) {
-            options.onSave(JSON.parse(res.data));
-          }
+          this.listen(onSave, listenKey);
         }
         this.tool.newDialogWindow({
           type: "JSONData",
