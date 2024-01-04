@@ -1,5 +1,5 @@
 <template>
-  <div class="dialog-page">
+  <div class="dialog-page" v-if="ready">
     <JavascriptExample v-if="type == 'JavascriptExample'" :source="source">
     </JavascriptExample>
     <JavascriptFunc v-else-if="type == 'JavascriptFunc'" :source="source">
@@ -19,6 +19,14 @@
       :onSave="onSave"
     >
     </JSONData>
+    <CommonForm
+      v-else-if="type == 'Form'"
+      :source="source"
+      :onSave="onSave"
+      :onSuccess="windowClose"
+      :options="cacheData"
+    >
+    </CommonForm>
   </div>
 </template>
 
@@ -28,6 +36,7 @@ import JavascriptFunc from "./JavascriptFunc";
 import Markdown from "./Markdown";
 import MarkdownView from "./MarkdownView";
 import JSONData from "./JSONData";
+import CommonForm from "./CommonForm";
 
 export default {
   components: {
@@ -36,6 +45,7 @@ export default {
     JavascriptFunc,
     Markdown,
     MarkdownView,
+    CommonForm,
   },
   props: ["source"],
   data() {
@@ -44,6 +54,7 @@ export default {
       cacheData: null,
       listenKeys: null,
       onSave: null,
+      ready: false,
     };
   },
   computed: {},
@@ -63,18 +74,33 @@ export default {
         this.cacheData = cacheData;
       }
       if (this.$route.query.listenKeys) {
-        console.log(this.$route.query.listenKeys);
+        // console.log(this.$route.query.listenKeys);
         this.listenKeys = JSON.parse(this.$route.query.listenKeys);
       }
       if (this.listenKeys && this.listenKeys.length > 0) {
-        this.onSave = (data) => {
-          this.tool.electronNotifyListen({
-            listenKey: this.listenKeys[0],
-            data: JSON.stringify(data),
-          });
-          window.close();
+        this.onSave = async (data) => {
+          if (this.type == "Form" && data) {
+            this.tool.electronNotifyListen({
+              listenKey: this.listenKeys[0],
+              data: data,
+            });
+            if (data) {
+              this.windowClose();
+            }
+          }
+          if (this.type != "Form") {
+            this.tool.electronNotifyListen({
+              listenKey: this.listenKeys[0],
+              data: data,
+            });
+            this.windowClose();
+          }
         };
       }
+      this.ready = true;
+    },
+    windowClose() {
+      window.close();
     },
   },
   created() {},

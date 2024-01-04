@@ -154,12 +154,6 @@
         </tm-layout>
       </tm-layout>
     </template>
-    <FormDialog
-      ref="PushForm"
-      :source="source"
-      title="推送数据"
-      :onSave="doPush"
-    ></FormDialog>
   </div>
 </template>
 
@@ -221,23 +215,18 @@ export default {
         valueType: this.pullForm.valueType,
       };
 
-      this.$refs.PushForm.show({
+      this.tool.showForm({
+        formType: "kafka-push",
+        param: this.toolboxWorker.getWorkParam(),
         title: `推送数据至:${data.topic}`,
-        form: [this.form.toolbox.kafka.push],
         data: [data],
+        onSave: (res) => {
+          if (res) {
+            this.tool.success("推送数据成功");
+            this.doPull();
+          }
+        },
       });
-    },
-    async doPush(dataList) {
-      let data = dataList[0];
-      let param = this.toolboxWorker.getWorkParam(Object.assign({}, data));
-      let res = await this.server.kafka.push(param);
-      if (res.code == 0) {
-        this.doPull();
-        return true;
-      } else {
-        this.tool.error(res.msg);
-        return false;
-      }
     },
     toCommit(data) {
       let groupId = this.pullForm.groupId;

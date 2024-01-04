@@ -107,12 +107,6 @@
         </tm-layout>
       </tm-layout>
     </div>
-    <FormDialog
-      ref="OtherServerForm"
-      :source="source"
-      title="其它服务"
-      :onSave="doSave"
-    ></FormDialog>
   </el-dialog>
 </template>
 
@@ -141,75 +135,40 @@ export default {
         this.load();
       });
     },
-    getForm() {
-      let form = {
-        fields: [
-          {
-            label: "名称",
-            name: "name",
-            rules: [
-              {
-                required: true,
-                message: `名称不能为空!`,
-              },
-            ],
-          },
-          {
-            label: "地址",
-            name: "url",
-            rules: [
-              {
-                required: true,
-                message: `地址不能为空!`,
-              },
-            ],
-          },
-        ],
-      };
-      return form;
-    },
     async toInsert() {
       let data = {};
-      this.$refs.OtherServerForm.show({
+
+      this.tool.showForm({
+        formType: "other-server",
+        param: {},
         title: `新增其它服务`,
-        form: [this.getForm()],
         data: [data],
+        onSave: (res) => {
+          if (res) {
+            this.tool.success("新增成功");
+            this.load();
+          }
+        },
       });
     },
     async toUpdate(row) {
       let data = {};
       data.name = row.name;
       data.url = row.extend.url;
-      this.$refs.OtherServerForm.show({
+
+      this.tool.showForm({
+        formType: "other-server",
+        param: {},
         title: `修改${data.name}服务`,
-        form: [this.getForm()],
         data: [data],
         extendId: row.extendId,
-      });
-    },
-    async doSave(dataList, config) {
-      let url = dataList[0].url;
-      try {
-        new URL(url);
-      } catch (error) {
-        this.tool.error("请填写正确地址");
-        return false;
-      }
-      let param = {
-        extendId: config.extendId,
-        extendType: "otherServer",
-        name: dataList[0].name,
-        extend: {
-          url: url,
+        onSave: (res) => {
+          if (res) {
+            this.tool.success("修改成功");
+            this.load();
+          }
         },
-      };
-      let res = await this.server.toolbox.extend.save(param);
-      if (res.code != 0) {
-        this.tool.error(res.msg);
-      } else {
-        this.load();
-      }
-      return true;
+      });
     },
     async toDelete(data) {
       let msg = "确认删除";

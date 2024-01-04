@@ -76,24 +76,6 @@
         </tm-layout>
       </tm-layout>
     </template>
-    <FormDialog
-      ref="TopicForm"
-      :source="source"
-      title="主题"
-      :onSave="doInsert"
-    ></FormDialog>
-    <FormDialog
-      ref="CommitForm"
-      :source="source"
-      title="主题提交"
-      :onSave="doCommit"
-    ></FormDialog>
-    <FormDialog
-      ref="DeleteRecordForm"
-      :source="source"
-      title="删除记录"
-      :onSave="doDeleteRecord"
-    ></FormDialog>
   </div>
 </template>
 
@@ -262,27 +244,18 @@ export default {
     toInsert() {
       let data = {};
 
-      this.$refs.TopicForm.show({
+      this.tool.showForm({
+        formType: "kafka-topic",
+        param: this.toolboxWorker.getWorkParam(),
         title: `创建主题`,
-        form: [this.form.toolbox.kafka.topic],
         data: [data],
+        onSave: (res) => {
+          if (res) {
+            this.tool.success("创建主题成功");
+            this.loadTopics();
+          }
+        },
       });
-    },
-    async doInsert(dataList) {
-      let data = dataList[0];
-      let param = this.toolboxWorker.getWorkParam({
-        topic: data.topic,
-        numPartitions: Number(data.numPartitions),
-        replicationFactor: Number(data.replicationFactor),
-      });
-      let res = await this.server.kafka.createTopic(param);
-      if (res.code == 0) {
-        await this.loadTopics();
-        return true;
-      } else {
-        this.tool.error(res.msg);
-        return false;
-      }
     },
     toCommit(topic) {
       let data = {
@@ -292,28 +265,17 @@ export default {
         groupId: "test-group",
       };
 
-      this.$refs.CommitForm.show({
+      this.tool.showForm({
+        formType: "kafka-commit",
+        param: this.toolboxWorker.getWorkParam(),
         title: `主题提交`,
-        form: [this.form.toolbox.kafka.commit],
         data: [data],
+        onSave: (res) => {
+          if (res) {
+            this.tool.success("提交成功");
+          }
+        },
       });
-    },
-    async doCommit(dataList) {
-      let data = dataList[0];
-      let param = this.toolboxWorker.getWorkParam({
-        topic: data.topic,
-        groupId: data.groupId,
-        partition: Number(data.partition),
-        offset: Number(data.offset),
-      });
-      let res = await this.server.kafka.commit(param);
-      if (res.code == 0) {
-        this.tool.success("主题提交成功");
-        return true;
-      } else {
-        this.tool.error(res.msg);
-        return false;
-      }
     },
     toDeleteRecord(topic) {
       let data = {
@@ -322,27 +284,17 @@ export default {
         offset: 0,
       };
 
-      this.$refs.DeleteRecordForm.show({
+      this.tool.showForm({
+        formType: "kafka-delete-record",
+        param: this.toolboxWorker.getWorkParam(),
         title: `删除记录`,
-        form: [this.form.toolbox.kafka.deleteRecord],
         data: [data],
+        onSave: (res) => {
+          if (res) {
+            this.tool.success("删除记录成功");
+          }
+        },
       });
-    },
-    async doDeleteRecord(dataList) {
-      let data = dataList[0];
-      let param = this.toolboxWorker.getWorkParam({
-        topic: data.topic,
-        partition: Number(data.partition),
-        offset: Number(data.offset),
-      });
-      let res = await this.server.kafka.deleteRecords(param);
-      if (res.code == 0) {
-        this.tool.success("记录删除成功");
-        return true;
-      } else {
-        this.tool.error(res.msg);
-        return false;
-      }
     },
     toDelete(data) {
       let msg = "确认删除";

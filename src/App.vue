@@ -42,6 +42,7 @@
     <JavascriptFuncDialog :source="source"></JavascriptFuncDialog>
     <JavascriptExampleDialog :source="source"></JavascriptExampleDialog>
     <TextDialog :source="source"></TextDialog>
+    <CommonFormDialog :source="source"></CommonFormDialog>
     <div class="editor-for-copy" ref="editorForCopy"></div>
   </div>
 </template>
@@ -62,6 +63,7 @@ import MarkdownViewDialog from "@/views/dialog/MarkdownViewDialog";
 import JavascriptFuncDialog from "@/views/dialog/JavascriptFuncDialog";
 import JavascriptExampleDialog from "@/views/dialog/JavascriptExampleDialog";
 import TextDialog from "@/views/dialog/TextDialog";
+import CommonFormDialog from "@/views/dialog/CommonFormDialog";
 
 export default {
   components: {
@@ -76,6 +78,7 @@ export default {
     TextDialog,
     Workspace,
     DialogPage,
+    CommonFormDialog,
   },
   props: [],
   data() {

@@ -72,12 +72,6 @@
         </tm-layout>
       </tm-layout>
     </template>
-    <FormDialog
-      ref="InsertIndexName"
-      :source="source"
-      title="新增索引"
-      :onSave="doInsert"
-    ></FormDialog>
   </div>
 </template>
 
@@ -239,26 +233,18 @@ export default {
     toInsert() {
       let data = {};
 
-      this.$refs.InsertIndexName.show({
+      this.tool.showForm({
+        formType: "es-index",
+        param: this.toolboxWorker.getWorkParam(),
         title: `新增索引`,
-        form: [this.form.toolbox.elasticsearch.index],
         data: [data],
+        onSave: (res) => {
+          if (res) {
+            this.tool.success("新增索引成功");
+            this.loadIndexes();
+          }
+        },
       });
-    },
-    async doInsert(dataList) {
-      let data = dataList[0];
-      let param = this.toolboxWorker.getWorkParam({
-        indexName: data.indexName,
-        mapping: data.mapping,
-      });
-      let res = await this.server.elasticsearch.createIndex(param);
-      if (res.code == 0) {
-        await this.loadIndexes();
-        return true;
-      } else {
-        this.tool.error(res.msg);
-        return false;
-      }
     },
     toReindex(data) {
       this.toolboxWorker.showReindexForm(

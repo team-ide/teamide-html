@@ -38,17 +38,15 @@ export default {
     async show(data, options) {
       options = options || {};
       this.title = options.title;
+      let onSave = options.onSave;
+      delete options.onSave;
       this.onSave = null;
       if (this.tool.isUseNewWindowOpenDialog()) {
-        let listenKey = "" + this.tool.getNumber();
-        this.tool.newDialogWindow({
-          type: "JSONData",
-          title: this.title || "数据",
-          cacheKey: this.tool.getNumber(),
-          cacheData: data,
-          listenKeys: [listenKey],
-        });
-        if (options.onSave != null) {
+        let listenKeys = [];
+
+        if (onSave != null) {
+          let listenKey = "" + this.tool.getNumber();
+          listenKeys.push(listenKey);
           let res = await this.tool.electronOnListen({
             listenKey: listenKey,
           });
@@ -56,14 +54,21 @@ export default {
             options.onSave(JSON.parse(res.data));
           }
         }
+        this.tool.newDialogWindow({
+          type: "JSONData",
+          title: this.title || "数据",
+          cacheKey: this.tool.getNumber(),
+          cacheData: data,
+          listenKeys: listenKeys,
+        });
         return;
       }
 
       this.showDialog = true;
-      if (options.onSave) {
+      if (onSave) {
         this.onSave = (arg) => {
           this.hide();
-          options.onSave(arg);
+          onSave(arg);
         };
       }
       this.$nextTick(() => {

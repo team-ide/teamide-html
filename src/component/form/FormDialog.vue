@@ -35,7 +35,6 @@ export default {
     "source",
     "title",
     "width",
-    "wrap",
     "onSave",
     "saveText",
     "showName",
@@ -62,14 +61,6 @@ export default {
           this.formHeight_ = "calc(100% - 60px)";
         } else {
           this.formHeight_ = "100%";
-        }
-      }
-      if (this.wrap) {
-        if (this.showName) {
-          this.wrap[this.showName] = this.show;
-        }
-        if (this.hideName) {
-          this.wrap[this.hideName] = this.hide;
         }
       }
     },
