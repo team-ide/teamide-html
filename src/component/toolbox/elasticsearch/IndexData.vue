@@ -246,9 +246,9 @@
               small
               @size-change="handleSizeChange"
               @current-change="handleCurrentChange"
-              :current-page="searchForm.pageIndex"
-              :page-sizes="[10, 50, 100, 200, 500]"
-              :page-size="searchForm.pageSize"
+              :current-page="pageIndex"
+              :page-sizes="[10, 50, 100, 200, 500, 1000, 5000]"
+              :page-size="pageSize"
               layout="total, sizes, prev, pager, next, jumper"
               :total="total"
               :disabled="total <= 0"
@@ -278,7 +278,7 @@ export default {
         orderList: [],
       },
       pageIndex: 1,
-      pageSize: 10,
+      pageSize: 50,
       total: 0,
       dataList: null,
       mapping: null,
@@ -295,6 +295,7 @@ export default {
       await this.toSearch();
     },
     async toSearch() {
+      this.pageIndex = 1;
       await this.doSearch();
     },
     handleSizeChange(pageSize) {
@@ -494,7 +495,8 @@ export default {
       });
       let res = await this.server.elasticsearch.insertData(param);
       if (res.code == 0) {
-        await this.toSearch();
+        this.tool.success("新增成功");
+        this.doSearch();
         return true;
       } else {
         this.tool.error(res.msg);
@@ -533,7 +535,8 @@ export default {
       });
       let res = await this.server.elasticsearch.updateData(param);
       if (res.code == 0) {
-        await this.toSearch();
+        this.tool.success("修改成功");
+        this.doSearch();
         return true;
       } else {
         this.tool.error(res.msg);
@@ -549,6 +552,7 @@ export default {
       });
       let res = await this.server.elasticsearch.deleteData(param);
       if (res.code == 0) {
+        this.tool.success("删除成功");
         this.doSearch();
         return true;
       } else {

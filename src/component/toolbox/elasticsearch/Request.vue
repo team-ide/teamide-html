@@ -178,6 +178,7 @@ export default {
       actions: [
         { text: "/_search", value: "/_search" },
         { text: "/_doc/x", value: "/_doc/x" },
+        { text: "/_sql", value: "/_sql" },
       ],
       methods: [
         { text: "POST", value: "POST" },

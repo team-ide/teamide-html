@@ -218,7 +218,7 @@
             >
               导出选中(SQL)({{ selects.length }})
             </div>
-            <div @click="doSearch" class="color-green tm-link mgr-10">查询</div>
+            <div @click="toSearch" class="color-green tm-link mgr-10">查询</div>
           </div>
         </tm-layout>
         <tm-layout height="auto" v-loading="dataList_loading">
@@ -253,7 +253,7 @@
               @size-change="handleSizeChange"
               @current-change="handleCurrentChange"
               :current-page="pageNo"
-              :page-sizes="[10, 50, 100, 200, 500]"
+              :page-sizes="[10, 50, 100, 200, 500, 1000, 5000]"
               :page-size="pageSize"
               layout="total, sizes, prev, pager, next, jumper"
               :total="total"
@@ -392,6 +392,10 @@ export default {
     },
     handleCurrentChange(pageNo) {
       this.pageNo = pageNo;
+      this.doSearch();
+    },
+    toSearch() {
+      this.pageNo = 1;
       this.doSearch();
     },
     initInputWidth() {
