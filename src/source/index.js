@@ -35,7 +35,7 @@ let defaultUserSetting = {
     editorBackgroudColor: "",
     terminalBackgroudColor: "",
     mainWindowAlwaysOnTop: "false",
-    useNewWindowOpenDialog: "true",
+    useNewWindowOpenDialog: "false",
 }
 source.defaultUserSetting = defaultUserSetting;
 source.userSetting = Object.assign({}, defaultUserSetting);
