@@ -201,6 +201,7 @@
 
 .toolbox-editor .el-input.is-disabled .el-input__inner {
     background-color: transparent;
+    border: 1px solid #4e4e4e;
 }
 
 .toolbox-editor .el-pagination .btn-next,

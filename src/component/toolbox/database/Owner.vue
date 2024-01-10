@@ -409,12 +409,6 @@ export default {
           },
         });
         menus.push({
-          text: "同步",
-          onClick: () => {
-            this.toSync(data);
-          },
-        });
-        menus.push({
           text: "复制名称",
           onClick: async () => {
             let res = await this.tool.clipboardWrite(
@@ -594,73 +588,57 @@ export default {
       this.toolboxWorker.openTabByExtend(extend);
     },
     async toExport(data) {
-      let ownerName = null;
-      let tableName = null;
+      let extend = {
+        options: {
+          from: {
+            type: "database",
+            toolboxId: this.toolboxWorker.toolboxId,
+          },
+        },
+      };
+      let title = "[导出]";
       if (data == null) {
       } else if (data.isOwner) {
-        ownerName = data.ownerName;
+        extend.options.from.ownerName = data.ownerName;
       } else if (data.isTable) {
-        ownerName = data.owner.ownerName;
-        tableName = data.tableName;
+        extend.options.from.ownerName = data.owner.ownerName;
+        extend.options.from.tableName = data.tableName;
       }
-      let name = "导出";
-      if (ownerName) {
-        name += "[" + tableName + "]库";
+      if (extend.options.from.tableName) {
+        title += "[" + extend.options.from.tableName + "]表";
+      } else if (extend.options.from.ownerName) {
+        title += "[" + extend.options.from.ownerName + "]库";
       }
-      if (tableName) {
-        name += "[" + tableName + "]表";
-      }
-      let extend = {
-        name: name,
-        title: name,
-        type: "export",
-        ownerName: ownerName,
-        tableName: tableName,
-      };
+      extend.type = "datamove";
+      extend.name = title;
+      extend.title = title;
       this.toolboxWorker.openTabByExtend(extend);
     },
     async toImport(data) {
-      let ownerName = null;
-      let tableName = null;
-      if (data.isOwner) {
-        ownerName = data.ownerName;
-      } else if (data.isTable) {
-        ownerName = data.owner.ownerName;
-        tableName = data.tableName;
-      }
-      let name = "导入[" + ownerName + "]库";
-      if (tableName) {
-        name += "[" + tableName + "]表";
-      }
       let extend = {
-        name: name,
-        title: name,
-        type: "import",
-        ownerName: ownerName,
-        tableName: tableName,
+        options: {
+          to: {
+            type: "database",
+            toolboxId: this.toolboxWorker.toolboxId,
+          },
+        },
       };
-      this.toolboxWorker.openTabByExtend(extend);
-    },
-    async toSync(data) {
-      let ownerName = null;
-      let tableName = null;
-      if (data.isOwner) {
-        ownerName = data.ownerName;
+      let title = "[导入]";
+      if (data == null) {
+      } else if (data.isOwner) {
+        extend.options.to.ownerName = data.ownerName;
       } else if (data.isTable) {
-        ownerName = data.owner.ownerName;
-        tableName = data.tableName;
+        extend.options.to.ownerName = data.owner.ownerName;
+        extend.options.to.tableName = data.tableName;
       }
-      let name = "同步[" + ownerName + "]库";
-      if (tableName) {
-        name += "[" + tableName + "]表";
+      if (extend.options.to.tableName) {
+        title += "[" + extend.options.to.tableName + "]表";
+      } else if (extend.options.to.ownerName) {
+        title += "[" + extend.options.to.ownerName + "]库";
       }
-      let extend = {
-        name: name,
-        title: name,
-        type: "sync",
-        ownerName: ownerName,
-        tableName: tableName,
-      };
+      extend.type = "datamove";
+      extend.name = title;
+      extend.title = title;
       this.toolboxWorker.openTabByExtend(extend);
     },
     async doOwnerDelete(ownerName) {

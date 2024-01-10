@@ -326,14 +326,16 @@ export default {
         },
       });
     },
-    openPage(page, title) {
+    openPage(page, title, extend) {
+      extend = extend || {};
+      extend.toolboxType = "page";
+      extend.page = page;
+      extend.title = title;
+      if (extend.onlyOpenOneKey == null) {
+        extend.onlyOpenOneKey = "page:" + page;
+      }
       this.tool.openByOption({
-        extend: {
-          toolboxType: "page",
-          page: page,
-          title: title,
-          onlyOpenOneKey: "page:" + page,
-        },
+        extend: extend,
       });
     },
     openTerminal(place, placeData) {

@@ -36,6 +36,9 @@
           :extend="extend"
         ></UserSetting>
       </template>
+      <template v-else-if="extend.page == 'datamove'">
+        <DataMove :source="source" :options="extend.options"></DataMove>
+      </template>
     </template>
   </div>
 </template>

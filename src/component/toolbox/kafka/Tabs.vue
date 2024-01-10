@@ -24,6 +24,12 @@
             >
             </Groups>
           </template>
+          <template v-else-if="item.extend.type == 'datamove'">
+            <DataMove
+              :source="source"
+              :options="item.extend.options"
+            ></DataMove>
+          </template>
         </template>
       </WorkspaceSpans>
     </div>
