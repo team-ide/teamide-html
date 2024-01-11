@@ -1,270 +1,85 @@
 <template>
-  <div class="pdlr-10 datamove-owners-page">
-    <el-form class="" size="mini" inline>
-      <el-form-item label="所有库" class="mgb-0" v-if="from.ownerName == null">
-        <el-switch v-model="formData.allOwner"> </el-switch>
+  <div class="pdlr-10">
+    <el-form class="" size="mini">
+      <el-form-item label="所有库" class="mgb-0" v-if="owner == null">
+        <el-switch v-model="allOwner"> </el-switch>
       </el-form-item>
       <el-form-item
-        label="选择库进行配置（如果选择所有库，不受该选项影响）"
-        v-if="ownerList.length != 0"
+        v-if="owner != null && table == null"
+        label="所有表"
         class="mgb-0"
       >
-        <div v-if="ownerList.length == 0" class="ft-12 color-orange">
-          没有库信息
-        </div>
-        <el-select
-          v-model="formData.owners"
-          clearable
-          filterable
-          multiple
-          value-key="ownerName"
-        >
-          <el-option
-            v-for="(owner, index) in ownerList"
-            :value="owner"
-            :label="owner.from.ownerName"
-            :key="index"
-          >
-            {{ owner.from.ownerName }}
-          </el-option>
-        </el-select>
-      </el-form-item>
-      <el-form-item label="" class="mgb-0">
-        <div
-          class="tm-link color-orange mgr-5 ft-12"
-          v-if="formData.owners.length != 0 && openList"
-          @click="openList = false"
-        >
-          收起库
-        </div>
-        <div
-          class="tm-link color-orange mgr-5 ft-12"
-          v-if="formData.owners.length != 0 && !openList"
-          @click="openList = true"
-        >
-          展开库
-        </div>
+        <el-switch v-model="owner.allTable"> </el-switch>
       </el-form-item>
     </el-form>
-    <div v-if="formData.owners.length != 0 && openList">
-      <template v-for="(owner, ownerIndex) in formData.owners">
-        <div
-          :key="ownerIndex"
-          v-loading="owner.tableListLoading"
-          class="owner-one-box"
+    <template v-if="!allOwner">
+      <div class="ft-12 color-orange pdtb-10">
+        配置库映射信息，如果库需要单独的用户名、密码访问，则填写下信息否则使用主配置查询
+      </div>
+      <el-table
+        :data="ownerList"
+        border
+        style="width: 100%"
+        size="mini"
+        @selection-change="selectionOwner"
+      >
+        <el-table-column v-if="owner == null" type="selection" width="55">
+        </el-table-column>
+        <el-table-column label="库" prop="ownerName" sortable>
+        </el-table-column>
+        <el-table-column label="源用户名" width="100">
+          <template slot-scope="scope">
+            <el-input v-model="scope.row.from.ownerUsername" />
+          </template>
+        </el-table-column>
+        <el-table-column label="源密码" width="100">
+          <template slot-scope="scope">
+            <el-input v-model="scope.row.from.ownerPasswrod" />
+          </template>
+        </el-table-column>
+        <el-table-column :label="toOwnerNameLabel">
+          <template slot-scope="scope">
+            <el-input v-model="scope.row.to.ownerName" /> </template
+        ></el-table-column>
+        <el-table-column
+          label="目标用户名"
+          width="100"
+          v-if="to.type == 'database'"
         >
-          <el-form size="mini" inline>
-            <el-form-item label="库名称" class="mgb-0">
-              <el-input
-                v-model="owner.from.ownerName"
-                style="width: 150px"
-                readonly
-              >
-              </el-input>
-            </el-form-item>
-            <el-form-item :label="toOwnerNameLabel" class="mgb-0">
-              <el-input v-model="owner.to.ownerName" style="width: 150px">
-              </el-input>
-            </el-form-item>
-
-            <el-form-item
-              label="所有表"
-              class="mgb-0"
-              v-if="
-                from.tableName == null ||
-                (owner.tableList != null && owner.tableList.length == 0)
-              "
-            >
-              <el-switch v-model="owner.allTable"> </el-switch>
-            </el-form-item>
-            <el-form-item label="" class="mgb-0">
-              <div
-                v-if="owner.tableList == null && from.tableName == null"
-                class="tm-link color-green mgr-5"
-                @click="initOwnerTables(owner)"
-              >
-                加载表信息
-              </div>
-              <div
-                v-if="owner.tableList != null && owner.tableList.length == 0"
-                class="ft-12 color-orange"
-              >
-                没有表信息
-              </div>
-            </el-form-item>
-
-            <el-form-item
-              label="选择表进行配置"
-              v-if="owner.tableList != null && owner.tableList.length != 0"
-              class="mgb-0"
-            >
-              <el-select
-                v-model="owner.tables"
-                style="width: 250px"
-                clearable
-                filterable
-                multiple
-                value-key="tableName"
-              >
-                <el-option
-                  v-for="(table, index) in owner.tableList"
-                  :value="table"
-                  :label="table.from.tableName"
-                  :key="index"
-                >
-                  {{ table.from.tableName }}
-                </el-option>
-              </el-select>
-            </el-form-item>
-            <el-form-item label="" class="mgb-0">
-              <div
-                class="tm-link color-orange mgr-5 ft-12"
-                v-if="owner.tables.length != 0 && owner.openList"
-                @click="owner.openList = false"
-              >
-                收起表
-              </div>
-              <div
-                class="tm-link color-orange mgr-5 ft-12"
-                v-if="owner.tables.length != 0 && !owner.openList"
-                @click="owner.openList = true"
-              >
-                展开表
-              </div>
-            </el-form-item>
-          </el-form>
-          <div class="pdl-10" v-if="owner.openList">
-            <template v-for="(table, tableIndex) in owner.tables">
-              <div :key="tableIndex" class="table-one-box">
-                <div v-loading="table.columnListLoading">
-                  <el-form size="mini" inline>
-                    <el-form-item label="表名称" class="mgb-0">
-                      <el-input
-                        v-model="table.from.tableName"
-                        style="width: 150px"
-                        readonly=""
-                      >
-                      </el-input>
-                    </el-form-item>
-                    <el-form-item :label="toTableNameLabel" class="mgb-0">
-                      <el-input
-                        v-model="table.to.tableName"
-                        style="width: 150px"
-                      >
-                      </el-input>
-                    </el-form-item>
-
-                    <el-form-item label="所有字段" class="mgb-0">
-                      <el-switch v-model="table.allColumn"> </el-switch>
-                    </el-form-item>
-                    <el-form-item
-                      v-if="table.columns == null"
-                      label=""
-                      class="mgb-0"
-                    >
-                      <div
-                        class="tm-link color-green mgr-5"
-                        @click="initTableColumns(owner, table)"
-                      >
-                        加载字段信息
-                      </div>
-                    </el-form-item>
-                    <el-form-item
-                      v-if="table.columns != null"
-                      label=""
-                      class="mgb-0"
-                    >
-                      <div
-                        class="tm-link color-green mgr-5 ft-12"
-                        @click="addColumn(table.columns, 'columnXXX')"
-                      >
-                        添加字段
-                      </div>
-                      <div
-                        class="tm-link color-orange mgr-5 ft-12"
-                        v-if="table.columns.length != 0 && table.openList"
-                        @click="table.openList = false"
-                      >
-                        收起字段
-                      </div>
-                      <div
-                        class="tm-link color-orange mgr-5 ft-12"
-                        v-if="table.columns.length != 0 && !table.openList"
-                        @click="table.openList = true"
-                      >
-                        展开字段
-                      </div>
-                    </el-form-item>
-                  </el-form>
-                </div>
-                <div v-if="table.openList">
-                  <el-table
-                    :data="table.columns"
-                    border
-                    style="width: 100%"
-                    size="mini"
-                  >
-                    <el-table-column label="字段">
-                      <template slot-scope="scope">
-                        <div class="">
-                          <el-input v-model="scope.row.from.columnName" />
-                        </div>
-                      </template>
-                    </el-table-column>
-                    <el-table-column :label="toColumnNameLabel">
-                      <template slot-scope="scope">
-                        <div class="">
-                          <el-input v-model="scope.row.to.columnName" />
-                        </div>
-                      </template>
-                    </el-table-column>
-                    <el-table-column
-                      label="导出固定值（函数脚本，默认为查询出的值）"
-                    >
-                      <template slot-scope="scope">
-                        <div class="">
-                          <el-input v-model="scope.row.value" />
-                        </div>
-                      </template>
-                    </el-table-column>
-                    <el-table-column label="操作" width="200px">
-                      <template slot-scope="scope">
-                        <div
-                          class="tm-link color-grey mglr-5 ft-12"
-                          @click="upColumn(table, scope.row)"
-                        >
-                          上移
-                        </div>
-                        <div
-                          class="tm-link color-grey mglr-5 ft-12"
-                          @click="downColumn(table, scope.row)"
-                        >
-                          下移
-                        </div>
-                        <div
-                          class="tm-link color-grey mglr-5 ft-12"
-                          @click="
-                            addColumn(table.columns, 'columnXXX', scope.row)
-                          "
-                        >
-                          插入
-                        </div>
-                        <div
-                          class="tm-link color-red mglr-5 ft-12"
-                          @click="removeColumn(table, scope.row)"
-                        >
-                          删除
-                        </div>
-                      </template>
-                    </el-table-column>
-                  </el-table>
-                </div>
-              </div>
-            </template>
-          </div>
-        </div>
-      </template>
-    </div>
+          <template slot-scope="scope">
+            <el-input v-model="scope.row.to.ownerUsername" />
+          </template>
+        </el-table-column>
+        <el-table-column
+          label="标密码"
+          width="100"
+          v-if="to.type == 'database'"
+        >
+          <template slot-scope="scope">
+            <el-input v-model="scope.row.to.ownerPasswrod" />
+          </template>
+        </el-table-column>
+      </el-table>
+    </template>
+    <template v-if="owner != null && !owner.allTable">
+      <div class="ft-12 color-orange pdtb-10">配置 表 映射信息</div>
+      <el-table
+        :data="tableList"
+        border
+        style="width: 100%"
+        size="mini"
+        @selection-change="selectionTable"
+      >
+        <el-table-column type="selection" width="55" v-if="table == null">
+        </el-table-column>
+        <el-table-column label="表" prop="tableName" sortable>
+        </el-table-column>
+        <el-table-column :label="toTableNameLabel">
+          <template slot-scope="scope">
+            <el-input v-model="scope.row.to.tableName" /> </template
+        ></el-table-column>
+      </el-table>
+    </template>
   </div>
 </template>
 
@@ -276,31 +91,34 @@ export default {
   data() {
     return {
       ownerList: [],
+      tableList: [],
+      allOwner: true,
       toOwnerNameLabel: "",
       toTableNameLabel: "",
       toColumnNameLabel: "",
-      openList: true,
+      owner: null,
+      table: null,
     };
   },
   computed: {},
   watch: {
-    "from.toolboxId"() {
-      this.init();
-    },
     "to.type"() {
       this.initLabel();
+    },
+    "from.toolboxId"() {
+      this.init();
     },
   },
   methods: {
     initLabel() {
-      if (
-        this.to.type == "sql" ||
-        this.to.type == "txt" ||
-        this.to.type == "excel"
-      ) {
+      if (this.to.type == "txt" || this.to.type == "excel") {
         this.toOwnerNameLabel = "映射文件|目录名称";
         this.toTableNameLabel = "映射文件|目录名称";
         this.toColumnNameLabel = "映射字段名称";
+      } else if (this.to.type == "sql") {
+        this.toOwnerNameLabel = "导出的库名称";
+        this.toTableNameLabel = "导出的表名称";
+        this.toColumnNameLabel = "导出的字段名称";
       } else if (this.to.type == "elasticsearch") {
         this.toOwnerNameLabel = "映射索引名称";
         this.toTableNameLabel = "映射索引名称";
@@ -319,26 +137,58 @@ export default {
         this.toColumnNameLabel = "映射名称";
       }
     },
-    init() {
+    async init() {
       this.ownerList = [];
+      this.tableList = [];
+      this.owner = null;
+      this.table = null;
+      if (this.from.ownerName != null) {
+        this.allOwner = false;
+      }
       this.initLabel();
 
-      this.initOwnerList();
+      await this.initOwnerList();
+      await this.initTableList();
+      this.fullFormData();
+    },
+    fullFormData() {
+      this.formData.allOwner = false;
+      this.formData.owners = [];
+      if (this.owner != null) {
+        if (this.owner.allTable) {
+          this.owner.tables = [];
+        } else {
+          this.owner.tables = this.selectTableList || [];
+        }
+        this.formData.owners = [this.owner];
+      } else if (this.allOwner) {
+        this.formData.allOwner = true;
+      } else {
+        this.formData.owners = this.selectOwnerList || [];
+      }
+    },
+    selectionOwner(val) {
+      this.selectOwnerList = val;
+      this.fullFormData();
+    },
+    selectionTable(val) {
+      this.selectTableList = val;
+      this.fullFormData();
     },
     addOwner(owners, ownerName) {
       let owner = {};
       owner.from = {
         ownerName: ownerName,
+        ownerUsername: "",
+        ownerPasswrod: "",
       };
       owner.to = {
         ownerName: ownerName,
+        ownerUsername: "",
+        ownerPasswrod: "",
       };
+      owner.allTable = true;
       owner.ownerName = ownerName;
-      owner.allTable = false;
-      owner.tables = [];
-      owner.tableListLoading = false;
-      owner.tableList = null;
-      owner.openList = true;
       owners.push(owner);
       return owner;
     },
@@ -352,57 +202,22 @@ export default {
       };
       table.tableName = tableName;
       table.allColumn = true;
-      table.columns = null;
-      table.columnListLoading = false;
-      table.openList = false;
       tables.push(table);
       return table;
     },
-    addColumn(columns, columnName, after) {
-      let column = {};
-      column.from = {
-        columnName: columnName,
-      };
-      column.to = {
-        columnName: columnName,
-      };
-      column.value = null;
-
-      let appendIndex = columns.indexOf(after);
-      if (appendIndex < 0) {
-        appendIndex = columns.length;
-      } else {
-        appendIndex++;
+    async initTableList() {
+      if (this.from.ownerName == null) {
+        return;
       }
-      columns.splice(appendIndex, 0, column);
-      return column;
-    },
-    async initTableColumns(owner, table) {
-      table.columnListLoading = true;
-      table.columns = [];
+      if (this.from.tableName != null) {
+        this.owner.allTable = false;
+        this.table = this.addTable(this.tableList, this.from.tableName);
+        return;
+      }
+      this.owner.allTable = true;
       let param = {
         toolboxId: this.from.toolboxId,
-        ownerName: owner.from.ownerName,
-        tableName: table.from.tableName,
-      };
-      table.openList = true;
-      let res = await this.server.database.tableDetail(param);
-      if (res.code != 0) {
-        this.tool.error(res.msg);
-      }
-      let tableDetail = res.data || {};
-      let list = tableDetail.columnList || {};
-      list.forEach((one) => {
-        this.addColumn(table.columns, one.columnName);
-      });
-      table.columnListLoading = false;
-    },
-    async initOwnerTables(owner) {
-      owner.tableListLoading = true;
-      owner.tableList = [];
-      let param = {
-        toolboxId: this.from.toolboxId,
-        ownerName: owner.from.ownerName,
+        ownerName: this.from.ownerName,
       };
       let res = await this.server.database.tables(param);
       if (res.code != 0) {
@@ -410,23 +225,13 @@ export default {
       }
       let list = res.data || [];
       list.forEach((one) => {
-        this.addTable(owner.tableList, one.tableName);
+        this.addTable(this.tableList, one.tableName);
       });
-      owner.tableListLoading = false;
     },
     async initOwnerList() {
-      this.formData.owners = [];
-      this.ownerList = [];
       if (this.from.ownerName != null) {
-        this.formData.allOwner = false;
-        let owner = this.addOwner(this.formData.owners, this.from.ownerName);
-        owner.allTable = true;
-        if (this.from.tableName != null) {
-          owner.allTable = false;
-          owner.tables = [];
-          let table = this.addTable(owner.tables, this.from.tableName);
-          table.allColumn = true;
-        }
+        this.allOwner = false;
+        this.owner = this.addOwner(this.ownerList, this.from.ownerName);
         return;
       }
       let param = {
@@ -441,18 +246,6 @@ export default {
         this.addOwner(this.ownerList, one.ownerName);
       });
     },
-    upColumn(table, one) {
-      this.tool.up(table, "columns", one);
-    },
-    downColumn(table, one) {
-      this.tool.down(table, "columns", one);
-    },
-    removeColumn(table, one) {
-      let findIndex = table.columns.indexOf(one);
-      if (findIndex >= 0) {
-        table.columns.splice(findIndex, 1);
-      }
-    },
   },
   created() {},
   mounted() {
@@ -462,14 +255,4 @@ export default {
 </script>
 
 <style>
-.datamove-owners-page .owner-one-box {
-  border: 1px dotted #4d4d4d;
-  margin-top: 5px;
-  padding: 5px;
-}
-.datamove-owners-page .table-one-box {
-  border: 1px dotted #4d4d4d;
-  margin-top: 5px;
-  padding: 5px;
-}
 </style>

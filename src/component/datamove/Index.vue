@@ -102,7 +102,7 @@
         </tm-layout>
       </tm-layout>
       <tm-layout-bar bottom></tm-layout-bar>
-      <tm-layout height="400px">
+      <tm-layout height="400px" class="app-scroll-bar">
         <template v-if="from.type == 'database' && from.toolboxId != null">
           <FromOwners
             :source="source"
@@ -114,7 +114,22 @@
         </template>
       </tm-layout>
       <tm-layout-bar bottom></tm-layout-bar>
-      <tm-layout height="auto"> </tm-layout>
+      <tm-layout height="auto">
+        <div class="pdtb-10 ft-15">
+          <div class="tm-btn tm-btn-sm color-green mgl-10" @click="toStart">
+            执行
+          </div>
+          任务列表
+          <div class="tm-btn bg-blue mgl-20 tm-btn-sm" @click="loadList()">
+            刷新
+          </div>
+          <span class="color-orange ft-12 mgl-10">
+            请点击刷新来刷新列表任务状态
+          </span>
+        </div>
+        <List ref="List" :source="source" style="height: calc(100% - 46px)">
+        </List>
+      </tm-layout>
     </tm-layout>
   </div>
 </template>
@@ -123,9 +138,10 @@
 <script>
 import Config from "./Config";
 import FromOwners from "./FromOwners";
+import List from "./List";
 
 export default {
-  components: { Config, FromOwners },
+  components: { Config, FromOwners, List },
   props: ["source", "options"],
   data() {
     return {
@@ -141,6 +157,7 @@ export default {
         fileNameSplice: "/",
         allOwner: true,
         owners: [],
+        rowNumber: 0,
       },
       sqlFileMergeTypes: [
         { text: "生成一个文件", value: "one" },
@@ -155,7 +172,11 @@ export default {
     };
   },
   computed: {},
-  watch: {},
+  watch: {
+    "to.type"() {
+      console.log("to type changed", this.to.type);
+    },
+  },
   methods: {
     init() {
       this.initOptions(this.options);
@@ -194,6 +215,29 @@ export default {
       this.from = options.from;
       this.to = options.to;
       this.ready = true;
+    },
+    async toStart() {
+      let param = Object.assign({}, this.formData);
+      param.from = this.from;
+      param.to = this.to;
+      param.batchNumber = Number(param.batchNumber);
+      param.rowNumber = Number(param.rowNumber);
+      if (param.from.toolboxId) {
+        param.fromToolboxId = param.from.toolboxId;
+      }
+      if (param.to.toolboxId) {
+        param.toToolboxId = param.to.toolboxId;
+      }
+      let res = await this.server.datamove.start(param);
+      if (res.code != 0) {
+        this.tool.error(res.msg);
+      } else {
+        this.tool.success("任务启动成功");
+        this.loadList();
+      }
+    },
+    loadList() {
+      this.$refs.List.loadList();
     },
   },
   created() {},
