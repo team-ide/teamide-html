@@ -130,7 +130,33 @@ export default {
         })
         .catch((e) => {});
     },
-    async get(taskKey) {},
+    async get(taskKey) {
+      let res = await this.server.datamove.get({ taskKey: taskKey });
+      if (res.code != 0) {
+        this.tool.error(res.msg);
+        return;
+      }
+      return res.data;
+    },
+    async checkTask(one) {
+      if (one == null || one.isEnd || this.tool.isEmpty(one.key)) {
+        return;
+      }
+      let taskKey = one.key;
+      let res = await this.server.datamove.get({ taskKey: taskKey });
+      if (res.data == null) {
+        return;
+      }
+      if (this.taskList.indexOf(one) < 0) {
+        return;
+      }
+      Object.assign(one, res.data);
+      if (!one.isEnd) {
+        setTimeout(() => {
+          this.checkTask(one);
+        }, 1000);
+      }
+    },
     async loadList() {
       let res = await this.server.datamove.list({});
       if (res.code != 0) {
@@ -138,7 +164,9 @@ export default {
         return;
       }
       let taskList = res.data || [];
-      taskList.forEach((one) => {});
+      taskList.forEach((one) => {
+        this.checkTask(one);
+      });
       taskList.sort((o1, o2) => {
         var a = o1.startTime;
         var b = o2.startTime;
