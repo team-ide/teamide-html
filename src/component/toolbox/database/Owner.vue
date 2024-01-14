@@ -329,13 +329,13 @@ export default {
             "SELECT * FROM " + owner.ownerName + "." + data.tableName + ";";
         }
       }
-      this.toolboxWorker.showSqlFiles({
-        executeSQL: extend.executeSQL,
-        onOpen: (data) => {
-          extend["extendId"] = data.extendId;
-          this.toolboxWorker.openTabByExtend(extend);
-        },
-      });
+      // this.toolboxWorker.showSqlFiles({
+      //   executeSQL: extend.executeSQL,
+      //   onOpen: (data) => {
+      //     extend["extendId"] = data.extendId;
+      this.toolboxWorker.openTabByExtend(extend);
+      //   },
+      // });
     },
     nodeContextmenu(event, data, node, nodeView) {
       let menus = [];

@@ -1,6 +1,14 @@
 <template>
   <div class="pdlr-10">
     <el-form size="mini" inline>
+      <template v-if="to.type == 'sql'">
+        <DatabasePack
+          :source="source"
+          :config="to"
+          :shouldDialectType="true"
+          :change="changeDatabasePack"
+        ></DatabasePack>
+      </template>
       <el-form-item label="使用SQL导出">
         <el-switch v-model="bySql"> </el-switch>
       </el-form-item>
@@ -103,13 +111,12 @@
           <el-input v-model="to.replaceLine" style="width: 100px"> </el-input>
         </el-form-item>
       </template>
-      <el-form-item label="所有库" class="mgb-0" v-if="owner == null && !bySql">
+      <el-form-item label="所有库" v-if="owner == null && !bySql">
         <el-switch v-model="allOwner"> </el-switch>
       </el-form-item>
       <el-form-item
         v-if="owner != null && table == null && !bySql"
         label="所有表"
-        class="mgb-0"
       >
         <el-switch v-model="owner.allTable"> </el-switch>
       </el-form-item>
@@ -187,11 +194,15 @@
         </el-table-column>
         <el-table-column :label="toTableNameLabel">
           <template slot-scope="scope">
-            <el-input v-model="scope.row.to.tableName" /> </template
-        ></el-table-column>
+            <el-input v-model="scope.row.to.tableName" />
+          </template>
+        </el-table-column>
       </el-table>
     </template>
     <template v-if="bySql">
+      <el-form-item label="自动拼接分页查询">
+        <el-switch v-model="shouldSelectPage"> </el-switch>
+      </el-form-item>
       <Editor
         ref="Editor"
         :source="source"
@@ -204,8 +215,10 @@
 
 
 <script>
+import DatabasePack from "./DatabasePack";
+
 export default {
-  components: {},
+  components: { DatabasePack },
   props: ["source", "from", "to", "formData"],
   data() {
     return {
@@ -230,11 +243,13 @@ export default {
       shouldOwner: true,
       shouldTable: true,
       bySql: false,
+      shouldSelectPage: false,
     };
   },
   computed: {},
   watch: {},
   methods: {
+    changeDatabasePack() {},
     async init() {
       this.ownerList = [];
       this.tableList = [];
@@ -272,6 +287,7 @@ export default {
       this.from.owners = [];
       this.from.bySql = this.bySql;
       if (this.bySql) {
+        this.from.shouldSelectPage = this.shouldSelectPage;
         this.from.shouldOwner = false;
         this.from.shouldTable = false;
         if (this.to.type == "sql") {

@@ -83,57 +83,6 @@
             >
             </Table>
           </template>
-          <template v-else-if="item.extend.type == 'export'">
-            <Export
-              :source="source"
-              :toolboxWorker="toolboxWorker"
-              :ownerName="item.extend.ownerName"
-              :tableName="item.extend.tableName"
-              :columnTypeInfoList="columnTypeInfoList"
-              :indexTypeInfoList="indexTypeInfoList"
-              :extend="item.extend"
-              :tabId="item.tabId"
-              :actived="
-                toolboxWorker.itemsWorker.activeItem &&
-                item.key == toolboxWorker.itemsWorker.activeItem.key
-              "
-            >
-            </Export>
-          </template>
-          <template v-else-if="item.extend.type == 'import'">
-            <Import
-              :source="source"
-              :toolboxWorker="toolboxWorker"
-              :ownerName="item.extend.ownerName"
-              :tableName="item.extend.tableName"
-              :columnTypeInfoList="columnTypeInfoList"
-              :indexTypeInfoList="indexTypeInfoList"
-              :extend="item.extend"
-              :tabId="item.tabId"
-              :actived="
-                toolboxWorker.itemsWorker.activeItem &&
-                item.key == toolboxWorker.itemsWorker.activeItem.key
-              "
-            >
-            </Import>
-          </template>
-          <template v-else-if="item.extend.type == 'sync'">
-            <Sync
-              :source="source"
-              :toolboxWorker="toolboxWorker"
-              :ownerName="item.extend.ownerName"
-              :tableName="item.extend.tableName"
-              :columnTypeInfoList="columnTypeInfoList"
-              :indexTypeInfoList="indexTypeInfoList"
-              :extend="item.extend"
-              :tabId="item.tabId"
-              :actived="
-                toolboxWorker.itemsWorker.activeItem &&
-                item.key == toolboxWorker.itemsWorker.activeItem.key
-              "
-            >
-            </Sync>
-          </template>
           <template v-else-if="item.extend.type == 'test'">
             <Test
               :source="source"
@@ -170,13 +119,10 @@ import Model from "./Model";
 import Sql from "./Sql";
 import Table from "./Table";
 import TableData from "./TableData";
-import Export from "./Export";
-import Import from "./Import";
-import Sync from "./Sync";
 import Test from "./Test";
 
 export default {
-  components: { DDL, Model, Sql, Table, TableData, Export, Import, Sync, Test },
+  components: { DDL, Model, Sql, Table, TableData, Test },
   props: [
     "source",
     "toolboxWorker",
