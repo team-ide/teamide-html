@@ -47,7 +47,82 @@
           <div class="color-orange" v-else>暂无信息</div>
         </template>
       </el-table-column>
-      <el-table-column label=""> </el-table-column>
+      <el-table-column label="">
+        <template slot-scope="scope" v-if="scope.row.extend != null">
+          <div
+            class=""
+            v-if="
+              scope.row.extend.ownerTotal != 0 ||
+              scope.row.extend.tableTotal != 0
+            "
+          >
+            <span class="mglr-10">
+              库：
+              <span>
+                {{ scope.row.extend.ownerTotal }}
+                /
+                <span class="color-green">
+                  {{ scope.row.extend.ownerCount.success }}
+                </span>
+                /
+                <span class="color-red">
+                  {{ scope.row.extend.ownerCount.error }}
+                </span>
+              </span>
+            </span>
+            <span class="mglr-10">
+              表：
+              <span>
+                {{ scope.row.extend.tableTotal }}
+                /
+                <span class="color-green">
+                  {{ scope.row.extend.tableCount.success }}
+                </span>
+                /
+                <span class="color-red">
+                  {{ scope.row.extend.tableCount.error }}
+                </span>
+              </span>
+            </span>
+          </div>
+          <div
+            class=""
+            v-if="
+              scope.row.extend.readCount.total != 0 ||
+              scope.row.extend.writeCount.total != 0
+            "
+          >
+            <span class="mglr-10">
+              数据读取：
+              <span>
+                {{ scope.row.extend.readCount.total }}
+                /
+                <span class="color-green">
+                  {{ scope.row.extend.readCount.success }}
+                </span>
+                /
+                <span class="color-red">
+                  {{ scope.row.extend.readCount.error }}
+                </span>
+              </span>
+            </span>
+            <span class="mglr-10">
+              写入读取：
+              <span>
+                {{ scope.row.extend.writeCount.total }}
+                /
+                <span class="color-green">
+                  {{ scope.row.extend.writeCount.success }}
+                </span>
+                /
+                <span class="color-red">
+                  {{ scope.row.extend.writeCount.error }}
+                </span>
+              </span>
+            </span>
+          </div>
+        </template>
+      </el-table-column>
       <el-table-column label="附件" width="100px">
         <template slot-scope="scope">
           <div class="color-orange" v-if="scope.row.annexInfo != null">
@@ -154,7 +229,7 @@ export default {
       if (!one.isEnd) {
         setTimeout(() => {
           this.checkTask(one);
-        }, 1000);
+        }, 2000);
       }
     },
     async loadList() {

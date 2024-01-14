@@ -1,130 +1,103 @@
 <template>
   <div class="datamove-box" v-if="ready">
     <tm-layout height="100%">
-      <tm-layout height="80px">
-        <el-form class="pdlr-10" size="mini" inline>
-          <el-form-item label="有错继续" class="mgb-0">
-            <el-switch v-model="formData.errorContinue"> </el-switch>
-          </el-form-item>
-          <el-form-item label="批量处理" class="mgb-0">
-            <el-input v-model="formData.batchNumber" style="width: 100px">
-            </el-input>
-          </el-form-item>
-          <el-form-item
-            v-if="from.type == 'database' && to.type == 'database'"
-            label="同步库"
-            class="mgb-0"
-          >
-            <el-switch v-model="formData.shouldOwner"> </el-switch>
-          </el-form-item>
-          <el-form-item
-            v-if="from.type == 'database' && to.type == 'database'"
-            label="同步表"
-            class="mgb-0"
-          >
-            <el-switch v-model="formData.shouldTable"> </el-switch>
-          </el-form-item>
-          <el-form-item
-            v-if="from.type == 'database' && to.type == 'sql'"
-            label="建库语句"
-            class="mgb-0"
-          >
-            <el-switch v-model="formData.shouldOwner"> </el-switch>
-          </el-form-item>
-          <el-form-item
-            v-if="from.type == 'database' && to.type == 'sql'"
-            label="建表语句"
-            class="mgb-0"
-          >
-            <el-switch v-model="formData.shouldTable"> </el-switch>
-          </el-form-item>
-          <el-form-item
-            v-if="from.type == 'database' && to.type == 'sql'"
-            label="SQL文件合并类型"
-            class="mgb-0"
-          >
-            <el-select
-              v-model="formData.sqlFileMergeType"
-              style="width: 150px"
-              clearable
-              filterable
-            >
-              <el-option
-                v-for="(one, index) in sqlFileMergeTypes"
-                :key="index"
-                :value="one.value"
-                :label="one.text"
-              >
-              </el-option>
-            </el-select>
-          </el-form-item>
-          <el-form-item
+      <tm-layout height="500px">
+        <div v-show="step == 'config'">
+          <tm-layout>
+            <tm-layout width="50%" class="">
+              <div class="pd-10 ft-14 ft-600 color-orange">
+                源数据配置（将读取这里的数据）
+              </div>
+              <Config ref="From" :source="source" :config="from" :isFrom="true">
+              </Config>
+            </tm-layout>
+            <tm-layout width="auto">
+              <div class="pd-10 ft-14 ft-600 color-orange">
+                目标数据配置（将数据写入到这里）
+              </div>
+              <Config ref="To" :source="source" :config="to" :isTo="true">
+              </Config>
+            </tm-layout>
+          </tm-layout>
+          <div class="tm-btn tm-btn-sm bg-teal mgl-10" @click="toNextStep()">
+            下一步
+          </div>
+        </div>
+        <template v-if="step == 'options'">
+          <div class="pd-10 ft-14 ft-600 color-orange">详细配置</div>
+
+          <el-form class="pdlr-10" size="mini" inline>
+            <el-form-item label="有错继续" class="mgb-5">
+              <el-switch v-model="formData.errorContinue"> </el-switch>
+            </el-form-item>
+            <el-form-item label="批量处理" class="mgb-5">
+              <el-input v-model="formData.batchNumber" style="width: 100px">
+              </el-input> </el-form-item
+          ></el-form>
+          <template
             v-if="
               from.type == 'database' &&
-              (to.type == 'txt' ||
-                to.type == 'excel' ||
-                (to.type == 'sql' && formData.fileNameSplice == 'table'))
+              (to.type == 'database' ||
+                to.type == 'txt' ||
+                to.type == 'sql' ||
+                to.type == 'excel')
             "
-            label="文件名称格式"
-            class="mgb-0"
           >
-            <el-select
-              v-model="formData.fileNameSplice"
-              style="width: 150px"
-              clearable
-              filterable
+            <DbToDbOrFile
+              ref="Options"
+              :source="source"
+              :from="from"
+              :to="to"
+              :formData="formData"
             >
-              <el-option
-                v-for="(one, index) in fileNameSplices"
-                :key="index"
-                :value="one.value"
-                :label="one.text"
-              >
-              </el-option>
-            </el-select>
-          </el-form-item>
-        </el-form>
-      </tm-layout>
-      <tm-layout-bar bottom></tm-layout-bar>
-      <tm-layout height="160px">
-        <tm-layout width="50%" class="">
-          <div class="pd-10 ft-12 color-orange">
-            源数据配置（将读取这里的数据）
-          </div>
-          <Config :source="source" :config="from" :isFrom="true"></Config>
-        </tm-layout>
-        <tm-layout-bar right></tm-layout-bar>
-        <tm-layout width="auto">
-          <div class="pd-10 ft-12 color-orange">
-            目标数据配置（将数据写入到这里）
-          </div>
-          <Config :source="source" :config="to" :isTo="true"></Config>
-        </tm-layout>
-      </tm-layout>
-      <tm-layout-bar bottom></tm-layout-bar>
-      <tm-layout height="400px" class="app-scroll-bar">
-        <template v-if="from.type == 'database' && from.toolboxId != null">
-          <FromOwners
-            :source="source"
-            :from="from"
-            :to="to"
-            :formData="formData"
+            </DbToDbOrFile>
+          </template>
+          <template
+            v-if="
+              to.type == 'database' &&
+              (from.type == 'txt' ||
+                from.type == 'sql' ||
+                from.type == 'excel' ||
+                from.type == 'data' ||
+                from.type == 'script')
+            "
           >
-          </FromOwners>
+            <DataToDb
+              ref="Options"
+              :source="source"
+              :from="from"
+              :to="to"
+              :formData="formData"
+            >
+            </DataToDb>
+          </template>
+
+          <div class="tm-btn tm-btn-sm bg-grey mg-10" @click="toBackStep()">
+            上一步
+          </div>
+          <div class="tm-btn tm-btn-sm bg-green mg-0" @click="toStart()">
+            执行
+          </div>
+        </template>
+        <template v-else-if="step == 'confirm'">
+          <div class="pd-10 ft-14 ft-600 color-orange">确认配置</div>
+          <div class="tm-btn tm-btn-sm bg-grey mg-10" @click="toBackStep()">
+            上一步
+          </div>
+          <div class="tm-btn tm-btn-sm bg-green mg-10" @click="toStart()">
+            执行
+          </div>
         </template>
       </tm-layout>
       <tm-layout-bar bottom></tm-layout-bar>
       <tm-layout height="auto">
         <div class="pdtb-10 ft-15">
-          <div class="tm-btn tm-btn-sm color-green mgl-10" @click="toStart">
-            执行
-          </div>
-          任务列表
+          <span class="color-orange ft-12 mgl-10"> 任务列表 </span>
           <div class="tm-btn bg-blue mgl-20 tm-btn-sm" @click="loadList()">
             刷新
           </div>
           <span class="color-orange ft-12 mgl-10">
-            请点击刷新来刷新列表任务状态
+            未结束的任务会自动刷新
           </span>
         </div>
         <List ref="List" :source="source" style="height: calc(100% - 46px)">
@@ -137,53 +110,29 @@
 
 <script>
 import Config from "./Config";
-import FromOwners from "./FromOwners";
+import DbToDbOrFile from "./DbToDbOrFile";
+import DataToDb from "./DataToDb";
 import List from "./List";
 
 export default {
-  components: { Config, FromOwners, List },
+  components: { Config, DbToDbOrFile, DataToDb, List },
   props: ["source", "options"],
   data() {
     return {
+      step: "config",
       ready: false,
       from: null,
       to: null,
       formData: {
         errorContinue: true,
         batchNumber: 100,
-        shouldOwner: true,
-        shouldTable: true,
-        sqlFileMergeType: "owner",
-        fileNameSplice: "/",
-        allOwner: true,
-        owners: [],
-        rowNumber: 0,
-        bySql: false,
-        selectSql: "",
-        indexName: "",
-        indexIdName: "",
-        indexIdScript: "",
-        topicName: "",
-        topicKey: "",
-        topicValue: "",
-        filePath: "",
       },
-      sqlFileMergeTypes: [
-        { text: "生成一个文件", value: "one" },
-        { text: "每个库一个文件", value: "owner" },
-        { text: "每个表一个文件", value: "table" },
-      ],
-      fileNameSplices: [
-        { text: "库名/表名", value: "/" },
-        { text: "库名_表名", value: "_" },
-        { text: "库名-表名", value: "-" },
-      ],
     };
   },
   computed: {},
   watch: {
     "to.type"() {
-      console.log("to type changed", this.to.type);
+      // console.log("to type changed", this.to.type);
     },
   },
   methods: {
@@ -196,22 +145,96 @@ export default {
         this.initOptions(options);
       });
     },
+    checkStepData() {
+      switch (this.step) {
+        case "config":
+          if (!this.$refs.From.checkData()) {
+            return false;
+          }
+          if (!this.$refs.To.checkData()) {
+            return false;
+          }
+          break;
+        case "options":
+          if (this.$refs.Options == null) {
+            this.tool.warn("暂不支持该类型");
+            return false;
+          }
+          if (!this.$refs.Options.checkData()) {
+            return false;
+          }
+          break;
+      }
+      return true;
+    },
+    toBackStep() {
+      switch (this.step) {
+        case "options":
+          this.step = "config";
+          break;
+        case "confirm":
+          this.step = "options";
+          break;
+      }
+    },
+    toNextStep() {
+      if (!this.checkStepData()) {
+        return;
+      }
+      switch (this.step) {
+        case "config":
+          this.step = "options";
+          break;
+        case "options":
+          this.step = "confirm";
+          break;
+      }
+    },
     initConfig(config) {
-      config.typeReadonly = false;
-      config.toolboxIdReadonly = false;
+      config.shouldOwner = true;
       config.colSeparator = ","; // 列分隔符号
       config.replaceCol = "|:-，-:|"; // 将值中的 ',' 替换为该字符串
       config.replaceLine = "|:-n-:|"; // 将值中的 '\n' 替换为该字符串
       config.txtFileType = "csv";
+      config.shouldOwner = true;
+      config.shouldTable = true;
+      config.sqlFileMergeType = "owner";
+      config.fileNameSplice = "/";
+      config.fileName = "导出";
+      config.allOwner = true;
+      config.owners = [];
+      config.rowNumber = 0;
+      config.total = 1;
+      config.bySql = false;
+      if (this.tool.isNotEmpty(config.selectSql)) {
+        config.bySql = true;
+      } else {
+        config.selectSql = "";
+      }
+      config.indexIdName = "";
+      config.indexIdScript = "";
+      config.topicName = "";
+      config.topicKey = "";
+      config.topicValue = "";
+      config.filePath = "";
+
       if (this.tool.isEmpty(config.type)) {
         config.type = "excel";
+        config.typeReadonly = false;
       } else {
         config.typeReadonly = true;
       }
-      if (!this.tool.isEmpty(config.toolboxId)) {
-        config.toolboxIdReadonly = true;
-      } else {
+      if (this.tool.isEmpty(config.toolboxId)) {
         config.toolboxId = null;
+        config.toolboxIdReadonly = false;
+      } else {
+        config.toolboxIdReadonly = true;
+      }
+      if (this.tool.isEmpty(config.indexName)) {
+        config.indexName = "";
+      }
+      if (this.tool.isEmpty(config.topicName)) {
+        config.topicName = "";
       }
     },
     initOptions(options) {
@@ -226,6 +249,9 @@ export default {
       this.ready = true;
     },
     async toStart() {
+      if (!this.checkStepData()) {
+        return;
+      }
       let param = Object.assign({}, this.formData);
       param.from = this.from;
       param.to = this.to;

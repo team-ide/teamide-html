@@ -14,14 +14,7 @@
             :key="index"
             :value="one.value"
             :label="one.text"
-            :disabled="
-              isTo &&
-              (one.value == 'data' ||
-                one.value == 'script' ||
-                one.value == 'kafka' ||
-                one.value == 'redis' ||
-                one.value == 'elasticsearch')
-            "
+            :disabled="one.disabled"
           >
           </el-option>
         </el-select>
@@ -60,20 +53,22 @@
           </el-option>
         </el-select>
       </el-form-item>
-      <el-form-item
-        v-if="config.ownerName != null"
-        :label="isFrom ? '导出库' : '导入到库'"
-      >
-        <el-input v-model="config.ownerName" style="width: 250px" disabled>
-        </el-input>
-      </el-form-item>
-      <el-form-item
-        v-if="config.tableName != null"
-        :label="isFrom ? '导出表' : '导入到表'"
-      >
-        <el-input v-model="config.tableName" style="width: 250px" disabled>
-        </el-input>
-      </el-form-item>
+      <template v-if="config.type == 'txt'">
+        <el-form-item label="列分割字符">
+          <el-input v-model="config.colSeparator" style="width: 100px">
+          </el-input>
+        </el-form-item>
+        <el-form-item
+          :label="'列分割字符转换（替换值中`' + config.colSeparator + '`）'"
+        >
+          <el-input v-model="config.replaceCol" style="width: 100px">
+          </el-input>
+        </el-form-item>
+        <el-form-item label="换行符转换（替换值中`\n`）">
+          <el-input v-model="config.replaceLine" style="width: 100px">
+          </el-input>
+        </el-form-item>
+      </template>
     </el-form>
   </div>
 </template>
@@ -93,8 +88,6 @@ export default {
         { text: "ES", value: "elasticsearch" },
         { text: "Kafka", value: "kafka" },
         { text: "Redis", value: "redis" },
-        { text: "数据", value: "data" },
-        { text: "生成数据", value: "script" },
       ],
       txtFileTypes: [
         { text: "TXT", value: "txt" },
@@ -124,19 +117,6 @@ export default {
         type == "kafka" ||
         type == "redis"
       );
-    },
-    checkData() {
-      if (this.tool.isEmpty(this.config.type)) {
-        this.tool.warn("请选择类型");
-        return false;
-      }
-      if (this.shouldToolboxList(this.config.type)) {
-        if (this.tool.isEmpty(this.config.toolboxId)) {
-          this.tool.warn("请选择配置");
-          return false;
-        }
-      }
-      return true;
     },
     async initToolboxList() {
       if (!this.shouldToolboxList(this.config.type)) {

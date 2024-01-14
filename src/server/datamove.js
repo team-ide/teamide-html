@@ -16,6 +16,10 @@ let datamove = {
     list(param) {
         return http.post('api/datamove/list', param);
     },
+    readFileColumnList(param) {
+        return http.post('api/datamove/readFileColumnList', param);
+    },
+
 };
 
 

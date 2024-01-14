@@ -604,10 +604,11 @@ export default {
         extend.options.from.ownerName = data.owner.ownerName;
         extend.options.from.tableName = data.tableName;
       }
+      if (extend.options.from.ownerName) {
+        title += "[" + extend.options.from.ownerName + "]库";
+      }
       if (extend.options.from.tableName) {
         title += "[" + extend.options.from.tableName + "]表";
-      } else if (extend.options.from.ownerName) {
-        title += "[" + extend.options.from.ownerName + "]库";
       }
       extend.type = "datamove";
       extend.name = title;
@@ -631,10 +632,11 @@ export default {
         extend.options.to.ownerName = data.owner.ownerName;
         extend.options.to.tableName = data.tableName;
       }
+      if (extend.options.to.ownerName) {
+        title += "[" + extend.options.to.ownerName + "]库";
+      }
       if (extend.options.to.tableName) {
         title += "[" + extend.options.to.tableName + "]表";
-      } else if (extend.options.to.ownerName) {
-        title += "[" + extend.options.to.ownerName + "]库";
       }
       extend.type = "datamove";
       extend.name = title;
