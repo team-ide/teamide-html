@@ -1,5 +1,5 @@
 <template>
-  <div class="datamove-box" v-if="ready">
+  <div class="datamove-box toolbox-editor" v-if="ready">
     <tm-layout height="100%">
       <tm-layout height="500px">
         <div v-show="step == 'config'">
@@ -19,9 +19,6 @@
               </Config>
             </tm-layout>
           </tm-layout>
-          <div class="tm-btn tm-btn-sm bg-teal mgl-10" @click="toNextStep()">
-            下一步
-          </div>
         </div>
         <template v-if="step == 'options'">
           <div class="pd-10 ft-14 ft-600 color-orange">详细配置</div>
@@ -71,27 +68,40 @@
             >
             </DataToDb>
           </template>
-
-          <div class="tm-btn tm-btn-sm bg-grey mg-10" @click="toBackStep()">
-            上一步
-          </div>
-          <div class="tm-btn tm-btn-sm bg-green mg-0" @click="toStart()">
-            执行
-          </div>
-        </template>
-        <template v-else-if="step == 'confirm'">
-          <div class="pd-10 ft-14 ft-600 color-orange">确认配置</div>
-          <div class="tm-btn tm-btn-sm bg-grey mg-10" @click="toBackStep()">
-            上一步
-          </div>
-          <div class="tm-btn tm-btn-sm bg-green mg-10" @click="toStart()">
-            执行
-          </div>
+          <template
+            v-if="
+              from.type == 'data' &&
+              (to.type == 'sql' || to.type == 'txt' || to.type == 'excel')
+            "
+          >
+            <DataToFile
+              ref="Options"
+              :source="source"
+              :from="from"
+              :to="to"
+              :formData="formData"
+            >
+            </DataToFile>
+          </template>
         </template>
       </tm-layout>
       <tm-layout-bar bottom></tm-layout-bar>
       <tm-layout height="auto">
         <div class="pdtb-10 ft-15">
+          <template v-if="step == 'config'">
+            <div class="tm-btn tm-btn-sm bg-teal mglr-10" @click="toNextStep()">
+              下一步
+            </div>
+          </template>
+          <template v-if="step == 'options'">
+            <div class="tm-btn tm-btn-sm bg-grey mglr-10" @click="toBackStep()">
+              上一步
+            </div>
+            <div class="tm-btn tm-btn-sm bg-green mglr-10" @click="toStart()">
+              执行
+            </div>
+          </template>
+
           <span class="color-orange ft-12 mgl-10"> 任务列表 </span>
           <div class="tm-btn bg-blue mgl-20 tm-btn-sm" @click="loadList()">
             刷新
@@ -112,11 +122,13 @@
 import Config from "./Config";
 import DbToDbOrFile from "./DbToDbOrFile";
 import DataToDb from "./DataToDb";
+import DataToFile from "./DataToFile";
+
 import List from "./List";
 
 export default {
-  components: { Config, DbToDbOrFile, DataToDb, List },
-  props: ["source", "options"],
+  components: { Config, DbToDbOrFile, DataToDb, DataToFile, List },
+  props: ["source", "options_"],
   data() {
     return {
       step: "config",
@@ -127,17 +139,16 @@ export default {
         errorContinue: true,
         batchNumber: 100,
       },
+      options: null,
     };
   },
   computed: {},
-  watch: {
-    "to.type"() {
-      // console.log("to type changed", this.to.type);
-    },
-  },
+  watch: {},
   methods: {
     init() {
-      this.initOptions(this.options);
+      if (this.options_) {
+        this.setOptions(this.options_);
+      }
     },
     setOptions(options) {
       this.ready = false;
@@ -237,8 +248,8 @@ export default {
         config.topicName = "";
       }
     },
-    initOptions(options) {
-      options = options || {};
+    initOptions(opts) {
+      let options = Object.assign({}, opts || {});
       options.from = options.from || {};
       this.initConfig(options.from);
       options.to = options.to || {};
@@ -246,6 +257,30 @@ export default {
 
       this.from = options.from;
       this.to = options.to;
+      if (this.from.type == "data" && this.from.dataList) {
+        let columnList = this.from.columnList || [];
+        if (columnList.length == 0) {
+          let columnCache = {};
+          this.from.dataList.forEach((one) => {
+            for (let name in one) {
+              if (columnCache[name]) {
+                continue;
+              }
+              columnCache[name] = true;
+              columnList.push({
+                columnName: name,
+              });
+            }
+          });
+        }
+        columnList.forEach((one) => {
+          if (this.tool.isEmpty(one.columnName)) {
+            one.columnName = one.name;
+          }
+        });
+        this.from.columnList = columnList;
+      }
+      this.options = options;
       this.ready = true;
     },
     async toStart() {

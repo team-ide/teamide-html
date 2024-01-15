@@ -191,23 +191,48 @@ export default {
       }
     },
     async toExport(data) {
-      this.tool.warn("功能还未完善，敬请期待！");
+      let extend = {
+        options: {
+          from: {
+            type: "elasticsearch",
+            toolboxId: this.toolboxWorker.toolboxId,
+          },
+        },
+      };
+      let title = "[导出]";
+      if (data == null) {
+      } else {
+        extend.options.from.indexName = data.indexName;
+      }
+      if (extend.options.from.indexName) {
+        title += "[" + extend.options.from.indexName + "]索引";
+      }
+      extend.type = "datamove";
+      extend.name = title;
+      extend.title = title;
+      this.toolboxWorker.openTabByExtend(extend);
       return;
     },
     async toImport(data) {
-      let name = "导入";
-      let indexName = null;
-      if (data) {
-        indexName = data.indexName;
-        name += ":" + data.indexName;
-      }
-
       let extend = {
-        name: name,
-        title: name,
-        type: "import",
-        indexName: indexName,
+        options: {
+          to: {
+            type: "elasticsearch",
+            toolboxId: this.toolboxWorker.toolboxId,
+          },
+        },
       };
+      let title = "[导入]";
+      if (data == null) {
+      } else {
+        extend.options.to.indexName = data.indexName;
+      }
+      if (extend.options.to.indexName) {
+        title += "[" + extend.options.to.indexName + "]索引";
+      }
+      extend.type = "datamove";
+      extend.name = title;
+      extend.title = title;
       this.toolboxWorker.openTabByExtend(extend);
       return;
     },
@@ -222,13 +247,13 @@ export default {
         extend.title += "-" + data.indexName;
         extend.indexName = data.indexName;
       }
-      this.toolboxWorker.showRequestRecords({
-        indexName: extend.indexName,
-        onOpen: (data) => {
-          extend["extendId"] = data.extendId;
-          this.toolboxWorker.openTabByExtend(extend);
-        },
-      });
+      // this.toolboxWorker.showRequestRecords({
+      //   indexName: extend.indexName,
+      //   onOpen: (data) => {
+      //     extend["extendId"] = data.extendId;
+      this.toolboxWorker.openTabByExtend(extend);
+      // },
+      // });
     },
     toInsert() {
       let data = {};

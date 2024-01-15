@@ -46,11 +46,6 @@
     >
     </SqlProfile>
 
-    <DataListExport
-      ref="DataListExport"
-      :source="source"
-      :toolboxWorker="toolboxWorker"
-    ></DataListExport>
     <SqlFiles
       ref="SqlFiles"
       :source="source"
@@ -68,7 +63,6 @@ import TableDataListSql from "./TableDataListSql";
 import OwnerCreate from "./OwnerCreate";
 import ShowInfo from "./ShowInfo";
 import SqlProfile from "./SqlProfile";
-import DataListExport from "./DataListExport";
 import SqlFiles from "./SqlFiles";
 
 export default {
@@ -80,7 +74,6 @@ export default {
     OwnerCreate,
     ShowInfo,
     SqlProfile,
-    DataListExport,
     SqlFiles,
   },
   props: ["source", "toolboxWorker", "extend"],
@@ -112,7 +105,6 @@ export default {
       this.toolboxWorker.formatParam = this.formatParam;
       this.toolboxWorker.showSqlProfile = this.showSqlProfile;
       this.toolboxWorker.getRowMenus = this.getRowMenus;
-      this.toolboxWorker.showDataListExport = this.showDataListExport;
       await this.loadData();
       this.ready = true;
     },
@@ -169,9 +161,6 @@ export default {
       }
 
       return menus;
-    },
-    showDataListExport(options) {
-      this.$refs.DataListExport.show(options);
     },
     showSqlProfile(data) {
       if (data == null || data.profiling == null) {

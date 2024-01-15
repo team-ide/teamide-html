@@ -107,10 +107,16 @@ export default {
           menus.push({
             text: "数据导出",
             onClick: () => {
-              this.toolboxWorker.showDataListExport({
-                dataList: dataList,
-                columnList: columnList,
-              });
+              let options = {
+                title: "数据导出",
+                from: {
+                  type: "data",
+                  dataList: dataList,
+                  columnList: columnList,
+                },
+                to: {},
+              };
+              this.tool.showDataMove(options);
             },
           });
         }

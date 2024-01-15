@@ -27,6 +27,12 @@
       :options="cacheData"
     >
     </CommonForm>
+    <DataMove
+      v-else-if="type == 'DataMove'"
+      :source="source"
+      :options_="cacheData"
+    >
+    </DataMove>
   </div>
 </template>
 

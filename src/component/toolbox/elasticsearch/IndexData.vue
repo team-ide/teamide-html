@@ -173,6 +173,13 @@
             <div class="tm-btn tm-btn-sm bg-green ft-13" @click="toInsert">
               新增
             </div>
+            <div
+              v-if="dataList != null && dataList.length != 0"
+              class="tm-btn tm-btn-sm bg-grey ft-13"
+              @click="toExportData"
+            >
+              导出表格数据
+            </div>
           </div>
         </tm-layout>
         <tm-layout height="auto">
@@ -290,6 +297,22 @@ export default {
   computed: {},
   watch: {},
   methods: {
+    toExportData() {
+      let dataList = [];
+      this.dataList.forEach((one) => {
+        dataList.push(one._source);
+      });
+      let options = {
+        title: "数据导出",
+        from: {
+          type: "data",
+          dataList: dataList,
+          columnList: this.columnList,
+        },
+        to: {},
+      };
+      this.tool.showDataMove(options);
+    },
     async init() {
       this.ready = true;
       await this.toSearch();

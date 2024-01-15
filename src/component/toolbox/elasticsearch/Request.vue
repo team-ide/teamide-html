@@ -111,7 +111,7 @@
               class="tm-btn tm-btn-sm bg-teal-8 ft-13"
               @click="toOpenRequest()"
             >
-              打开其它请求
+              打开保存的请求
             </div>
           </el-form-item>
         </el-form>
@@ -152,15 +152,7 @@
 <script>
 export default {
   components: {},
-  props: [
-    "source",
-    "toolboxWorker",
-    "tabId",
-    "extend",
-    "extendId",
-    "indexName",
-    "indexes",
-  ],
+  props: ["source", "toolboxWorker", "tabId", "extend", "indexName", "indexes"],
   data() {
     return {
       ready: false,
@@ -194,6 +186,7 @@ export default {
         { text: "scroll", value: "scroll" },
         { text: "_source", value: "_source" },
       ],
+      extendId: null,
     };
   },
   computed: {},
@@ -226,11 +219,40 @@ export default {
       this.form.path = path;
     },
     async init() {
+      if (this.extend) {
+        this.extendId = this.extend.extendId;
+      }
+      if (this.indexName) {
+        this.form.indexName = this.indexName;
+      }
       this.inited = true;
       await this.initRequestRecord();
       this.ready = true;
     },
     async toSaveRequestRecord() {
+      if (this.tool.isEmpty(this.extendId)) {
+        let name =
+          "Http请求-" + this.tool.formatDate(new Date(), "yyyy-MM-dd hh:mm:ss");
+        let param = this.toolboxWorker.getWorkParam({
+          extendType: "esReqeustRecords",
+          name: name,
+          extend: {
+            indexName: this.indexName || "",
+            params: this.params,
+            body: this.body,
+          },
+        });
+        let res = await this.server.toolbox.extend.save(param);
+        if (res.code != 0) {
+          this.tool.error(res.msg);
+          return;
+        }
+        this.extendId = res.data.extendId;
+        await this.toolboxWorker.updateOpenTabExtend(this.tabId, {
+          extendId: this.extendId,
+        });
+        return;
+      }
       let param = this.toolboxWorker.getWorkParam({
         extendId: this.extendId,
       });

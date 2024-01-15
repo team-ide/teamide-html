@@ -4,18 +4,18 @@
       <tm-layout height="100%">
         <tm-layout height="110px">
           <el-form
-            class="pdt-10 pdlr-10"
+            class="pdt-5 pdlr-10"
             size="mini"
             :inline="true"
             @submit.native.prevent
           >
-            <el-form-item label="Topic">
+            <el-form-item label="Topic" class="mgb-5">
               <el-input v-model="pullForm.topic" />
             </el-form-item>
-            <el-form-item label="GroupId">
+            <el-form-item label="GroupId" class="mgb-5">
               <el-input v-model="pullForm.groupId" />
             </el-form-item>
-            <el-form-item label="KeyType">
+            <el-form-item label="KeyType" class="mgb-5">
               <el-select
                 placeholder="请选择类型"
                 v-model="pullForm.keyType"
@@ -25,7 +25,7 @@
                 <el-option label="Long（int64）" value="long"></el-option>
               </el-select>
             </el-form-item>
-            <el-form-item label="ValueType">
+            <el-form-item label="ValueType" class="mgb-5">
               <el-select
                 placeholder="请选择类型"
                 v-model="pullForm.valueType"
@@ -35,13 +35,13 @@
                 <el-option label="Long（int64）" value="long"></el-option>
               </el-select>
             </el-form-item>
-            <el-form-item label="拉取数量">
+            <el-form-item label="拉取数量" class="mgb-5">
               <el-input v-model="pullForm.pullSize" style="width: 80px" />
             </el-form-item>
-            <el-form-item label="拉取时间">
+            <el-form-item label="拉取时间" class="mgb-5">
               <el-input v-model="pullForm.pullTimeout" style="width: 80px" />
             </el-form-item>
-            <el-form-item label="">
+            <el-form-item label="" class="mgb-5">
               <div class="">
                 <div
                   class="tm-btn tm-btn-sm bg-teal-8 ft-13"
@@ -55,6 +55,13 @@
                 </div>
                 <div class="tm-btn tm-btn-sm bg-grey ft-13" @click="showGroup">
                   查看消费组
+                </div>
+                <div
+                  v-if="dataList != null && dataList.length != 0"
+                  class="tm-btn tm-btn-sm bg-grey ft-13"
+                  @click="toExportData"
+                >
+                  导出表格数据
                 </div>
               </div>
             </el-form-item>
@@ -185,6 +192,33 @@ export default {
   computed: {},
   watch: {},
   methods: {
+    toExportData() {
+      let columnList = [];
+      columnList.push({ columnName: "partition" });
+      columnList.push({ columnName: "offset" });
+      columnList.push({ columnName: "key" });
+      columnList.push({ columnName: "value" });
+
+      this.headerColumnList.forEach((one) => {
+        columnList.push({
+          columnName: "header." + one.name,
+          subProperty: true,
+        });
+      });
+      this.columnList.forEach((one) => {
+        columnList.push({ columnName: "value." + one.name, subProperty: true });
+      });
+      let options = {
+        title: "数据导出",
+        from: {
+          type: "data",
+          dataList: this.dataList,
+          columnList: columnList,
+        },
+        to: {},
+      };
+      this.tool.showDataMove(options);
+    },
     init() {
       this.ready = true;
       this.toPull();

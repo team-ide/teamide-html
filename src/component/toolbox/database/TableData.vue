@@ -842,12 +842,22 @@ export default {
         menus.push({
           text: "数据导出",
           onClick: () => {
-            this.toolboxWorker.showDataListExport({
-              ownerName: this.ownerName,
-              tableDetail: this.tableDetail,
-              dataList: this.dataList,
-              columnList: this.form.columnList,
-            });
+            let options = {
+              title: "数据导出",
+              from: {
+                type: "data",
+                dataList: this.dataList,
+                columnList: this.form.columnList,
+              },
+              to: {},
+            };
+            if (this.tool.isNotEmpty(this.ownerName)) {
+              options.to.ownerName = this.ownerName;
+              if (this.tableDetail != null) {
+                options.to.tableName = this.tableDetail.tableName;
+              }
+            }
+            this.tool.showDataMove(options);
           },
         });
       }

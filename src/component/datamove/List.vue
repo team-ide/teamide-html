@@ -131,25 +131,32 @@
           <div class="color-orange" v-else>暂无附件信息</div>
         </template>
       </el-table-column>
-      <el-table-column label="操作" width="120px">
+      <el-table-column label="操作" width="160px">
         <template slot-scope="scope">
           <div
+            v-if="scope.row.isEnd"
+            class="tm-link color-grey mgr-10"
+            @click="tool.showJSONData(scope.row)"
+          >
+            查看
+          </div>
+          <div
             v-if="!scope.row.isEnd"
-            class="tm-link color-orange mgr-20"
+            class="tm-link color-orange mgr-10"
             @click="toStop(scope.row)"
           >
             停止
           </div>
           <div
             v-if="scope.row.isEnd"
-            class="tm-link color-red mgr-20"
+            class="tm-link color-red mgr-10"
             @click="toDelete(scope.row)"
           >
             删除
           </div>
           <a
             v-if="scope.row.isEnd && scope.row.hasAnnex"
-            class="tm-link color-blue mgr-20"
+            class="tm-link color-blue mgr-10"
             :href="getDownloadUrl(scope.row)"
             target="_blank"
           >

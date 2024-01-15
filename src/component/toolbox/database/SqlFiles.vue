@@ -47,13 +47,6 @@
                     <div class="tm-link color-white">点击上传</div>
                   </el-upload>
                 </div>
-                <div
-                  v-if="onOpen != null"
-                  class="tm-btn tm-btn-sm bg-green ft-13"
-                  @click="toOpenBlank()"
-                >
-                  打开空SQL
-                </div>
               </div>
             </el-form-item>
           </el-form>
@@ -225,37 +218,6 @@ export default {
       }
     },
 
-    async toOpenBlank() {
-      let name =
-        "SQL-" + this.tool.formatDate(new Date(), "yyyy-MM-dd hh:mm:ss");
-      let filePath =
-        "sql-files/toolbox-" +
-        this.toolboxWorker.toolboxId +
-        "-" +
-        this.tool.formatDate(new Date(), "yyyyMMddhhmmssS") +
-        "-" +
-        this.tool.getNumber() +
-        ".sql";
-      let param = this.toolboxWorker.getWorkParam({
-        extendType: "sqlFile",
-        name: name,
-        extend: {
-          filePath: filePath,
-        },
-      });
-      let res = await this.server.toolbox.extend.save(param);
-      if (res.code != 0) {
-        this.tool.error(res.msg);
-      } else {
-        this.load();
-        await this.server.toolbox.extend.saveFile({
-          extendId: res.data.extendId,
-          text: this.options.executeSQL || "",
-        });
-        this.onOpen && this.onOpen(res.data);
-        this.hide();
-      }
-    },
     async toDelete(data) {
       let param = this.toolboxWorker.getWorkParam({
         extendId: data.extendId,

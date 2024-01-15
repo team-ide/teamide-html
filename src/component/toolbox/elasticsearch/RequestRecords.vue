@@ -33,13 +33,6 @@
                 >
                   刷新
                 </div>
-                <div
-                  v-if="onOpen != null"
-                  class="tm-btn tm-btn-sm bg-green ft-13"
-                  @click="toOpenBlank()"
-                >
-                  打开空请求
-                </div>
               </div>
             </el-form-item>
           </el-form>
@@ -171,27 +164,6 @@ export default {
       this.hide();
     },
 
-    async toOpenBlank() {
-      let name =
-        "Http请求-" + this.tool.formatDate(new Date(), "yyyy-MM-dd hh:mm:ss");
-
-      let param = this.toolboxWorker.getWorkParam({
-        extendType: this.extendType,
-        name: name,
-        extend: {
-          indexName: this.indexName || "",
-          body: "{\n}",
-        },
-      });
-      let res = await this.server.toolbox.extend.save(param);
-      if (res.code != 0) {
-        this.tool.error(res.msg);
-      } else {
-        this.load();
-        this.onOpen && this.onOpen(res.data);
-        this.hide();
-      }
-    },
     async toDelete(data) {
       let param = this.toolboxWorker.getWorkParam({
         extendId: data.extendId,

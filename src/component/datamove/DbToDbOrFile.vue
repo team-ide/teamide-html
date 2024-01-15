@@ -74,6 +74,11 @@
           </el-select>
         </el-form-item>
       </template>
+      <template v-if="bySql">
+        <el-form-item label="数据所在库">
+          <el-input v-model="from.ownerName" style="width: 150px"> </el-input>
+        </el-form-item>
+      </template>
       <template v-if="bySql && (to.type == 'database' || to.type == 'sql')">
         <el-form-item label="导入到库">
           <el-input v-model="to.ownerName" style="width: 150px"> </el-input>
@@ -200,12 +205,15 @@
       </el-table>
     </template>
     <template v-if="bySql">
-      <el-form-item label="自动拼接分页查询">
-        <el-switch v-model="shouldSelectPage"> </el-switch>
-      </el-form-item>
+      <el-form size="mini" inline>
+        <el-form-item label="自动拼接分页查询">
+          <el-switch v-model="shouldSelectPage"> </el-switch>
+        </el-form-item>
+      </el-form>
       <Editor
         ref="Editor"
         :source="source"
+        :value="from.selectSql"
         language="sql"
         style="height: 200px"
       ></Editor>

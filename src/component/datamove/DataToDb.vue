@@ -1,7 +1,11 @@
 <template>
   <div class="pdlr-10">
-    <el-form size="mini" inline
-      ><el-form-item label="选择导入到库" class="mgb-0">
+    <el-form size="mini" inline>
+      <el-form-item label="数据量" v-if="from.type == 'data'">
+        <el-input v-model="dataTotal" style="width: 100px" readonly="">
+        </el-input>
+      </el-form-item>
+      <el-form-item label="选择导入到库" class="mgb-0">
         <el-select
           v-model="selectOwner"
           style="width: 200px"
@@ -94,16 +98,21 @@
         </el-upload>
       </el-form-item>
     </el-form>
-    <template v-if="from.type == 'script'">
+    <template v-if="from.type == 'data' || from.type == 'script'">
       <div class="mgb-10">
         <div
           class="tm-link color-green mgr-5 ft-12"
-          @click="addColumn(columnList, { columnName: 'columnXXX' })"
+          @click="addColumn(mappingColumnList, { columnName: 'columnXXX' })"
         >
           添加字段
         </div>
       </div>
-      <el-table :data="columnList" border style="width: 100%" size="mini">
+      <el-table
+        :data="mappingColumnList"
+        border
+        style="width: 100%"
+        size="mini"
+      >
         <el-table-column label="字段" width="200px">
           <template slot-scope="scope">
             <div class="">
@@ -111,10 +120,28 @@
             </div>
           </template>
         </el-table-column>
-        <el-table-column label="导出固定值（函数脚本，默认为查询出的值）">
+        <el-table-column
+          v-if="from.type == 'script'"
+          label="导出固定值（函数脚本，默认为查询出的值）"
+        >
           <template slot-scope="scope">
             <div class="">
               <el-input v-model="scope.row.from.value" />
+            </div>
+          </template>
+        </el-table-column>
+        <el-table-column v-if="from.type == 'data'" label="映射到字段">
+          <template slot-scope="scope">
+            <div class="">
+              <el-select v-model="scope.row.to.columnName" filterable clearable>
+                <el-option
+                  v-for="(one, index) in columnList"
+                  :key="index"
+                  :value="one.from.columnName"
+                  :label="one.from.columnName"
+                >
+                </el-option>
+              </el-select>
             </div>
           </template>
         </el-table-column>
@@ -135,7 +162,11 @@
             <div
               class="tm-link color-grey mglr-5 ft-12"
               @click="
-                addColumn(columnList, { columnName: 'columnXXX' }, scope.row)
+                addColumn(
+                  mappingColumnList,
+                  { columnName: 'columnXXX' },
+                  scope.row
+                )
               "
             >
               插入
@@ -150,9 +181,7 @@
         </el-table-column>
       </el-table>
     </template>
-    <template
-      v-if="from.type == 'data' || from.type == 'txt' || from.type == 'excel'"
-    >
+    <template v-if="from.type == 'txt' || from.type == 'excel'">
       <el-table
         :data="mappingColumnList"
         border
@@ -201,6 +230,7 @@ export default {
       selectTable: null,
       filePath: null,
       uploadReady: true,
+      dataTotal: 0,
     };
   },
   computed: {},
@@ -224,6 +254,10 @@ export default {
       this.mappingColumnList = [];
       this.selectOwner = null;
       this.selectTable = null;
+      this.dataTotal = 0;
+      if (this.from.dataList) {
+        this.dataTotal = this.from.dataList.length;
+      }
       await this.initData();
     },
     onFileUpload(response) {
@@ -241,6 +275,11 @@ export default {
       }
     },
     async initData() {
+      if (this.from.columnList != null) {
+        this.from.columnList.forEach((one) => {
+          this.addColumn(this.mappingColumnList, one);
+        });
+      }
       await this.initOwnerList();
     },
     checkData() {
@@ -270,30 +309,15 @@ export default {
       this.to.tableName = this.selectTable.tableName;
       this.to.columnList = [];
       this.from.columnList = [];
-      if (
-        this.from.type == "data" ||
-        this.from.type == "txt" ||
-        this.from.type == "excel"
-      ) {
-        if (this.mappingColumnList.length == 0) {
-          this.tool.warn("请设置导入到的列");
-          return false;
-        }
-        this.mappingColumnList.forEach((one) => {
-          this.from.columnList.push(one.from);
-          this.to.columnList.push(one.to);
-        });
-      } else if (this.from.type == "script") {
-        if (this.columnList.length == 0) {
-          this.tool.warn("请设置导入到的列");
-          return false;
-        }
-        this.columnList.forEach((one) => {
-          this.from.columnList.push(one.from);
-          this.to.columnList.push(one.to);
-        });
-        this.from.total = Number(this.from.total);
+      if (this.mappingColumnList.length == 0) {
+        this.tool.warn("请设置导入到的列");
+        return false;
       }
+      this.mappingColumnList.forEach((one) => {
+        this.from.columnList.push(one.from);
+        this.to.columnList.push(one.to);
+      });
+      this.from.total = Number(this.from.total);
 
       return true;
     },
@@ -342,6 +366,11 @@ export default {
       list.forEach((one) => {
         this.addColumn(this.columnList, one);
       });
+      if (this.from.type == "script") {
+        list.forEach((one) => {
+          this.addColumn(this.mappingColumnList, one);
+        });
+      }
     },
     async initTableList() {
       this.tableList = [];
@@ -404,15 +433,15 @@ export default {
       });
     },
     upColumn(one) {
-      this.tool.up(this, "columnList", one);
+      this.tool.up(this, "mappingColumnList", one);
     },
     downColumn(one) {
-      this.tool.down(this, "columnList", one);
+      this.tool.down(this, "mappingColumnList", one);
     },
     removeColumn(one) {
-      let findIndex = this.columnList.indexOf(one);
+      let findIndex = this.mappingColumnList.indexOf(one);
       if (findIndex >= 0) {
-        this.columnList.splice(findIndex, 1);
+        this.mappingColumnList.splice(findIndex, 1);
       }
     },
   },

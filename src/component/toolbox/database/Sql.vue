@@ -1,7 +1,10 @@
 <template>
   <div class="toolbox-database-sql">
     <tm-layout height="100%">
-      <tm-layout height="80px" class="">
+      <tm-layout height="120px" class="">
+        <div class="pdlr-10 pdt-5 color-orange ft-12">
+          可以选择SQL右击执行或根据SQL导出数据；部分数据库查询不同的库需要输入相应的用户名密码；
+        </div>
         <el-form
           class="pdt-5 pdl-10"
           ref="form"
@@ -65,18 +68,8 @@
             >
               执行
             </div>
-            <div
-              class="mgt-2 tm-btn tm-btn-sm bg-blue ft-13"
-              :class="{
-                'tm-disabled': executeSQLIng,
-              }"
-              @click="toExecuteSelectSql"
-            >
-              执行选中
-            </div>
 
             <div
-              v-if="hasSqlFile"
               class="mgt-2 tm-btn tm-btn-sm bg-teal-8 ft-13"
               @click="toSaveSqlFile"
             >
@@ -84,16 +77,16 @@
             </div>
             <div
               v-if="hasSqlFile"
-              class="mgt-2 tm-btn tm-btn-sm bg-teal-8 ft-13"
+              class="mgt-2 tm-btn tm-btn-sm color-teal ft-13"
               @click="initSqlFile"
             >
-              刷新SQL
+              重新加载SQL
             </div>
             <div
-              class="mgt-2 tm-btn tm-btn-sm bg-teal-8 ft-13"
+              class="mgt-2 tm-btn tm-btn-sm color-teal ft-13"
               @click="toOpenSql"
             >
-              打开其它SQL
+              打开保存的SQL
             </div>
           </el-form-item>
         </el-form>
@@ -288,6 +281,35 @@ export default {
       }
     },
     async toSaveSqlFile() {
+      if (this.tool.isEmpty(this.extendId)) {
+        let name =
+          "SQL-" + this.tool.formatDate(new Date(), "yyyy-MM-dd hh:mm:ss");
+        let filePath =
+          "sql-files/toolbox-" +
+          this.toolboxWorker.toolboxId +
+          "-" +
+          this.tool.formatDate(new Date(), "yyyyMMddhhmmssS") +
+          "-" +
+          this.tool.getNumber() +
+          ".sql";
+        let param = this.toolboxWorker.getWorkParam({
+          extendType: "sqlFile",
+          name: name,
+          extend: {
+            filePath: filePath,
+          },
+        });
+        let res = await this.server.toolbox.extend.save(param);
+        if (res.code != 0) {
+          this.tool.error(res.msg);
+          return;
+        }
+        this.extendId = res.data.extendId;
+        await this.toolboxWorker.updateOpenTabExtend(this.tabId, {
+          extendId: this.extendId,
+        });
+      }
+      this.hasSqlFile = true;
       let res = await this.server.toolbox.extend.saveFile({
         extendId: this.extendId,
         text: this.executeSQL || "",
@@ -336,6 +358,13 @@ export default {
         },
       });
       menus.push({
+        text: "根据选中SQL导出",
+        disabled: this.tool.isEmpty(sql),
+        onClick: () => {
+          this.toExportBySql(sql);
+        },
+      });
+      menus.push({
         text: "执行全部",
         onClick: () => {
           this.toExecuteSql();
@@ -345,6 +374,25 @@ export default {
       if (menus.length > 0) {
         this.tool.showContextmenu(menus);
       }
+    },
+    toExportBySql(selectSql) {
+      let extend = {
+        options: {
+          from: {
+            type: "database",
+            toolboxId: this.toolboxWorker.toolboxId,
+            selectSql: selectSql,
+          },
+        },
+      };
+      let title = "[导出][根据SQL]";
+      if (this.form.ownerName) {
+        extend.options.from.ownerName = this.form.ownerName;
+      }
+      extend.type = "datamove";
+      extend.name = title;
+      extend.title = title;
+      this.toolboxWorker.openTabByExtend(extend);
     },
     async toExecuteSelectSql() {
       let sql = this.$refs.Editor.getSelection();

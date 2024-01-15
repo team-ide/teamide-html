@@ -34,7 +34,6 @@
               :source="source"
               :toolboxWorker="toolboxWorker"
               :indexName="item.extend.indexName"
-              :extendId="item.extend.extendId"
               :extend="item.extend"
               :indexes="indexes"
               :tabId="item.tabId"
@@ -44,7 +43,7 @@
           <template v-else-if="item.extend.type == 'datamove'">
             <DataMove
               :source="source"
-              :options="item.extend.options"
+              :options_="item.extend.options"
             ></DataMove>
           </template>
         </template>
