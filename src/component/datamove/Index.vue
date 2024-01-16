@@ -83,6 +83,24 @@
             >
             </DataToFile>
           </template>
+          <template
+            v-if="
+              to.type == 'elasticsearch' &&
+              (from.type == 'txt' ||
+                from.type == 'excel' ||
+                from.type == 'data' ||
+                from.type == 'script')
+            "
+          >
+            <DataToEs
+              ref="Options"
+              :source="source"
+              :from="from"
+              :to="to"
+              :formData="formData"
+            >
+            </DataToEs>
+          </template>
         </template>
       </tm-layout>
       <tm-layout-bar bottom></tm-layout-bar>
@@ -122,12 +140,13 @@
 import Config from "./Config";
 import DbToDbOrFile from "./DbToDbOrFile";
 import DataToDb from "./DataToDb";
+import DataToEs from "./DataToEs";
 import DataToFile from "./DataToFile";
 
 import List from "./List";
 
 export default {
-  components: { Config, DbToDbOrFile, DataToDb, DataToFile, List },
+  components: { Config, DbToDbOrFile, DataToDb, DataToEs, DataToFile, List },
   props: ["source", "options_"],
   data() {
     return {
@@ -220,14 +239,14 @@ export default {
       if (this.tool.isNotEmpty(config.selectSql)) {
         config.bySql = true;
       } else {
-        config.selectSql = "";
+        config.selectSql = null;
       }
-      config.indexIdName = "";
-      config.indexIdScript = "";
-      config.topicName = "";
-      config.topicKey = "";
-      config.topicValue = "";
-      config.filePath = "";
+      config.indexIdName = null;
+      config.indexIdScript = null;
+      config.topicName = null;
+      config.topicKey = null;
+      config.topicValue = null;
+      config.filePath = null;
 
       if (this.tool.isEmpty(config.type)) {
         config.type = "excel";
@@ -242,17 +261,17 @@ export default {
         config.toolboxIdReadonly = true;
       }
       if (this.tool.isEmpty(config.indexName)) {
-        config.indexName = "";
+        config.indexName = null;
       }
       if (this.tool.isEmpty(config.topicName)) {
-        config.topicName = "";
+        config.topicName = null;
       }
     },
     initOptions(opts) {
       let options = Object.assign({}, opts || {});
-      options.from = options.from || {};
+      options.from = Object.assign(options.from || {});
       this.initConfig(options.from);
-      options.to = options.to || {};
+      options.to = Object.assign(options.to || {});
       this.initConfig(options.to);
 
       this.from = options.from;

@@ -5,57 +5,37 @@
         <el-input v-model="dataTotal" style="width: 100px" readonly="">
         </el-input>
       </el-form-item>
-      <el-form-item label="选择导入到的库" class="mgb-0">
+      <el-form-item label="选择导入到的Index" class="mgb-0">
         <el-select
-          v-model="selectOwner"
+          v-model="selectIndex"
           style="width: 200px"
           filterable
-          value-key="ownerName"
+          value-key="indexName"
         >
           <el-option
-            v-for="(one, index) in ownerList"
+            v-for="(one, index) in indexList"
             :key="index"
             :value="one"
-            :label="one.ownerName"
+            :label="one.indexName"
           >
           </el-option>
         </el-select>
       </el-form-item>
-      <el-form-item label="库登录用户">
+      <el-form-item label="index登录用户">
         <el-input
           v-model="to.username"
           style="width: 120px"
-          placeholder="默认配置用户"
+          placeholder="可不填写或默认配置用户"
         >
         </el-input>
       </el-form-item>
-      <el-form-item label="库登录密码">
+      <el-form-item label="index登录密码">
         <el-input
           v-model="to.password"
           style="width: 120px"
-          placeholder="默认配置密码"
+          placeholder="可不填写或默认配置密码"
         >
         </el-input>
-      </el-form-item>
-      <el-form-item
-        v-if="from.type != 'sql' && selectOwner != null"
-        label="选择导入到表"
-        class="mgb-0"
-      >
-        <el-select
-          v-model="selectTable"
-          style="width: 200px"
-          filterable
-          value-key="tableName"
-        >
-          <el-option
-            v-for="(one, index) in tableList"
-            :key="index"
-            :value="one"
-            :label="one.tableName"
-          >
-          </el-option>
-        </el-select>
       </el-form-item>
       <el-form-item v-if="from.type == 'script'" label="导入数据数量">
         <el-input v-model="from.total" style="width: 100px"> </el-input>
@@ -76,8 +56,7 @@
       </template>
       <el-form-item
         v-if="
-          from.type == 'sql' ||
-          (selectTable != null && (from.type == 'txt' || from.type == 'excel'))
+          selectIndex != null && (from.type == 'txt' || from.type == 'excel')
         "
         label="文件路径"
       >
@@ -96,6 +75,16 @@
         >
           <div class="tm-link color-teal-8">点击上传</div>
         </el-upload>
+      </el-form-item>
+      <el-form-item label="_id对应的字段名称">
+        <el-input v-model="indexIdName" style="width: 150px"> </el-input>
+      </el-form-item>
+      <el-form-item label="_id对应的表达式">
+        <el-input v-model="indexIdScript" style="width: 150px"> </el-input>
+        <span class="color-orange ft-12">
+          如果字段中没有直接对应的_id字段，可以使用表达式计算出_id值， (如:
+          `key1+'' + key2`)
+        </span>
       </el-form-item>
     </el-form>
     <template v-if="from.type == 'data' || from.type == 'script'">
@@ -116,7 +105,7 @@
         <el-table-column label="字段" width="200px">
           <template slot-scope="scope">
             <div class="">
-              <el-input v-model="scope.row.from.columnName" readonly />
+              <el-input v-model="scope.row.from.columnName" />
             </div>
           </template>
         </el-table-column>
@@ -133,7 +122,11 @@
         <el-table-column v-if="from.type == 'data'" label="映射到字段">
           <template slot-scope="scope">
             <div class="">
-              <el-select v-model="scope.row.to.columnName" filterable clearable>
+              <el-select
+                v-model="scope.row.from.columnName"
+                filterable
+                clearable
+              >
                 <el-option
                   v-for="(one, index) in columnList"
                   :key="index"
@@ -222,25 +215,20 @@ export default {
   props: ["source", "from", "to", "formData"],
   data() {
     return {
-      ownerList: [],
-      tableList: [],
+      indexList: [],
       mappingColumnList: [],
       columnList: [],
-      selectOwner: null,
-      selectTable: null,
+      selectIndex: null,
       filePath: null,
       uploadReady: true,
       dataTotal: 0,
+      indexIdName: "",
+      indexIdScript: "",
     };
   },
   computed: {},
   watch: {
-    selectOwner() {
-      this.$nextTick(() => {
-        this.initTableList();
-      });
-    },
-    selectTable() {
+    selectIndex() {
       this.$nextTick(() => {
         this.initColumnList();
       });
@@ -248,12 +236,10 @@ export default {
   },
   methods: {
     async init() {
-      this.ownerList = [];
-      this.tableList = [];
+      this.indexList = [];
       this.columnList = [];
       this.mappingColumnList = [];
-      this.selectOwner = null;
-      this.selectTable = null;
+      this.selectIndex = null;
       this.dataTotal = 0;
       if (this.from.dataList) {
         this.dataTotal = this.from.dataList.length;
@@ -280,33 +266,30 @@ export default {
           this.addColumn(this.mappingColumnList, one);
         });
       }
-      await this.initOwnerList();
+      await this.initIndexList();
     },
     checkData() {
       if (
-        this.from.type == "sql" ||
-        this.from.type == "txt" ||
-        this.from.type == "excel"
+        this.tool.isEmpty(this.indexIdName) &&
+        this.tool.isEmpty(this.indexIdScript)
       ) {
+        this.tool.warn("请设置_id字段名或_id值表达式");
+        return false;
+      }
+      this.to.indexIdName = this.indexIdName;
+      this.to.indexIdScript = this.indexIdScript;
+      if (this.from.type == "txt" || this.from.type == "excel") {
         if (this.tool.isEmpty(this.filePath)) {
           this.tool.warn("请上传文件");
           return false;
         }
         this.from.filePath = this.filePath;
       }
-      if (this.from.type == "sql") {
-        return true;
-      }
-      if (this.selectOwner == null) {
-        this.tool.warn("请选择导入到的库");
+      if (this.selectIndex == null) {
+        this.tool.warn("请选择导入到的Index");
         return false;
       }
-      if (this.selectTable == null) {
-        this.tool.warn("请选择导入到的表");
-        return false;
-      }
-      this.to.ownerName = this.selectOwner.ownerName;
-      this.to.tableName = this.selectTable.tableName;
+      this.to.indexName = this.selectIndex.indexName;
       this.to.columnList = [];
       this.from.columnList = [];
       if (this.mappingColumnList.length == 0) {
@@ -315,23 +298,21 @@ export default {
       }
       this.mappingColumnList.forEach((one) => {
         this.from.columnList.push(one.from);
-        this.to.columnList.push(one.to);
+        if (this.from.type == "script" || this.from.type == "data") {
+          this.to.columnList.push(one.from);
+        } else {
+          this.to.columnList.push(one.to);
+        }
       });
       this.from.total = Number(this.from.total);
 
       return true;
     },
-    addOwner(owners, ownerName) {
-      let owner = {};
-      owner.ownerName = ownerName;
-      owners.push(owner);
-      return owner;
-    },
-    addTable(tables, tableName) {
-      let table = {};
-      table.tableName = tableName;
-      tables.push(table);
-      return table;
+    addIndex(indexList, indexName) {
+      let index = {};
+      index.indexName = indexName;
+      indexList.push(index);
+      return index;
     },
     addColumn(columns, one, after) {
       let column = {};
@@ -349,20 +330,25 @@ export default {
     },
     async initColumnList() {
       this.columnList = [];
-      if (this.selectOwner == null || this.selectTable == null) {
+      if (this.selectIndex == null) {
         return;
       }
       let param = {
         toolboxId: this.to.toolboxId,
-        ownerName: this.selectOwner.ownerName,
-        tableName: this.selectTable.tableName,
+        indexName: this.selectIndex.indexName,
       };
-      let res = await this.server.database.tableDetail(param);
+      let res = await this.server.elasticsearch.getMapping(param);
       if (res.code != 0) {
         this.tool.error(res.msg);
       }
       res.data = res.data || {};
-      let list = res.data.columnList || {};
+      let list = [];
+      if (res.data.mappings && res.data.mappings.properties) {
+        let properties = res.data.mappings.properties;
+        for (let k in properties) {
+          list.push({ columnName: k });
+        }
+      }
       list.forEach((one) => {
         this.addColumn(this.columnList, one);
       });
@@ -372,46 +358,23 @@ export default {
         });
       }
     },
-    async initTableList() {
-      this.tableList = [];
-      this.selectTable = null;
-      if (this.selectOwner == null) {
-        return;
-      }
-      if (this.to.tableName != null) {
-        this.selectTable = this.addTable(this.tableList, this.to.tableName);
-        return;
-      }
-      let param = {
-        toolboxId: this.to.toolboxId,
-        ownerName: this.selectOwner.ownerName,
-      };
-      let res = await this.server.database.tables(param);
-      if (res.code != 0) {
-        this.tool.error(res.msg);
-      }
-      let list = res.data || [];
-      list.forEach((one) => {
-        this.addTable(this.tableList, one.tableName);
-      });
-    },
-    async initOwnerList() {
-      this.ownerList = [];
-      this.selectOwner = null;
-      if (this.to.ownerName != null) {
-        this.selectOwner = this.addOwner(this.ownerList, this.to.ownerName);
+    async initIndexList() {
+      this.indexList = [];
+      this.selectIndex = null;
+      if (this.to.indexName != null) {
+        this.selectIndex = this.addIndex(this.indexList, this.to.indexName);
         return;
       }
       let param = {
         toolboxId: this.to.toolboxId,
       };
-      let res = await this.server.database.owners(param);
+      let res = await this.server.elasticsearch.indexes(param);
       if (res.code != 0) {
         this.tool.error(res.msg);
       }
       let list = res.data || [];
       list.forEach((one) => {
-        this.addOwner(this.ownerList, one.ownerName);
+        this.addIndex(this.indexList, one.indexName);
       });
     },
     async loadFileColumnList() {
