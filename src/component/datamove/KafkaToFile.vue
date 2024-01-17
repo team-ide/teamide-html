@@ -67,8 +67,8 @@ export default {
       mappingColumnList: [],
       columnList: [],
       selectTolic: null,
-      kafkaKey: "key",
-      kafkaValue: "value",
+      topicKey: "key",
+      topicValue: "value",
     };
   },
   computed: {},
@@ -85,7 +85,6 @@ export default {
       this.columnList = [];
       this.mappingColumnList = [];
       this.selectTolic = null;
-      console.log(this.from);
       await this.initData();
     },
     async initData() {
@@ -102,8 +101,8 @@ export default {
         return false;
       }
       this.from.topicName = this.selectTolic.topicName;
-      this.to.kafkaKey = this.kafkaKey;
-      this.to.kafkaValue = this.kafkaValue;
+      this.from.topicKey = this.topicKey;
+      this.from.topicValue = this.topicValue;
 
       return true;
     },
@@ -136,12 +135,6 @@ export default {
       list.forEach((one) => {
         this.addColumn(this.columnList, one);
       });
-      if (this.from.type == "script") {
-        this.mappingColumnList = [];
-        list.forEach((one) => {
-          this.addColumn(this.mappingColumnList, one);
-        });
-      }
     },
     async initTopicList() {
       this.topicList = [];
