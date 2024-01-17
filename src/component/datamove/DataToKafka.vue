@@ -5,18 +5,18 @@
         <el-input v-model="dataTotal" style="width: 100px" readonly="">
         </el-input>
       </el-form-item>
-      <el-form-item label="选择导入到的Index" class="mgb-0">
+      <el-form-item label="选择导入到的Topic" class="mgb-0">
         <el-select
-          v-model="selectIndex"
+          v-model="selectTolic"
           style="width: 200px"
           filterable
-          value-key="indexName"
+          value-key="topicName"
         >
           <el-option
-            v-for="(one, index) in indexList"
+            v-for="(one, index) in topicList"
             :key="index"
             :value="one"
-            :label="one.indexName"
+            :label="one.topicName"
           >
           </el-option>
         </el-select>
@@ -56,7 +56,7 @@
       </template>
       <el-form-item
         v-if="
-          selectIndex != null && (from.type == 'txt' || from.type == 'excel')
+          selectTolic != null && (from.type == 'txt' || from.type == 'excel')
         "
         label="文件路径"
       >
@@ -76,15 +76,8 @@
           <div class="tm-link color-teal-8">点击上传</div>
         </el-upload>
       </el-form-item>
-      <el-form-item label="_id对应的字段名称">
-        <el-input v-model="indexIdName" style="width: 150px"> </el-input>
-      </el-form-item>
-      <el-form-item label="_id对应的表达式">
-        <el-input v-model="indexIdScript" style="width: 150px"> </el-input>
-        <span class="color-orange ft-12">
-          如果字段中没有直接对应的_id字段，可以使用表达式计算出_id值， (如:
-          `key1+'' + key2`)
-        </span>
+      <el-form-item label="key对应的字段名称">
+        <el-input v-model="topicKey" style="width: 150px"> </el-input>
       </el-form-item>
     </el-form>
     <template v-if="from.type == 'data' || from.type == 'script'">
@@ -215,10 +208,10 @@ export default {
   props: ["source", "from", "to", "formData"],
   data() {
     return {
-      indexList: [],
+      topicList: [],
       mappingColumnList: [],
       columnList: [],
-      selectIndex: null,
+      selectTolic: null,
       filePath: null,
       uploadReady: true,
       dataTotal: 0,
@@ -228,7 +221,7 @@ export default {
   },
   computed: {},
   watch: {
-    selectIndex() {
+    selectTolic() {
       this.$nextTick(() => {
         this.initColumnList();
       });
@@ -236,10 +229,10 @@ export default {
   },
   methods: {
     async init() {
-      this.indexList = [];
+      this.topicList = [];
       this.columnList = [];
       this.mappingColumnList = [];
-      this.selectIndex = null;
+      this.selectTolic = null;
       this.dataTotal = 0;
       if (this.from.dataList) {
         this.dataTotal = this.from.dataList.length;
@@ -285,11 +278,11 @@ export default {
         }
         this.from.filePath = this.filePath;
       }
-      if (this.selectIndex == null) {
+      if (this.selectTolic == null) {
         this.tool.warn("请选择导入到的Index");
         return false;
       }
-      this.to.indexName = this.selectIndex.indexName;
+      this.to.topicName = this.selectTolic.topicName;
       this.to.columnList = [];
       this.from.columnList = [];
       if (this.mappingColumnList.length == 0) {
@@ -308,11 +301,11 @@ export default {
 
       return true;
     },
-    addIndex(indexList, indexName) {
-      let index = {};
-      index.indexName = indexName;
-      indexList.push(index);
-      return index;
+    addTolic(topicList, topicName) {
+      let one = {};
+      one.topicName = topicName;
+      topicList.push(one);
+      return one;
     },
     addColumn(columns, one, after) {
       let column = {};
@@ -330,25 +323,10 @@ export default {
     },
     async initColumnList() {
       this.columnList = [];
-      if (this.selectIndex == null) {
+      if (this.selectTolic == null) {
         return;
       }
-      let param = {
-        toolboxId: this.to.toolboxId,
-        indexName: this.selectIndex.indexName,
-      };
-      let res = await this.server.elasticsearch.getMapping(param);
-      if (res.code != 0) {
-        this.tool.error(res.msg);
-      }
-      res.data = res.data || {};
       let list = [];
-      if (res.data.mappings && res.data.mappings.properties) {
-        let properties = res.data.mappings.properties;
-        for (let k in properties) {
-          list.push({ columnName: k });
-        }
-      }
       list.forEach((one) => {
         this.addColumn(this.columnList, one);
       });
@@ -360,22 +338,22 @@ export default {
       }
     },
     async initIndexList() {
-      this.indexList = [];
-      this.selectIndex = null;
-      if (this.to.indexName != null) {
-        this.selectIndex = this.addIndex(this.indexList, this.to.indexName);
+      this.topicList = [];
+      this.selectTolic = null;
+      if (this.to.topicName != null) {
+        this.selectTolic = this.addTolic(this.topicList, this.to.topicName);
         return;
       }
       let param = {
         toolboxId: this.to.toolboxId,
       };
-      let res = await this.server.elasticsearch.indexes(param);
+      let res = await this.server.kakfa.topics(param);
       if (res.code != 0) {
         this.tool.error(res.msg);
       }
       let list = res.data || [];
       list.forEach((one) => {
-        this.addIndex(this.indexList, one.indexName);
+        this.addTolic(this.topicList, one.topic);
       });
     },
     async loadFileColumnList() {

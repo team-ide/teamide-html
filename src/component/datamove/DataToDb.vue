@@ -367,6 +367,7 @@ export default {
         this.addColumn(this.columnList, one);
       });
       if (this.from.type == "script") {
+        this.mappingColumnList = [];
         list.forEach((one) => {
           this.addColumn(this.mappingColumnList, one);
         });

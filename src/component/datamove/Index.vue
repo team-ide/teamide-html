@@ -101,6 +101,39 @@
             >
             </DataToEs>
           </template>
+          <template
+            v-if="
+              to.type == 'kafka' &&
+              (from.type == 'txt' ||
+                from.type == 'excel' ||
+                from.type == 'data' ||
+                from.type == 'script')
+            "
+          >
+            <DataToKafka
+              ref="Options"
+              :source="source"
+              :from="from"
+              :to="to"
+              :formData="formData"
+            >
+            </DataToKafka>
+          </template>
+          <template
+            v-if="
+              from.type == 'kafka' &&
+              (to.type == 'txt' || to.type == 'excel' || to.type == 'sql')
+            "
+          >
+            <KafkaToFile
+              ref="Options"
+              :source="source"
+              :from="from"
+              :to="to"
+              :formData="formData"
+            >
+            </KafkaToFile>
+          </template>
         </template>
       </tm-layout>
       <tm-layout-bar bottom></tm-layout-bar>
@@ -142,11 +175,22 @@ import DbToDbOrFile from "./DbToDbOrFile";
 import DataToDb from "./DataToDb";
 import DataToEs from "./DataToEs";
 import DataToFile from "./DataToFile";
+import DataToKafka from "./DataToKafka";
+import KafkaToFile from "./KafkaToFile";
 
 import List from "./List";
 
 export default {
-  components: { Config, DbToDbOrFile, DataToDb, DataToEs, DataToFile, List },
+  components: {
+    Config,
+    DbToDbOrFile,
+    DataToDb,
+    DataToEs,
+    DataToFile,
+    DataToKafka,
+    KafkaToFile,
+    List,
+  },
   props: ["source", "options_"],
   data() {
     return {
@@ -243,9 +287,9 @@ export default {
       }
       config.indexIdName = null;
       config.indexIdScript = null;
-      config.topicName = null;
       config.topicKey = null;
       config.topicValue = null;
+      config.topicGroupName = "kafka-group-from-datamove";
       config.filePath = null;
 
       if (this.tool.isEmpty(config.type)) {

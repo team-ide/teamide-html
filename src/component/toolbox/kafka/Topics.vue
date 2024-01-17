@@ -203,11 +203,49 @@ export default {
       }
     },
     async toExport(data) {
-      this.tool.warn("功能还未完善，敬请期待！");
+      let extend = {
+        options: {
+          from: {
+            type: "kafka",
+            toolboxId: this.toolboxWorker.toolboxId,
+          },
+        },
+      };
+      let title = "[导出]";
+      if (data == null) {
+      } else {
+        extend.options.from.topicName = data.topic;
+      }
+      if (extend.options.from.topicName) {
+        title += "[" + extend.options.from.topicName + "]主题";
+      }
+      extend.type = "datamove";
+      extend.name = title;
+      extend.title = title;
+      this.toolboxWorker.openTabByExtend(extend);
       return;
     },
     async toImport(data) {
-      this.tool.warn("功能还未完善，敬请期待！");
+      let extend = {
+        options: {
+          to: {
+            type: "kafka",
+            toolboxId: this.toolboxWorker.toolboxId,
+          },
+        },
+      };
+      let title = "[导入]";
+      if (data == null) {
+      } else {
+        extend.options.to.topicName = data.topic;
+      }
+      if (extend.options.to.topicName) {
+        title += "[" + extend.options.to.topicName + "]主题";
+      }
+      extend.type = "datamove";
+      extend.name = title;
+      extend.title = title;
+      this.toolboxWorker.openTabByExtend(extend);
       return;
     },
     async showTopic(topic) {
