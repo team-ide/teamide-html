@@ -34,23 +34,23 @@
       <el-form-item label="导出保存文件名">
         <el-input v-model="to.fileName" style="width: 180px"> </el-input>
       </el-form-item>
-      <el-form-item label="选择导出的 主题" class="mgb-0">
+      <el-form-item label="选择导出的 索引" class="mgb-0">
         <el-select
-          v-model="selectTolic"
+          v-model="selectIndex"
           style="width: 200px"
           filterable
-          value-key="topicName"
+          value-key="indexName"
         >
           <el-option
-            v-for="(one, index) in topicList"
+            v-for="(one, index) in indexList"
             :key="index"
             :value="one"
-            :label="one.topicName"
+            :label="one.indexName"
           >
           </el-option>
         </el-select>
       </el-form-item>
-      <el-form-item label="主题 登录用户">
+      <el-form-item label="索引 登录用户">
         <el-input
           v-model="from.username"
           style="width: 180px"
@@ -58,7 +58,7 @@
         >
         </el-input>
       </el-form-item>
-      <el-form-item label="主题 登录密码">
+      <el-form-item label="索引 登录密码">
         <el-input
           v-model="from.password"
           style="width: 180px"
@@ -66,31 +66,62 @@
         >
         </el-input>
       </el-form-item>
-      <el-form-item label="groupId">
-        <el-input v-model="topicGroupName" style="width: 200px"> </el-input>
-        <div class="color-orange ft-12">导出数据时候使用该groupId消费</div>
-      </el-form-item>
-      <el-form-item label="拉取消息超时时间（秒）">
-        <el-input v-model="pullWait" style="width: 100px"> </el-input>
-        <div class="color-orange ft-12">
-          消费时候如果超过该时间无数据，则停止拉取
-        </div>
-      </el-form-item>
-
-      <el-form-item label="Key字段名称">
-        <el-input v-model="topicKey" style="width: 100px"> </el-input>
-      </el-form-item>
-      <el-form-item label="Value字段名称">
-        <el-input v-model="topicValue" style="width: 100px"> </el-input>
-      </el-form-item>
     </el-form>
-    <div class="color-orange ft-15 ft-600">导出key、value字段</div>
-    <div class="color-orange ft-15 ft-600">
-      导出 header 中所有字段填充到 字段列表 中
+
+    <div class="mgb-10">
+      <div
+        class="tm-link color-green mgr-5 ft-12"
+        @click="addColumn(columnList, { columnName: 'columnXXX' })"
+      >
+        添加字段
+      </div>
     </div>
-    <div class="color-orange ft-15 ft-600">
-      如果 value可以解析为 json，将其中所有 一级 key 填充到 字段列表 中
-    </div>
+    <el-table :data="columnList" border style="width: 100%" size="mini">
+      <el-table-column label="字段">
+        <template slot-scope="scope">
+          <div class="">
+            <el-input v-model="scope.row.from.columnName" readonly />
+          </div>
+        </template>
+      </el-table-column>
+      <el-table-column label="导出列名称">
+        <template slot-scope="scope">
+          <div class="">
+            <el-input v-model="scope.row.to.columnName" />
+          </div>
+        </template>
+      </el-table-column>
+      <el-table-column label="操作" width="200px">
+        <template slot-scope="scope">
+          <div
+            class="tm-link color-grey mglr-5 ft-12"
+            @click="upColumn(scope.row)"
+          >
+            上移
+          </div>
+          <div
+            class="tm-link color-grey mglr-5 ft-12"
+            @click="downColumn(scope.row)"
+          >
+            下移
+          </div>
+          <div
+            class="tm-link color-grey mglr-5 ft-12"
+            @click="
+              addColumn(columnList, { columnName: 'columnXXX' }, scope.row)
+            "
+          >
+            插入
+          </div>
+          <div
+            class="tm-link color-red mglr-5 ft-12"
+            @click="removeColumn(scope.row)"
+          >
+            删除
+          </div>
+        </template>
+      </el-table-column>
+    </el-table>
   </div>
 </template>
 
@@ -101,23 +132,16 @@ export default {
   props: ["source", "from", "to", "formData"],
   data() {
     return {
-      topicList: [],
-      mappingColumnList: [],
+      indexList: [],
       columnList: [],
-      selectTolic: null,
-      topicKey: "key",
-      topicValue: "value",
-      topicGroupName: "kafka-group-from-datamove",
+      selectIndex: null,
       ownerName: "db_xxx",
       tableName: "table_xxx",
-      topicValueByData: true,
-      fillColumn: true,
-      pullWait: 2,
     };
   },
   computed: {},
   watch: {
-    selectTolic() {
+    selectIndex() {
       this.$nextTick(() => {
         this.initColumnList();
       });
@@ -125,57 +149,37 @@ export default {
   },
   methods: {
     async init() {
-      this.topicList = [];
+      this.indexList = [];
       this.columnList = [];
-      this.mappingColumnList = [];
-      this.selectTolic = null;
+      this.selectIndex = null;
       await this.initData();
     },
     async initData() {
-      if (this.from.columnList != null) {
-        this.from.columnList.forEach((one) => {
-          this.addColumn(this.mappingColumnList, one);
-        });
-      } else {
-        this.addColumn(this.mappingColumnList, { columnName: "key" });
-        this.addColumn(this.mappingColumnList, { columnName: "value" });
-      }
-      await this.initTopicList();
+      await this.initIndexList();
     },
     checkData() {
-      if (this.selectTolic == null) {
+      if (this.selectIndex == null) {
         this.tool.warn("请选择导出的Topic");
-        return false;
-      }
-      if (this.tool.isEmpty(this.topicGroupName)) {
-        this.tool.warn("请输入groupId");
-        return false;
-      }
-      if (this.tool.isEmpty(this.pullWait)) {
-        this.tool.warn("拉取消息超时时间");
         return false;
       }
       this.from.fillColumn = true;
       this.to.fillColumn = true;
       this.to.ownerName = this.ownerName;
       this.to.tableName = this.tableName;
-      this.from.topicName = this.selectTolic.topicName;
-      this.from.topicKey = this.topicKey;
-      this.from.topicValue = this.topicValue;
-      this.from.pullWait = Number(this.pullWait);
-      this.from.topicValueByData = this.topicValueByData;
-      this.from.topicGroupName = this.topicGroupName;
+      this.from.indexName = this.selectIndex.indexName;
       this.from.columnList = [];
-      this.mappingColumnList.forEach((one) => {
+      this.to.columnList = [];
+      this.columnList.forEach((one) => {
         this.from.columnList.push(one.from);
+        this.to.columnList.push(one.to);
       });
 
       return true;
     },
-    addTopic(topicList, topicName) {
+    addIndex(indexList, indexName) {
       let one = {};
-      one.topicName = topicName;
-      topicList.push(one);
+      one.indexName = indexName;
+      indexList.push(one);
       return one;
     },
     addColumn(columns, one, after) {
@@ -194,42 +198,63 @@ export default {
     },
     async initColumnList() {
       this.columnList = [];
-      if (this.selectTolic == null) {
+      if (this.selectIndex == null) {
         return;
       }
+      let param = {
+        toolboxId: this.from.toolboxId,
+        indexName: this.selectIndex.indexName,
+      };
+      let res = await this.server.elasticsearch.getMapping(param);
+      if (res.code != 0) {
+        this.tool.error(res.msg);
+      }
+      res.data = res.data || {};
       let list = [];
+      list.push({
+        columnName: "_id",
+      });
+      list.push({
+        columnName: "_source",
+      });
+      if (res.data.mappings && res.data.mappings.properties) {
+        let properties = res.data.mappings.properties;
+        for (let k in properties) {
+          list.push({ columnName: k });
+        }
+      }
       list.forEach((one) => {
         this.addColumn(this.columnList, one);
       });
     },
-    async initTopicList() {
-      this.topicList = [];
-      this.selectTolic = null;
+    async initIndexList() {
+      this.indexList = [];
+      this.selectIndex = null;
       let param = {
         toolboxId: this.from.toolboxId,
       };
-      let res = await this.server.kafka.topics(param);
+      let res = await this.server.elasticsearch.indexes(param);
       if (res.code != 0) {
         this.tool.error(res.msg);
       }
       let list = res.data || [];
       list.forEach((one) => {
-        let topicOne = this.addTopic(this.topicList, one.topic);
-        if (one.topic == this.from.topicName) {
-          this.selectTolic = topicOne;
+        let one_ = this.addIndex(this.indexList, one.indexName);
+        if (one_.indexName == this.from.indexName) {
+          this.selectIndex = one_;
         }
       });
     },
     upColumn(one) {
-      this.tool.up(this, "mappingColumnList", one);
+      this.tool.up(this, "columnList", one);
     },
     downColumn(one) {
-      this.tool.down(this, "mappingColumnList", one);
+      this.tool.down(this, "columnList", one);
     },
     removeColumn(one) {
-      let findIndex = this.mappingColumnList.indexOf(one);
+      let findIndex = this.columnList.indexOf(one);
       if (findIndex >= 0) {
-        this.mappingColumnList.splice(findIndex, 1);
+        this.columnList.splice(findIndex, 1);
       }
     },
   },

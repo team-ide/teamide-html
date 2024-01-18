@@ -5,38 +5,6 @@
         <el-input v-model="dataTotal" style="width: 100px" readonly="">
         </el-input>
       </el-form-item>
-      <el-form-item label="选择导入到的Topic" class="mgb-0">
-        <el-select
-          v-model="selectTolic"
-          style="width: 200px"
-          filterable
-          value-key="topicName"
-        >
-          <el-option
-            v-for="(one, index) in topicList"
-            :key="index"
-            :value="one"
-            :label="one.topicName"
-          >
-          </el-option>
-        </el-select>
-      </el-form-item>
-      <el-form-item label="index登录用户">
-        <el-input
-          v-model="to.username"
-          style="width: 120px"
-          placeholder="可不填写或默认配置用户"
-        >
-        </el-input>
-      </el-form-item>
-      <el-form-item label="index登录密码">
-        <el-input
-          v-model="to.password"
-          style="width: 120px"
-          placeholder="可不填写或默认配置密码"
-        >
-        </el-input>
-      </el-form-item>
       <el-form-item v-if="from.type == 'script'" label="导入数据数量">
         <el-input v-model="from.total" style="width: 100px"> </el-input>
       </el-form-item>
@@ -76,8 +44,46 @@
           <div class="tm-link color-teal-8">点击上传</div>
         </el-upload>
       </el-form-item>
+      <el-form-item label="选择导入到的 主题" class="mgb-0">
+        <el-select
+          v-model="selectTolic"
+          style="width: 200px"
+          filterable
+          value-key="topicName"
+        >
+          <el-option
+            v-for="(one, index) in topicList"
+            :key="index"
+            :value="one"
+            :label="one.topicName"
+          >
+          </el-option>
+        </el-select>
+      </el-form-item>
+      <el-form-item label="主题 登录用户">
+        <el-input
+          v-model="to.username"
+          style="width: 180px"
+          placeholder="可不填写或默认配置用户"
+        >
+        </el-input>
+      </el-form-item>
+      <el-form-item label="主题 登录密码">
+        <el-input
+          v-model="to.password"
+          style="width: 180px"
+          placeholder="可不填写或默认配置密码"
+        >
+        </el-input>
+      </el-form-item>
       <el-form-item label="key对应的字段名称">
         <el-input v-model="topicKey" style="width: 150px"> </el-input>
+      </el-form-item>
+      <el-form-item label="value对应的字段名称">
+        <el-input v-model="topicValue" style="width: 150px"> </el-input>
+      </el-form-item>
+      <el-form-item label="value使用数据转json">
+        <el-switch v-model="topicValueByData" style="width: 150px"> </el-switch>
       </el-form-item>
     </el-form>
     <template v-if="from.type == 'data' || from.type == 'script'">
@@ -115,11 +121,7 @@
         <el-table-column v-if="from.type == 'data'" label="映射到字段">
           <template slot-scope="scope">
             <div class="">
-              <el-select
-                v-model="scope.row.from.columnName"
-                filterable
-                clearable
-              >
+              <el-select v-model="scope.row.to.columnName" filterable clearable>
                 <el-option
                   v-for="(one, index) in columnList"
                   :key="index"
@@ -215,8 +217,9 @@ export default {
       filePath: null,
       uploadReady: true,
       dataTotal: 0,
-      indexIdName: "",
-      indexIdScript: "",
+      topicKey: "key",
+      topicValue: "value",
+      topicValueByData: true,
     };
   },
   computed: {},
@@ -262,15 +265,13 @@ export default {
       await this.initIndexList();
     },
     checkData() {
-      if (
-        this.tool.isEmpty(this.indexIdName) &&
-        this.tool.isEmpty(this.indexIdScript)
-      ) {
-        this.tool.warn("请设置_id字段名或_id值表达式");
+      if (this.tool.isEmpty(this.topicKey)) {
+        this.tool.warn("请设置 key 字段名");
         return false;
       }
-      this.to.indexIdName = this.indexIdName;
-      this.to.indexIdScript = this.indexIdScript;
+      this.to.topicKey = this.topicKey;
+      this.to.topicValue = this.topicValue;
+      this.to.topicValueByData = this.topicValueByData;
       if (this.from.type == "txt" || this.from.type == "excel") {
         if (this.tool.isEmpty(this.filePath)) {
           this.tool.warn("请上传文件");
@@ -291,7 +292,7 @@ export default {
       }
       this.mappingColumnList.forEach((one) => {
         this.from.columnList.push(one.from);
-        if (this.from.type == "script" || this.from.type == "data") {
+        if (this.from.type == "script") {
           this.to.columnList.push(one.from);
         } else {
           this.to.columnList.push(one.to);
@@ -327,6 +328,8 @@ export default {
         return;
       }
       let list = [];
+      list.push({ columnName: "key" });
+      list.push({ columnName: "value" });
       list.forEach((one) => {
         this.addColumn(this.columnList, one);
       });

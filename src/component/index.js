@@ -96,4 +96,7 @@ Vue.component('Editor', Editor);
 import DataMove from './datamove/Index.vue'
 Vue.component('DataMove', DataMove);
 
+import ScriptValueDescription from './ScriptValueDescription.vue'
+Vue.component('ScriptValueDescription', ScriptValueDescription);
+
 export default {};

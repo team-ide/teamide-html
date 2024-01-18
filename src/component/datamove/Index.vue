@@ -23,6 +23,9 @@
         <template v-if="step == 'options'">
           <div class="pd-10 ft-14 ft-600 color-orange">详细配置</div>
 
+          <div class="pdlr-10 pdb-10">
+            <ScriptValueDescription :source="source"> </ScriptValueDescription>
+          </div>
           <el-form class="pdlr-10" size="mini" inline>
             <el-form-item label="有错继续" class="mgb-5">
               <el-switch v-model="formData.errorContinue"> </el-switch>
@@ -121,6 +124,21 @@
           </template>
           <template
             v-if="
+              from.type == 'elasticsearch' &&
+              (to.type == 'txt' || to.type == 'excel' || to.type == 'sql')
+            "
+          >
+            <EsToFile
+              ref="Options"
+              :source="source"
+              :from="from"
+              :to="to"
+              :formData="formData"
+            >
+            </EsToFile>
+          </template>
+          <template
+            v-if="
               from.type == 'kafka' &&
               (to.type == 'txt' || to.type == 'excel' || to.type == 'sql')
             "
@@ -177,6 +195,7 @@ import DataToEs from "./DataToEs";
 import DataToFile from "./DataToFile";
 import DataToKafka from "./DataToKafka";
 import KafkaToFile from "./KafkaToFile";
+import EsToFile from "./EsToFile";
 
 import List from "./List";
 
@@ -189,6 +208,7 @@ export default {
     DataToFile,
     DataToKafka,
     KafkaToFile,
+    EsToFile,
     List,
   },
   props: ["source", "options_"],

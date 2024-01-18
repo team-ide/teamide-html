@@ -5,38 +5,6 @@
         <el-input v-model="dataTotal" style="width: 100px" readonly="">
         </el-input>
       </el-form-item>
-      <el-form-item label="选择导入到的Index" class="mgb-0">
-        <el-select
-          v-model="selectIndex"
-          style="width: 200px"
-          filterable
-          value-key="indexName"
-        >
-          <el-option
-            v-for="(one, index) in indexList"
-            :key="index"
-            :value="one"
-            :label="one.indexName"
-          >
-          </el-option>
-        </el-select>
-      </el-form-item>
-      <el-form-item label="index登录用户">
-        <el-input
-          v-model="to.username"
-          style="width: 120px"
-          placeholder="可不填写或默认配置用户"
-        >
-        </el-input>
-      </el-form-item>
-      <el-form-item label="index登录密码">
-        <el-input
-          v-model="to.password"
-          style="width: 120px"
-          placeholder="可不填写或默认配置密码"
-        >
-        </el-input>
-      </el-form-item>
       <el-form-item v-if="from.type == 'script'" label="导入数据数量">
         <el-input v-model="from.total" style="width: 100px"> </el-input>
       </el-form-item>
@@ -75,6 +43,38 @@
         >
           <div class="tm-link color-teal-8">点击上传</div>
         </el-upload>
+      </el-form-item>
+      <el-form-item label="选择导入到的 索引" class="mgb-0">
+        <el-select
+          v-model="selectIndex"
+          style="width: 200px"
+          filterable
+          value-key="indexName"
+        >
+          <el-option
+            v-for="(one, index) in indexList"
+            :key="index"
+            :value="one"
+            :label="one.indexName"
+          >
+          </el-option>
+        </el-select>
+      </el-form-item>
+      <el-form-item label="索引 登录用户">
+        <el-input
+          v-model="to.username"
+          style="width: 180px"
+          placeholder="可不填写或默认配置用户"
+        >
+        </el-input>
+      </el-form-item>
+      <el-form-item label="索引 登录密码">
+        <el-input
+          v-model="to.password"
+          style="width: 180px"
+          placeholder="可不填写或默认配置密码"
+        >
+        </el-input>
       </el-form-item>
       <el-form-item label="_id对应的字段名称">
         <el-input v-model="indexIdName" style="width: 150px"> </el-input>
@@ -122,11 +122,7 @@
         <el-table-column v-if="from.type == 'data'" label="映射到字段">
           <template slot-scope="scope">
             <div class="">
-              <el-select
-                v-model="scope.row.from.columnName"
-                filterable
-                clearable
-              >
+              <el-select v-model="scope.row.to.columnName" filterable clearable>
                 <el-option
                   v-for="(one, index) in columnList"
                   :key="index"
@@ -298,7 +294,7 @@ export default {
       }
       this.mappingColumnList.forEach((one) => {
         this.from.columnList.push(one.from);
-        if (this.from.type == "script" || this.from.type == "data") {
+        if (this.from.type == "script") {
           this.to.columnList.push(one.from);
         } else {
           this.to.columnList.push(one.to);
