@@ -15,21 +15,11 @@
             >
             </Data>
           </template>
-          <template v-else-if="item.extend.type == 'import'">
-            <Import
+          <template v-else-if="item.extend.type == 'datamove'">
+            <DataMove
               :source="source"
-              :toolboxWorker="toolboxWorker"
-              :extend="item.extend"
-            >
-            </Import>
-          </template>
-          <template v-else-if="item.extend.type == 'export'">
-            <Export
-              :source="source"
-              :toolboxWorker="toolboxWorker"
-              :extend="item.extend"
-            >
-            </Export>
+              :options_="item.extend.options"
+            ></DataMove>
           </template>
         </template>
       </WorkspaceSpans>
@@ -40,11 +30,9 @@
 
 <script>
 import Data from "./Data.vue";
-import Import from "./Import.vue";
-import Export from "./Export.vue";
 
 export default {
-  components: { Data, Import, Export },
+  components: { Data },
   props: ["source", "toolboxWorker", "extend"],
   data() {
     return {

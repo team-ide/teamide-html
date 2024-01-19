@@ -364,20 +364,34 @@ export default {
       }
     },
     async toExport(data) {
-      this.tool.warn("功能还未完善，敬请期待！");
-      return;
+      let extend = {
+        options: {
+          from: {
+            type: "redis",
+            toolboxId: this.toolboxWorker.toolboxId,
+          },
+        },
+      };
+      let title = "[导出]";
+      extend.type = "datamove";
+      extend.name = title;
+      extend.title = title;
+      this.toolboxWorker.openTabByExtend(extend);
     },
     async toImport(data) {
-      this.tool.warn("功能还未完善，敬请期待！");
-      return;
-      // data = data || {};
-      // let extend = {
-      //   name: "导入",
-      //   title: "导入",
-      //   type: "import",
-      //   database: data.database || this.searchForm.database,
-      // };
-      // this.toolboxWorker.openTabByExtend(extend);
+      let extend = {
+        options: {
+          to: {
+            type: "redis",
+            toolboxId: this.toolboxWorker.toolboxId,
+          },
+        },
+      };
+      let title = "[导入]";
+      extend.type = "datamove";
+      extend.name = title;
+      extend.title = title;
+      this.toolboxWorker.openTabByExtend(extend);
     },
     toInsert() {
       let extend = {

@@ -152,6 +152,39 @@
             >
             </KafkaToFile>
           </template>
+          <template
+            v-if="
+              to.type == 'redis' &&
+              (from.type == 'txt' ||
+                from.type == 'excel' ||
+                from.type == 'data' ||
+                from.type == 'script')
+            "
+          >
+            <DataToRedis
+              ref="Options"
+              :source="source"
+              :from="from"
+              :to="to"
+              :formData="formData"
+            >
+            </DataToRedis>
+          </template>
+          <template
+            v-if="
+              from.type == 'redis' &&
+              (to.type == 'txt' || to.type == 'excel' || to.type == 'sql')
+            "
+          >
+            <RedisToFile
+              ref="Options"
+              :source="source"
+              :from="from"
+              :to="to"
+              :formData="formData"
+            >
+            </RedisToFile>
+          </template>
         </template>
       </tm-layout>
       <tm-layout-bar bottom></tm-layout-bar>
@@ -196,6 +229,8 @@ import DataToFile from "./DataToFile";
 import DataToKafka from "./DataToKafka";
 import KafkaToFile from "./KafkaToFile";
 import EsToFile from "./EsToFile";
+import RedisToFile from "./RedisToFile";
+import DataToRedis from "./DataToRedis";
 
 import List from "./List";
 
@@ -209,6 +244,8 @@ export default {
     DataToKafka,
     KafkaToFile,
     EsToFile,
+    RedisToFile,
+    DataToRedis,
     List,
   },
   props: ["source", "options_"],

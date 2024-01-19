@@ -23,9 +23,7 @@
         </el-form-item>
       </template>
       <el-form-item
-        v-if="
-          selectTolic != null && (from.type == 'txt' || from.type == 'excel')
-        "
+        v-if="from.type == 'txt' || from.type == 'excel'"
         label="文件路径"
       >
         <el-input v-model="filePath" style="width: 300px" readonly="">
@@ -44,46 +42,38 @@
           <div class="tm-link color-teal-8">点击上传</div>
         </el-upload>
       </el-form-item>
-      <el-form-item label="选择导入到的 主题" class="mgb-0">
-        <el-select
-          v-model="selectTolic"
-          style="width: 200px"
-          filterable
-          value-key="topicName"
-        >
+      <el-form-item label="导入Database">
+        <el-input v-model="redisDatabase" style="width: 100px"> </el-input>
+      </el-form-item>
+      <el-form-item label="选择导入的 值 类型" class="mgb-0">
+        <el-select v-model="redisValueType" style="width: 200px" filterable>
           <el-option
-            v-for="(one, index) in topicList"
+            v-for="(one, index) in redisValueTypes"
             :key="index"
-            :value="one"
-            :label="one.topicName"
+            :value="one.value"
+            :label="one.text"
           >
           </el-option>
         </el-select>
       </el-form-item>
-      <el-form-item label="主题 登录用户">
-        <el-input
-          v-model="to.username"
-          style="width: 180px"
-          placeholder="可不填写或默认配置用户"
-        >
-        </el-input>
+
+      <el-form-item label="Key 字段名称">
+        <el-input v-model="redisKeyName" style="width: 150px"> </el-input>
       </el-form-item>
-      <el-form-item label="主题 登录密码">
-        <el-input
-          v-model="to.password"
-          style="width: 180px"
-          placeholder="可不填写或默认配置密码"
-        >
-        </el-input>
+      <el-form-item label="Key 对应的表达式">
+        <el-input v-model="redisKeyScript" style="width: 150px"> </el-input>
       </el-form-item>
-      <el-form-item label="key对应的字段名称">
-        <el-input v-model="topicKey" style="width: 150px"> </el-input>
+      <el-form-item label="Field 字段名称" v-if="redisValueType == 'hash'">
+        <el-input v-model="redisFieldName" style="width: 150px"> </el-input>
       </el-form-item>
-      <el-form-item label="value对应的字段名称">
-        <el-input v-model="topicValue" style="width: 150px"> </el-input>
+      <el-form-item label="Field 对应的表达式">
+        <el-input v-model="redisFieldScript" style="width: 150px"> </el-input>
+      </el-form-item>
+      <el-form-item label="Value 字段名称">
+        <el-input v-model="redisValueName" style="width: 150px"> </el-input>
       </el-form-item>
       <el-form-item label="value使用数据转json">
-        <el-switch v-model="topicValueByData" style="width: 150px"> </el-switch>
+        <el-switch v-model="redisValueByData"> </el-switch>
       </el-form-item>
     </el-form>
     <template v-if="from.type == 'data' || from.type == 'script'">
@@ -210,32 +200,33 @@ export default {
   props: ["source", "from", "to", "formData"],
   data() {
     return {
-      topicList: [],
+      redisValueTypes: [
+        { text: "String", value: "string" },
+        { text: "Hash", value: "hash" },
+        { text: "List", value: "list" },
+        { text: "Set", value: "set" },
+      ],
+      redisValueType: "string",
+      redisDatabase: 0,
+      redisKeyName: "key",
+      redisKeyScript: "",
+      redisFieldName: "field",
+      redisFieldScript: "",
+      redisValueName: "value",
+      redisValueByData: true,
       mappingColumnList: [],
       columnList: [],
-      selectTolic: null,
       filePath: null,
       uploadReady: true,
       dataTotal: 0,
-      topicKey: "key",
-      topicValue: "value",
-      topicValueByData: true,
     };
   },
   computed: {},
-  watch: {
-    selectTolic() {
-      this.$nextTick(() => {
-        this.initColumnList();
-      });
-    },
-  },
+  watch: {},
   methods: {
     async init() {
-      this.topicList = [];
       this.columnList = [];
       this.mappingColumnList = [];
-      this.selectTolic = null;
       this.dataTotal = 0;
       if (this.from.dataList) {
         this.dataTotal = this.from.dataList.length;
@@ -262,16 +253,30 @@ export default {
           this.addColumn(this.mappingColumnList, one);
         });
       }
-      await this.initTopicList();
+      this.initColumnList();
     },
     checkData() {
-      if (this.tool.isEmpty(this.topicKey)) {
-        this.tool.warn("请设置 key 字段名");
+      if (
+        this.tool.isEmpty(this.redisKeyName) &&
+        this.tool.isEmpty(this.redisKeyScript)
+      ) {
+        this.tool.warn("请设置 Key 字段名 或 表达式");
         return false;
       }
-      this.to.topicKey = this.topicKey;
-      this.to.topicValue = this.topicValue;
-      this.to.topicValueByData = this.topicValueByData;
+      if (this.redisValueType == "hash") {
+        if (
+          this.tool.isEmpty(this.redisFieldName) &&
+          this.tool.isEmpty(this.redisFieldScript)
+        ) {
+          this.tool.warn("请设置 Field 字段名 或 表达式");
+          return false;
+        }
+      }
+      if (!this.redisValueByData && this.tool.isEmpty(this.redisValueName)) {
+        this.tool.warn("请设置 Value 字段名");
+        return false;
+      }
+
       if (this.from.type == "txt" || this.from.type == "excel") {
         if (this.tool.isEmpty(this.filePath)) {
           this.tool.warn("请上传文件");
@@ -279,17 +284,22 @@ export default {
         }
         this.from.filePath = this.filePath;
       }
-      if (this.selectTolic == null) {
-        this.tool.warn("请选择导入到的Index");
-        return false;
-      }
-      this.to.topicName = this.selectTolic.topicName;
-      this.to.columnList = [];
-      this.from.columnList = [];
       if (this.mappingColumnList.length == 0) {
         this.tool.warn("请设置导入到的列");
         return false;
       }
+
+      this.to.redisValueType = this.redisValueType;
+      this.to.redisDatabase = Number(this.redisDatabase);
+      this.to.redisKeyName = this.redisKeyName;
+      this.to.redisKeyScript = this.redisKeyScript;
+      this.to.redisFieldName = this.redisFieldName;
+      this.to.redisFieldScript = this.redisFieldScript;
+      this.to.redisValueName = this.redisValueName;
+      this.to.redisValueByData = this.redisValueByData;
+
+      this.to.columnList = [];
+      this.from.columnList = [];
       this.mappingColumnList.forEach((one) => {
         this.from.columnList.push(one.from);
         if (this.from.type == "script") {
@@ -301,12 +311,6 @@ export default {
       this.from.total = Number(this.from.total);
 
       return true;
-    },
-    addTopic(topicList, topicName) {
-      let one = {};
-      one.topicName = topicName;
-      topicList.push(one);
-      return one;
     },
     addColumn(columns, one, after) {
       let column = {};
@@ -324,9 +328,6 @@ export default {
     },
     async initColumnList() {
       this.columnList = [];
-      if (this.selectTolic == null) {
-        return;
-      }
       let list = [];
       list.push({ columnName: "key" });
       list.push({ columnName: "value" });
@@ -339,25 +340,6 @@ export default {
           this.addColumn(this.mappingColumnList, one);
         });
       }
-    },
-    async initTopicList() {
-      this.topicList = [];
-      this.selectTolic = null;
-      if (this.to.topicName != null) {
-        this.selectTolic = this.addTopic(this.topicList, this.to.topicName);
-        return;
-      }
-      let param = {
-        toolboxId: this.to.toolboxId,
-      };
-      let res = await this.server.kakfa.topics(param);
-      if (res.code != 0) {
-        this.tool.error(res.msg);
-      }
-      let list = res.data || [];
-      list.forEach((one) => {
-        this.addTopic(this.topicList, one.topic);
-      });
     },
     async loadFileColumnList() {
       this.mappingColumnList = [];
