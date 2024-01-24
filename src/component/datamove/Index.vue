@@ -330,7 +330,7 @@ export default {
       config.shouldOwner = true;
       config.shouldTable = true;
       config.sqlFileMergeType = "owner";
-      config.fileNameSplice = "/";
+      config.fileNameSplice = "-";
       config.fileName = "导出";
       config.allOwner = true;
       config.owners = [];

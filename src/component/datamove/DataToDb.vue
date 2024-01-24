@@ -5,58 +5,6 @@
         <el-input v-model="dataTotal" style="width: 100px" readonly="">
         </el-input>
       </el-form-item>
-      <el-form-item label="选择导入到的库" class="mgb-0">
-        <el-select
-          v-model="selectOwner"
-          style="width: 200px"
-          filterable
-          value-key="ownerName"
-        >
-          <el-option
-            v-for="(one, index) in ownerList"
-            :key="index"
-            :value="one"
-            :label="one.ownerName"
-          >
-          </el-option>
-        </el-select>
-      </el-form-item>
-      <el-form-item label="库登录用户">
-        <el-input
-          v-model="to.username"
-          style="width: 120px"
-          placeholder="默认配置用户"
-        >
-        </el-input>
-      </el-form-item>
-      <el-form-item label="库登录密码">
-        <el-input
-          v-model="to.password"
-          style="width: 120px"
-          placeholder="默认配置密码"
-        >
-        </el-input>
-      </el-form-item>
-      <el-form-item
-        v-if="from.type != 'sql' && selectOwner != null"
-        label="选择导入到表"
-        class="mgb-0"
-      >
-        <el-select
-          v-model="selectTable"
-          style="width: 200px"
-          filterable
-          value-key="tableName"
-        >
-          <el-option
-            v-for="(one, index) in tableList"
-            :key="index"
-            :value="one"
-            :label="one.tableName"
-          >
-          </el-option>
-        </el-select>
-      </el-form-item>
       <el-form-item v-if="from.type == 'script'" label="导入数据数量">
         <el-input v-model="from.total" style="width: 100px"> </el-input>
       </el-form-item>
@@ -74,6 +22,42 @@
           <el-input v-model="from.replaceLine" style="width: 100px"> </el-input>
         </el-form-item>
       </template>
+      <el-form-item label="选择导入到的 库" class="mgb-0">
+        <el-select
+          v-model="selectOwner"
+          style="width: 200px"
+          filterable
+          value-key="ownerName"
+        >
+          <el-option
+            v-for="(one, index) in ownerList"
+            :key="index"
+            :value="one"
+            :label="one.ownerName"
+          >
+          </el-option>
+        </el-select>
+      </el-form-item>
+      <el-form-item
+        v-if="from.type != 'sql' && selectOwner != null"
+        label="选择导入到的 表"
+        class="mgb-0"
+      >
+        <el-select
+          v-model="selectTable"
+          style="width: 200px"
+          filterable
+          value-key="tableName"
+        >
+          <el-option
+            v-for="(one, index) in tableList"
+            :key="index"
+            :value="one"
+            :label="one.tableName"
+          >
+          </el-option>
+        </el-select>
+      </el-form-item>
       <el-form-item
         v-if="
           from.type == 'sql' ||
@@ -81,11 +65,10 @@
         "
         label="文件路径"
       >
-        <el-input v-model="filePath" style="width: 300px" readonly="">
+        <el-input v-model="filePath" style="width: 200px" readonly="">
         </el-input>
         <el-upload
           v-if="uploadReady"
-          class="toolbox-database-import-upload-file"
           :action="source.api + 'upload'"
           :limit="1"
           :data="{ place: 'other' }"
@@ -93,6 +76,7 @@
           name="file"
           :on-success="onFileUpload"
           :show-file-list="false"
+          style="display: inline-block; margin-left: 10px"
         >
           <div class="tm-link color-teal-8">点击上传</div>
         </el-upload>

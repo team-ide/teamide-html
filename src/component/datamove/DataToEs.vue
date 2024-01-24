@@ -22,28 +22,6 @@
           <el-input v-model="from.replaceLine" style="width: 100px"> </el-input>
         </el-form-item>
       </template>
-      <el-form-item
-        v-if="
-          selectIndex != null && (from.type == 'txt' || from.type == 'excel')
-        "
-        label="文件路径"
-      >
-        <el-input v-model="filePath" style="width: 300px" readonly="">
-        </el-input>
-        <el-upload
-          v-if="uploadReady"
-          class="toolbox-database-import-upload-file"
-          :action="source.api + 'upload'"
-          :limit="1"
-          :data="{ place: 'other' }"
-          :headers="{ JWT: tool.getJWT() }"
-          name="file"
-          :on-success="onFileUpload"
-          :show-file-list="false"
-        >
-          <div class="tm-link color-teal-8">点击上传</div>
-        </el-upload>
-      </el-form-item>
       <el-form-item label="选择导入到的 索引" class="mgb-0">
         <el-select
           v-model="selectIndex"
@@ -60,22 +38,6 @@
           </el-option>
         </el-select>
       </el-form-item>
-      <el-form-item label="索引 登录用户">
-        <el-input
-          v-model="to.username"
-          style="width: 180px"
-          placeholder="可不填写或默认配置用户"
-        >
-        </el-input>
-      </el-form-item>
-      <el-form-item label="索引 登录密码">
-        <el-input
-          v-model="to.password"
-          style="width: 180px"
-          placeholder="可不填写或默认配置密码"
-        >
-        </el-input>
-      </el-form-item>
       <el-form-item label="_id对应的字段名称">
         <el-input v-model="indexIdName" style="width: 150px"> </el-input>
       </el-form-item>
@@ -85,6 +47,28 @@
           如果字段中没有直接对应的_id字段，可以使用表达式计算出_id值， (如:
           `key1+'' + key2`)
         </span>
+      </el-form-item>
+      <el-form-item
+        v-if="
+          selectIndex != null && (from.type == 'txt' || from.type == 'excel')
+        "
+        label="文件路径"
+      >
+        <el-input v-model="filePath" style="width: 200px" readonly="">
+        </el-input>
+        <el-upload
+          v-if="uploadReady"
+          :action="source.api + 'upload'"
+          :limit="1"
+          :data="{ place: 'other' }"
+          :headers="{ JWT: tool.getJWT() }"
+          name="file"
+          :on-success="onFileUpload"
+          :show-file-list="false"
+          style="display: inline-block; margin-left: 10px"
+        >
+          <div class="tm-link color-teal-8">点击上传</div>
+        </el-upload>
       </el-form-item>
     </el-form>
     <template v-if="from.type == 'data' || from.type == 'script'">

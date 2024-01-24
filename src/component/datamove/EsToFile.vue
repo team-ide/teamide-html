@@ -50,22 +50,6 @@
           </el-option>
         </el-select>
       </el-form-item>
-      <el-form-item label="索引 登录用户">
-        <el-input
-          v-model="from.username"
-          style="width: 180px"
-          placeholder="可不填写或默认配置用户"
-        >
-        </el-input>
-      </el-form-item>
-      <el-form-item label="索引 登录密码">
-        <el-input
-          v-model="from.password"
-          style="width: 180px"
-          placeholder="可不填写或默认配置密码"
-        >
-        </el-input>
-      </el-form-item>
     </el-form>
 
     <div class="mgb-10">

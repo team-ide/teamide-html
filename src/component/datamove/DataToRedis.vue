@@ -22,26 +22,6 @@
           <el-input v-model="from.replaceLine" style="width: 100px"> </el-input>
         </el-form-item>
       </template>
-      <el-form-item
-        v-if="from.type == 'txt' || from.type == 'excel'"
-        label="文件路径"
-      >
-        <el-input v-model="filePath" style="width: 300px" readonly="">
-        </el-input>
-        <el-upload
-          v-if="uploadReady"
-          class="toolbox-database-import-upload-file"
-          :action="source.api + 'upload'"
-          :limit="1"
-          :data="{ place: 'other' }"
-          :headers="{ JWT: tool.getJWT() }"
-          name="file"
-          :on-success="onFileUpload"
-          :show-file-list="false"
-        >
-          <div class="tm-link color-teal-8">点击上传</div>
-        </el-upload>
-      </el-form-item>
       <el-form-item label="导入Database">
         <el-input v-model="redisDatabase" style="width: 100px"> </el-input>
       </el-form-item>
@@ -74,6 +54,26 @@
       </el-form-item>
       <el-form-item label="value使用数据转json">
         <el-switch v-model="redisValueByData"> </el-switch>
+      </el-form-item>
+      <el-form-item
+        v-if="from.type == 'txt' || from.type == 'excel'"
+        label="文件路径"
+      >
+        <el-input v-model="filePath" style="width: 200px" readonly="">
+        </el-input>
+        <el-upload
+          v-if="uploadReady"
+          :action="source.api + 'upload'"
+          :limit="1"
+          :data="{ place: 'other' }"
+          :headers="{ JWT: tool.getJWT() }"
+          name="file"
+          :on-success="onFileUpload"
+          :show-file-list="false"
+          style="display: inline-block; margin-left: 10px"
+        >
+          <div class="tm-link color-teal-8">点击上传</div>
+        </el-upload>
       </el-form-item>
     </el-form>
     <template v-if="from.type == 'data' || from.type == 'script'">

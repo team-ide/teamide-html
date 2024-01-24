@@ -14,10 +14,10 @@
       </el-form-item>
       <template v-if="!bySql">
         <template v-if="from.type == 'database' && to.type == 'database'">
-          <el-form-item label="同步库">
+          <el-form-item label="自动建库">
             <el-switch v-model="shouldOwner"> </el-switch>
           </el-form-item>
-          <el-form-item label="同步表">
+          <el-form-item label="同步表结构">
             <el-switch v-model="shouldTable"> </el-switch>
           </el-form-item>
         </template>
@@ -150,38 +150,10 @@
         </el-table-column>
         <el-table-column label="库" prop="ownerName" sortable>
         </el-table-column>
-        <el-table-column label="源用户名" width="100">
-          <template slot-scope="scope">
-            <el-input v-model="scope.row.from.ownerUsername" />
-          </template>
-        </el-table-column>
-        <el-table-column label="源密码" width="100">
-          <template slot-scope="scope">
-            <el-input v-model="scope.row.from.ownerPasswrod" />
-          </template>
-        </el-table-column>
         <el-table-column :label="toOwnerNameLabel">
           <template slot-scope="scope">
             <el-input v-model="scope.row.to.ownerName" /> </template
         ></el-table-column>
-        <el-table-column
-          label="目标用户名"
-          width="100"
-          v-if="to.type == 'database'"
-        >
-          <template slot-scope="scope">
-            <el-input v-model="scope.row.to.ownerUsername" />
-          </template>
-        </el-table-column>
-        <el-table-column
-          label="目标密码"
-          width="100"
-          v-if="to.type == 'database'"
-        >
-          <template slot-scope="scope">
-            <el-input v-model="scope.row.to.ownerPasswrod" />
-          </template>
-        </el-table-column>
       </el-table>
     </template>
     <template v-if="owner != null && !owner.allTable && !bySql">

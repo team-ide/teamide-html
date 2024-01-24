@@ -50,22 +50,6 @@
           </el-option>
         </el-select>
       </el-form-item>
-      <el-form-item label="主题 登录用户">
-        <el-input
-          v-model="from.username"
-          style="width: 180px"
-          placeholder="可不填写或默认配置用户"
-        >
-        </el-input>
-      </el-form-item>
-      <el-form-item label="主题 登录密码">
-        <el-input
-          v-model="from.password"
-          style="width: 180px"
-          placeholder="可不填写或默认配置密码"
-        >
-        </el-input>
-      </el-form-item>
       <el-form-item label="groupId">
         <el-input v-model="topicGroupName" style="width: 200px"> </el-input>
         <div class="color-orange ft-12">导出数据时候使用该groupId消费</div>
