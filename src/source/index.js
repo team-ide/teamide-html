@@ -36,9 +36,18 @@ let defaultUserSetting = {
     terminalBackgroudColor: "",
     mainWindowAlwaysOnTop: "false",
     useNewWindowOpenDialog: "false",
+    tableDataDateFormat: "true",
+    tableDataTimestampDateFormat: "true",
 }
 source.defaultUserSetting = defaultUserSetting;
 source.userSetting = Object.assign({}, defaultUserSetting);
+
+source.isTableDataDateFormat = () => {
+    return tool.isTrue(source.userSetting.tableDataDateFormat)
+}
+source.isTableDataTimestampDateFormat = () => {
+    return tool.isTrue(source.userSetting.tableDataTimestampDateFormat)
+}
 source.eventIsUserKey = (event) => {
     if (source.eventIsKeyGroups(event, source.userSetting.keyTabClose)) {
         if (source.workspaceTabClose) {

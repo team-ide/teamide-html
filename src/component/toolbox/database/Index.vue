@@ -9,8 +9,6 @@
             :toolboxWorker="toolboxWorker"
             :extend="extend"
             :ownersChange="ownersChange"
-            :openDateFormat="openDateFormat"
-            :changeOpenDateFormat="changeOpenDateFormat"
           >
           </Owner>
         </tm-layout>
@@ -22,7 +20,6 @@
             :owners="owners"
             :columnTypeInfoList="columnTypeInfoList"
             :indexTypeInfoList="indexTypeInfoList"
-            :openDateFormat="openDateFormat"
           >
           </Tabs>
         </tm-layout>
@@ -42,7 +39,6 @@
       :source="source"
       :toolboxWorker="toolboxWorker"
       :getRowMenus="getRowMenus"
-      :openDateFormat="openDateFormat"
     >
     </SqlProfile>
 
@@ -83,7 +79,6 @@ export default {
       owners: [],
       columnTypeInfoList: [],
       indexTypeInfoList: [],
-      openDateFormat: true,
       info: null,
     };
   },
@@ -91,12 +86,6 @@ export default {
   watch: {},
   methods: {
     async init() {
-      if (this.extend != null) {
-        if (this.tool.isNotEmpty(this.extend.openDateFormat)) {
-          this.openDateFormat = this.extend.openDateFormat;
-        }
-      }
-
       this.toolboxWorker.getInfo = this.getInfo;
       this.toolboxWorker.isMySql = this.isMySql;
       this.toolboxWorker.columnIsNumber = this.columnIsNumber;
@@ -107,12 +96,6 @@ export default {
       this.toolboxWorker.getRowMenus = this.getRowMenus;
       await this.loadData();
       this.ready = true;
-    },
-    changeOpenDateFormat(openDateFormat) {
-      this.openDateFormat = openDateFormat;
-      this.toolboxWorker.updateExtend({
-        openDateFormat: openDateFormat,
-      });
     },
     getInfo() {
       return this.info;
@@ -279,6 +262,7 @@ export default {
       let info = this.toolboxWorker.getInfo();
       let owners = [];
       list.forEach((one) => {
+        this.tool.addSqlName(one.ownerName);
         one.order = 1;
         if (info != null) {
           if (
@@ -318,7 +302,12 @@ export default {
       if (res.code != 0) {
         this.tool.error(res.msg);
       }
-      return res.data || [];
+      let list = res.data || [];
+
+      list.forEach((one) => {
+        this.tool.addSqlName(one.tableName);
+      });
+      return list;
     },
     async getTableDetail(ownerName, tableName) {
       let res = await this.loadTableDetail(ownerName, tableName);
@@ -338,6 +327,9 @@ export default {
       if (tableDetail) {
         tableDetail.columnList = tableDetail.columnList || [];
         tableDetail.indexList = tableDetail.indexList || [];
+        tableDetail.columnList.forEach((one) => {
+          this.tool.addSqlName(one.columnName);
+        });
       }
       return tableDetail;
     },

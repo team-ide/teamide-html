@@ -23,22 +23,6 @@
             >
               信息
             </div>
-            <template v-if="openDateFormat">
-              <div
-                class="tm-btn tm-btn-xs bg-orange"
-                @click="changeOpenDateFormat(false)"
-              >
-                关闭日期识别
-              </div>
-            </template>
-            <template v-else>
-              <div
-                class="tm-btn tm-btn-xs bg-green"
-                @click="changeOpenDateFormat(true)"
-              >
-                开启日期识别
-              </div>
-            </template>
           </div>
         </tm-layout>
         <tm-layout height="auto" class="app-scroll-bar">
@@ -117,8 +101,6 @@ export default {
     "toolboxWorker",
     "extend",
     "ownersChange",
-    "openDateFormat",
-    "changeOpenDateFormat",
   ],
   data() {
     return {

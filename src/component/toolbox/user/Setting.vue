@@ -80,6 +80,41 @@
         </div>
       </el-form-item>
     </el-form>
+    <div class="pd-10">表格设置</div>
+    <el-form size="mini" @submit.native.prevent label-width="200px">
+      <el-form-item label="格式化日期" class="mgb-5 mglr-10">
+        <el-switch
+          v-model="userSetting.tableDataDateFormat"
+          style="width: 200px"
+          @change="toSave('tableDataDateFormat')"
+          active-value="true"
+          inactive-value="false"
+        >
+        </el-switch>
+        <div
+          class="mgl-10 tm-link color-orange"
+          @click="toSave('tableDataDateFormat', '')"
+        >
+          恢复默认
+        </div>
+      </el-form-item>
+      <el-form-item label="识别并格式化时间戳" class="mgb-5 mglr-10">
+        <el-switch
+          v-model="userSetting.tableDataTimestampDateFormat"
+          style="width: 200px"
+          @change="toSave('tableDataTimestampDateFormat')"
+          active-value="true"
+          inactive-value="false"
+        >
+        </el-switch>
+        <div
+          class="mgl-10 tm-link color-orange"
+          @click="toSave('tableDataTimestampDateFormat', '')"
+        >
+          恢复默认
+        </div>
+      </el-form-item>
+    </el-form>
     <div class="pd-10">终端设置</div>
     <el-form size="mini" @submit.native.prevent label-width="200px">
       <el-form-item label="关闭Tab页" class="mgb-5 mglr-10">

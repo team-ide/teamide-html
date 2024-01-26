@@ -207,9 +207,12 @@
                   selects.length == 0,
               }"
             >
-              查看SQL(编辑:{{ updates.length }}/新增:{{
-                inserts.length
-              }}/删除:{{ selects.length }})
+              查看SQL( 编辑:
+              {{ updates.length }}
+              / 新增:
+              {{ inserts.length }}
+              / 删除:{{ selects.length }}
+              )
             </div>
             <div
               @click="showTableDataListSql"
@@ -229,7 +232,6 @@
             :inserts="inserts"
             :updates="updates"
             @keyup="tableKeyUp"
-            :openDateFormat="openDateFormat"
           >
           </DataTable>
         </tm-layout>
@@ -257,26 +259,20 @@
               :page-size="pageSize"
               layout="total, sizes, prev, pager, next, jumper"
               :total="total"
-              :disabled="total <= 0"
+              :disabled="total == 0"
             >
             </el-pagination>
           </div>
         </tm-layout>
       </tm-layout>
     </template>
-    <DataListExport
-      ref="DataListExport"
-      :source="source"
-      :toolboxWorker="toolboxWorker"
-    ></DataListExport>
   </div>
 </template>
 
 
 <script>
-import DataListExport from "./DataListExport";
 export default {
-  components: { DataListExport },
+  components: {},
   props: [
     "source",
     "toolboxWorker",
@@ -285,7 +281,6 @@ export default {
     "tableName",
     "extend",
     "tabId",
-    "openDateFormat",
   ],
   data() {
     return {

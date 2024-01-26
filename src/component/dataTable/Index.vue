@@ -103,14 +103,7 @@
 <script>
 export default {
   components: {},
-  props: [
-    "source",
-    "selects",
-    "inserts",
-    "updates",
-    "deletes",
-    "openDateFormat",
-  ],
+  props: ["source", "selects", "inserts", "updates", "deletes"],
   data() {
     return {
       columnList: [],
@@ -145,7 +138,7 @@ export default {
     typeIsDate(column) {
       let columnType = column.columnDataType || column.type;
       if (
-        this.openDateFormat &&
+        this.source.isTableDataDateFormat() &&
         this.tool.isNotEmpty(columnType) &&
         columnType.toLowerCase() == "date"
       ) {
@@ -156,7 +149,7 @@ export default {
     typeIsDateTime(column) {
       let columnType = column.columnDataType || column.type;
       if (
-        this.openDateFormat &&
+        this.source.isTableDataDateFormat() &&
         this.tool.isNotEmpty(columnType) &&
         (columnType.toLowerCase() == "datetime" ||
           columnType.toLowerCase() == "timestamp")
@@ -173,7 +166,10 @@ export default {
       if (this.tool.isEmpty(value)) {
         return false;
       }
-      if (this.openDateFormat && ("" + value).length == 13) {
+      if (
+        this.source.isTableDataTimestampDateFormat() &&
+        ("" + value).length == 13
+      ) {
         try {
           if (new Date(Number(value)).getTime() > 0) {
             return true;
@@ -257,21 +253,30 @@ export default {
           });
         },
       });
-      let colMenu = {
-        text: "隐藏/显示列",
+      let hColMenu = {
+        text: "已隐藏列",
         menus: [],
+        disabled: true,
       };
-      menus.push(colMenu);
+      menus.push(hColMenu);
+      let sColMenu = {
+        text: "已显示列",
+        menus: [],
+        disabled: true,
+      };
+      menus.push(sColMenu);
       this.columnList.forEach((one) => {
         if (one.checked) {
-          colMenu.menus.push({
+          sColMenu.disabled = false;
+          sColMenu.menus.push({
             text: "隐藏[" + one.name + "]",
             onClick: () => {
               one.checked = false;
             },
           });
         } else {
-          colMenu.menus.push({
+          hColMenu.disabled = false;
+          hColMenu.menus.push({
             text: "显示[" + one.name + "]",
             onClick: () => {
               one.checked = true;

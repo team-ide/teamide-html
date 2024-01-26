@@ -8,6 +8,7 @@ import md5 from 'js-md5';
 import cryptoJS from 'crypto-js';
 import keyCode from '@/tool/keyCode.js';
 import itemsWorker from './itemsWorker.js';
+import monaco from './monaco.js';
 
 let tool = {};
 Object.assign(tool, tm);
@@ -16,10 +17,12 @@ tool.newItemsWorker = itemsWorker.newItemsWorker;
 tool.md5 = md5;
 tool.jQuery = jQuery;
 
+tool.addSqlName = monaco.addSqlName;
 tool.init = function () {
     source.status = 'connecting';
     server.data().then(res => {
         if (res.code == 0) {
+            monaco.registerLanguages()
             let data = res.data;
             source.init(data);
             server.listenStart()

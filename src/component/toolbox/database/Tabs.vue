@@ -19,7 +19,6 @@
                 toolboxWorker.itemsWorker.activeItem &&
                 item.key == toolboxWorker.itemsWorker.activeItem.key
               "
-              :openDateFormat="openDateFormat"
             >
             </TableData>
           </template>
@@ -34,7 +33,6 @@
                 toolboxWorker.itemsWorker.activeItem &&
                 item.key == toolboxWorker.itemsWorker.activeItem.key
               "
-              :openDateFormat="openDateFormat"
             >
             </Sql>
           </template>
@@ -129,7 +127,6 @@ export default {
     "owners",
     "columnTypeInfoList",
     "indexTypeInfoList",
-    "openDateFormat",
   ],
   data() {
     return {};

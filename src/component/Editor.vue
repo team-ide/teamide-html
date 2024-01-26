@@ -90,6 +90,9 @@ export default {
         .getValueInRange(this.monacoInstance.getSelection());
       // return this.monacoInstance.getSelection().toString();
     },
+    getEditor() {
+      return this.monacoInstance;
+    },
     init() {
       let monaco = window.monaco;
       let languageList = monaco.languages.getLanguages();
@@ -126,7 +129,7 @@ export default {
       if (this.lineNumbers !== null) {
         lineNumbers = this.lineNumbers;
       }
-
+      
       this.monacoInstance = monaco.editor.create(this.$refs.editor, {
         theme: this.getTheme(), //官方自带三种主题vs, hc-black, or vs-dark
         minimap: { enabled: false }, // 缩略导航
