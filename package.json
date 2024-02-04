@@ -29,15 +29,15 @@
     "js-yaml": "^4.1.0",
     "json-bigint": "^1.0.0",
     "marked": "^4.3.0",
-    "teamide-xterm": "^5.3.3",
+    "teamide-xterm": "^5.3.7",
+    "teamide-xterm-addon-attach": "^0.9.3",
+    "teamide-xterm-addon-canvas": "^0.5.3",
+    "teamide-xterm-addon-fit": "^0.8.3",
+    "teamide-xterm-addon-search": "^0.13.3",
     "vue": "^2.6.14",
     "vue-router": "^3.5.1",
     "vue-template-compiler": "2.6.14",
     "vuedraggable": "^2.24.3",
-    "xterm-addon-attach": "^0.9.0",
-    "xterm-addon-canvas": "^0.5.0",
-    "xterm-addon-fit": "^0.8.0",
-    "xterm-addon-search": "^0.13.0",
     "zmodem.js": "^0.1.10"
   },
   "eslintConfig": {
@@ -62,5 +62,8 @@
     "> 1%",
     "last 2 versions",
     "not dead"
-  ]
+  ],
+  "devDependencies": {
+    "@babel/plugin-proposal-optional-chaining": "^7.21.0"
+  }
 }

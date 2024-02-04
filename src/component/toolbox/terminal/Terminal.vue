@@ -349,11 +349,11 @@ import _worker from "./worker.js";
 import "teamide-xterm/css/xterm.css";
 import Zmodem from "@/component/zmodem.js";
 import { Terminal } from "teamide-xterm";
-import { FitAddon } from "xterm-addon-fit";
-import { SearchAddon } from "xterm-addon-search";
-import { CanvasAddon } from "xterm-addon-canvas";
+import { FitAddon } from "teamide-xterm-addon-fit";
+import { SearchAddon } from "teamide-xterm-addon-search";
+import { CanvasAddon } from "teamide-xterm-addon-canvas";
 
-// import { AttachAddon } from "xterm-addon-attach";
+// import { AttachAddon } from "teamide-xterm-addon-attach";
 
 // https://juejin.cn/post/6918911964009725959
 
