@@ -54,6 +54,5 @@ new Vue({
     this.tool.$bvToast = this.$bvToast;
   },
   mounted() {
-    this.tool.init()
   }
 }).$mount('#app')

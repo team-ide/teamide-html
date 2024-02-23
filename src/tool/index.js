@@ -18,21 +18,30 @@ tool.md5 = md5;
 tool.jQuery = jQuery;
 
 tool.addSqlName = monaco.addSqlName;
-tool.init = function () {
+tool.init = async function () {
     source.status = 'connecting';
-    server.data().then(res => {
-        if (res.code == 0) {
-            monaco.registerLanguages()
+    try {
+        monaco.registerLanguages()
+    } catch (e) {
+        tool.error(e.toString());
+    }
+    try {
+        let res = await server.data();
+        if (res != null && res.code == 0) {
             let data = res.data;
+            if (tool.electronSetCache) {
+                tool.electronSetCache(source.mainWindowKey + "-data", data)
+            }
             source.init(data);
             server.listenStart()
         } else {
             tool.error(res.msg);
             source.init();
         }
-    }).catch(() => {
+    } catch (e) {
+        tool.error(e.toString());
         source.init();
-    })
+    }
 };
 if (window.electron && window.electron.ipcRenderer) {
     let ipcRenderer = window.electron.ipcRenderer;
@@ -115,43 +124,51 @@ tool.isUseNewWindowOpenDialog = () => {
 }
 var sessionLoadding = false;
 var refreshSessionStart = false;
-function refreshSession() {
-    function nextContinue() {
-        setTimeout(() => {
-            refreshSession();
-        }, 1000 * 60 * 10);
-    }
+
+function nextContinueRefreshSession() {
+    setTimeout(() => {
+        refreshSession();
+    }, 1000 * 60 * 10);
+}
+async function refreshSession() {
     if (sessionLoadding) {
-        nextContinue();
+        nextContinueRefreshSession();
     } else {
-        server.session().then(res => {
-            if (res.code == 0) {
-                let data = res.data;
-                source.initSession(data)
+        sessionLoadding = true;
+        try {
+            let res = await server.session();
+            if (res != null && res.code == 0) {
+                source.initSession(res.data)
             } else {
+                tool.error(res.msg);
                 source.initSession();
             }
-            nextContinue();
-        }).catch(() => {
-            nextContinue();
-        })
+        } catch (e) {
+            //tool.error(e.toString());
+        }
+        sessionLoadding = false;
+        nextContinueRefreshSession();
     }
 }
-tool.initSession = function () {
+tool.initSession = async function () {
     sessionLoadding = true;
-    server.session().then(res => {
-        if (res.code == 0) {
+    try {
+
+        let res = await server.session();
+        if (res != null && res.code == 0) {
             let data = res.data;
+            if (tool.electronSetCache) {
+                tool.electronSetCache(source.mainWindowKey + "-session", data)
+            }
             source.initSession(data)
         } else {
             tool.error(res.msg);
             source.initSession();
         }
-        sessionLoadding = false;
-    }).catch(() => {
-        source.initSession();
-        sessionLoadding = false;
-    })
+    } catch (e) {
+        //tool.error(e.toString());
+    }
+    sessionLoadding = false;
     if (!refreshSessionStart) {
         refreshSessionStart = true;
         setTimeout(() => {

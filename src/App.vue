@@ -1,9 +1,9 @@
 <template>
   <div id="app">
+    <InfoBox :source="source"></InfoBox>
+    <SystemInfoBox :source="source"></SystemInfoBox>
+    <AlertBox :source="source"></AlertBox>
     <template v-if="source.ready">
-      <InfoBox :source="source"></InfoBox>
-      <SystemInfoBox :source="source"></SystemInfoBox>
-      <AlertBox :source="source"></AlertBox>
       <div class="workspace-page" v-if="openWorkspace">
         <Workspace :source="source"> </Workspace>
       </div>
@@ -14,10 +14,18 @@
       <UpdateCheck :source="source" v-if="openWorkspace"></UpdateCheck>
     </template>
     <template v-else>
-      <div v-if="source.status == 'connecting'"></div>
-      <div v-if="source.status == 'connected'"></div>
+      <div v-if="source.status == 'connecting'">
+        <div class="ft-600 ft-20 color-orange" style="margin: 20px auto">
+          服务器连接中，请稍后
+        </div>
+      </div>
+      <div v-else-if="source.status == 'connected'">
+        <div class="ft-600 ft-20 color-orange" style="margin: 20px auto">
+          服务器连接成功，正在准备数据
+        </div>
+      </div>
       <div
-        v-if="source.status == 'error'"
+        v-else-if="source.status == 'error'"
         style="
           position: fixed;
           width: 100%;
@@ -118,6 +126,7 @@ export default {
     async init() {
       if (this.$route.path == "/dialog") {
         this.openDialogPage = true;
+        this.source.isDialogWindow = true;
       } else {
         this.openWorkspace = true;
       }
@@ -129,7 +138,19 @@ export default {
           this.tool.setJWT(jwt);
         }
       }
-      await this.tool.initSession();
+      if (this.source.isDialogWindow) {
+        let data = await this.tool.electronGetCache(
+          source.mainWindowKey + "-data"
+        );
+        this.source.init(data);
+        let sessionData = await this.tool.electronGetCache(
+          source.mainWindowKey + "-session"
+        );
+        this.source.initSession(sessionData);
+      } else {
+        await this.tool.init();
+        await this.tool.initSession();
+      }
       this.tool.newDialogWindow = async (options) => {
         options = options || {};
         options.windowKey = this.tool.generatekey(20);
