@@ -124,25 +124,7 @@ const newWorker = function (workerOption) {
             if (worker.uploadSocket == null) {
                 return;
             }
-            if (data.length < 200) {
-                worker.uploadSocket.send(new Uint8Array(data));
-                return;
-            }
-            // console.log("send start ", data.length)
             worker.uploadSocket.send(new Uint8Array(data));
-            let res = await this.receiveUploadMessage();
-            // console.log("send end ", res)
-        },
-        receiveUploadMessage() {
-            return new Promise((resolve, reject) => {
-                if (worker.uploadSocket == null) {
-                    resolve()
-                } else {
-                    worker.uploadSocket.onmessage = (event) => {
-                        resolve(event.data)
-                    };
-                }
-            });
         },
         newUploadSocket() {
             let url = source.api;
@@ -163,6 +145,8 @@ const newWorker = function (workerOption) {
                 worker.uploadSocket = null;
             };
             uploadSocket.onerror = () => {
+            };
+            uploadSocket.onmessage = () => {
             };
         },
         getParam() {
