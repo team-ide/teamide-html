@@ -18,13 +18,9 @@ tool.md5 = md5;
 tool.jQuery = jQuery;
 
 tool.addSqlName = monaco.addSqlName;
+tool.registerLanguages = monaco.registerLanguages;
 tool.init = async function () {
     source.status = 'connecting';
-    try {
-        monaco.registerLanguages()
-    } catch (e) {
-        tool.error(e.toString());
-    }
     try {
         let res = await server.data();
         if (res != null && res.code == 0) {

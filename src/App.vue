@@ -15,12 +15,12 @@
     </template>
     <template v-else>
       <div v-if="source.status == 'connecting'">
-        <div class="ft-600 ft-20 color-orange" style="margin: 20px auto">
+        <div class="ft-600 ft-20 color-orange text-center pdt-100">
           服务器连接中，请稍后
         </div>
       </div>
       <div v-else-if="source.status == 'connected'">
-        <div class="ft-600 ft-20 color-orange" style="margin: 20px auto">
+        <div class="ft-600 ft-20 color-orange text-center pdt-100">
           服务器连接成功，正在准备数据
         </div>
       </div>
@@ -150,6 +150,13 @@ export default {
       } else {
         await this.tool.init();
         await this.tool.initSession();
+      }
+      try {
+        window.onMonacoLoad(() => {
+          this.tool.registerLanguages();
+        });
+      } catch (e) {
+        this.tool.error(e.toString());
       }
       this.tool.newDialogWindow = async (options) => {
         options = options || {};

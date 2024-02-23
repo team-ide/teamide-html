@@ -65,6 +65,8 @@ export default {
           cacheKey: this.tool.getNumber(),
           cacheData: options,
           listenKeys: listenKeys,
+          width: 1000,
+          height: 800,
         });
         return;
       }
