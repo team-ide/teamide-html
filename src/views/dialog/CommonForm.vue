@@ -27,6 +27,8 @@
 </template>
 
 <script>
+import form from "@/form";
+
 export default {
   components: {},
   props: ["source", "options", "onSave", "onSuccess"],
@@ -120,6 +122,24 @@ export default {
         if (this.options.toolboxData) {
           this.checkShowPlaintextBtn = this.toolboxPlaintextBtn;
         }
+
+        let data = {};
+        if (this.source.login.user != null) {
+          let res = await this.server.toolbox.group.list({});
+          if (res.code != 0) {
+            this.tool.error(res.msg);
+          }
+          data = res.data || {};
+        }
+        let groups = data.groupList || [];
+        if (form.toolboxGroupOptions.length == 0) {
+          groups.forEach((one) => {
+            form.toolboxGroupOptions.push({
+              value: one.groupId,
+              text: one.name,
+            });
+          });
+        }
         return [this.form.toolbox, this.options.toolboxType.configForm];
       } else if (this.options.formType == "toolbox-group") {
         return [this.form.toolbox.group];
@@ -210,10 +230,12 @@ export default {
         let optionJSON = dataList[1];
         let toolboxType = this.options.toolboxType;
         toolboxData.toolboxType = toolboxType.name;
-        if (this.options.selectGroup) {
-          toolboxData.groupId = this.options.selectGroup.groupId;
-        } else if (this.options.groupId) {
-          toolboxData.groupId = this.options.groupId;
+        if (this.tool.isEmpty(toolboxData.groupId)) {
+          if (this.options.selectGroup) {
+            toolboxData.groupId = this.options.selectGroup.groupId;
+          } else if (this.options.groupId) {
+            toolboxData.groupId = this.options.groupId;
+          }
         }
         toolboxData.option = JSON.stringify(optionJSON);
         if (this.options.toolboxId) {

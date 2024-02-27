@@ -43,7 +43,13 @@
               />
             </div>
           </div>
-          <div class="toolbox-group-body app-scroll-bar">
+          <draggable
+            class="toolbox-group-body app-scroll-bar"
+            tag="div"
+            v-model="groupList"
+            @end="groupDragEnd"
+            draggable=".toolbox-group-one"
+          >
             <template v-for="group in groupList">
               <div
                 :key="group.groupId"
@@ -60,11 +66,12 @@
                 <div class="toolbox-group-title">
                   <div class="toolbox-group-title-text">
                     {{ group.name }}
+                    <span class="color-green ft-12">({{ group.count }})</span>
                   </div>
                 </div>
               </div>
             </template>
-          </div>
+          </draggable>
         </div>
 
         <div class="toolbox-data-list-box" v-if="showToolboxContext != null">
@@ -185,8 +192,11 @@
 </template>
 
 <script>
+import draggable from "vuedraggable";
+import form from "@/form";
+
 export default {
-  components: {},
+  components: { draggable },
   props: ["source", "openByOption"],
   data() {
     return {
@@ -232,6 +242,28 @@ export default {
     init() {
       this.initToolboxGroups();
     },
+    async groupDragEnd(arg) {
+      if (arg.newIndex == arg.oldIndex) {
+        return;
+      }
+      let sequences = {};
+      this.groupList.forEach((one, i) => {
+        if (one.groupId > 0) {
+          sequences[one.groupId] = i;
+        }
+      });
+      let res = await this.server.toolbox.group.updateSequence({
+        sequences: sequences,
+      });
+      if (res.code == 0) {
+        this.tool.success("排序成功");
+        this.initData();
+        return true;
+      } else {
+        this.tool.error(res.msg);
+        return false;
+      }
+    },
     async initToolboxGroups() {
       let data = {};
       if (this.source.login.user != null) {
@@ -242,7 +274,14 @@ export default {
         data = res.data || {};
       }
       let groups = data.groupList || [];
+
+      form.toolboxGroupOptions.splice(0, form.toolboxGroupOptions.length);
+
       groups.forEach((one) => {
+        form.toolboxGroupOptions.push({
+          value: one.groupId,
+          text: one.name,
+        });
         let find = null;
         this.source.showTabGroups.forEach((g) => {
           if (g.isToolboxGroup && g.value == one.groupId) {
@@ -292,21 +331,28 @@ export default {
       this.toolboxList = toolboxList;
 
       let groups = this.toolboxGroups || [];
-      groupList.push({
-        groupId: null,
+      this.group_all = {
+        groupId: -1,
+        name: "所有",
+        isAll: true,
+        count: 0,
+      };
+      groupList.push(this.group_all);
+      this.group_no_group = {
+        groupId: -2,
         name: "未分组",
-      });
+        isNoGroup: true,
+        count: 0,
+      };
+      groupList.push(this.group_no_group);
       let groupIdCache = {};
       groups.forEach((one) => {
+        one.count = 0;
         groupIdCache[one.groupId] = one;
-        groupList.push({
-          groupId: one.groupId,
-          name: one.name,
-          comment: one.comment,
-        });
+        groupList.push(one);
       });
       let selectGroup = groupList[0];
-      if (this.selectGroup && this.selectGroup.groupId != null) {
+      if (this.selectGroup) {
         groupList.forEach((one) => {
           if (one.groupId == this.selectGroup.groupId) {
             selectGroup = one;
@@ -325,16 +371,23 @@ export default {
         return;
       }
       let showToolboxContext = {};
-
-      let isDefaultGroup = this.tool.isEmpty(selectGroup.groupId);
+      this.groupList.forEach((one) => {
+        one.count = 0;
+      });
 
       this.toolboxList.forEach((one) => {
+        this.group_all.count++;
+        let dG = this.groupIdCache[one.groupId];
+        let isNoGroup = this.tool.isEmpty(one.groupId) || dG == null;
+        if (isNoGroup) {
+          this.group_no_group.count++;
+        } else {
+          dG.count++;
+        }
         let isThisGroup = false;
-        if (
-          isDefaultGroup &&
-          (this.tool.isEmpty(one.groupId) ||
-            this.groupIdCache[one.groupId] == null)
-        ) {
+        if (selectGroup.isAll) {
+          isThisGroup = true;
+        } else if (selectGroup.isNoGroup && isNoGroup) {
           isThisGroup = true;
         } else if (selectGroup.groupId == one.groupId) {
           isThisGroup = true;
@@ -391,6 +444,9 @@ export default {
       }
     },
     async moveGroup(toolboxId, groupId) {
+      if (groupId < 0) {
+        groupId = null;
+      }
       let res = await this.server.toolbox.moveGroup({
         toolboxId: toolboxId,
         groupId: groupId,
@@ -455,6 +511,9 @@ export default {
           };
           menus.push(moveGroupMenu);
           this.groupList.forEach((one) => {
+            if (one.isAll) {
+              return;
+            }
             moveGroupMenu.menus.push({
               text: one.name,
               onClick: () => {
@@ -506,10 +565,10 @@ export default {
       let optionsJSON = {};
 
       let groupId = null;
-      if (selectGroup) {
+      if (selectGroup && selectGroup.groupId > 0) {
         groupId = selectGroup.groupId;
       }
-
+      toolboxData.groupId = groupId;
       this.tool.showForm({
         formType: "toolbox",
         param: {},
@@ -675,7 +734,7 @@ export default {
       let toolboxData = {};
       Object.assign(toolboxData, find);
       delete toolboxData.toolboxId;
-      toolboxData.name = toolboxData.name + " Copy";
+      toolboxData.name = toolboxData.name + "";
 
       let optionsJSON = this.tool.getOptionJSON(toolboxData.option);
 
@@ -878,7 +937,7 @@ export default {
   /* width: calc(25% - 12.5px); */
   width: 100%;
   cursor: pointer;
-  margin-top: 10px;
+  margin-top: 5px;
 }
 .toolbox-context-box .toolbox-group-title {
   padding: 0px 10px;

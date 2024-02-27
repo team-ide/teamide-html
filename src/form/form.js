@@ -101,12 +101,13 @@ let model = {
 };
 
 var sshToolboxOptions = []
+var toolboxGroupOptions = []
 let toolbox = {
     fields: [
         {
             label: "名称",
             name: "name",
-            col: 12,
+            col: 8,
             rules: [
                 {
                     required: true,
@@ -118,9 +119,16 @@ let toolbox = {
         {
             label: "说明",
             name: "comment",
-            col: 12,
+            col: 8,
             rules: [
             ],
+        },
+        {
+            label: "分组",
+            name: "groupId",
+            col: 8,
+            type: "select",
+            options: toolboxGroupOptions,
         },
         {
             label: "可见性",
@@ -462,4 +470,5 @@ export default {
     toolbox,
     node,
     sshToolboxOptions,
+    toolboxGroupOptions,
 };
