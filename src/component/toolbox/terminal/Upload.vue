@@ -119,6 +119,7 @@ export default {
     doUpload(files) {
       this.isFileSelect = true;
       this.showDialog = false;
+      this.term.write("\r\n注意：显示文件上传的进度为本地到应用服务的进度\r\n");
 
       this.send_block_files(this.zsession, files, {
         on_offer_response: (obj, xfer) => {
@@ -132,7 +133,7 @@ export default {
                 obj.upload_file_count +
                 ") " +
                 obj.name +
-                " 已跳过（请检查文件是否已存在）\r\n"
+                " 已跳过（请检查文件是否已存在或是否有权限上传）\r\n"
             );
             if (obj.upload_number == obj.upload_file_count) {
               this.onSuccess();
@@ -140,7 +141,9 @@ export default {
           }
         },
         on_progress: (obj, xfer) => {
-          this.updateProgress(xfer);
+          try {
+            this.updateProgress(xfer);
+          } catch (error) {}
         },
         on_file_complete: (obj) => {
           this.term.write(
@@ -267,34 +270,45 @@ export default {
         percent = ((offset / total) * 100).toFixed(2);
       }
       let percentStr = "" + percent;
-      let fSize = 10 - percentStr.length;
+      let fSize = 6 - percentStr.length;
       for (let i = 0; i < fSize; i++) {
         percentStr = " " + percentStr;
       }
       let sleep = 0;
       let nowTime = new Date().getTime();
       let startTime = xfer._file_info.startTime;
-      if (nowTime - startTime > 0) {
-        sleep = ((offset * 1000) / (nowTime - startTime)).toFixed(2);
+      let useTime = nowTime - startTime;
+      if (useTime > 0) {
+        sleep = ((offset * 1000) / useTime).toFixed(2);
       }
-      this.term.write(
-        "\r" +
-          "上传文件(" +
-          detail.obj.upload_number +
-          "/" +
-          detail.obj.upload_file_count +
-          ") " +
-          name +
-          " " +
-          this.bytesHuman(total) +
-          " " +
-          this.bytesHuman(offset) +
-          " " +
-          this.bytesHuman(sleep) +
-          "/s " +
-          percentStr +
-          "%"
-      );
+      let overS = total - offset;
+      let overT = -1;
+      if (overS > 0 && sleep > 0) {
+        overT = (overS / sleep).toFixed(2);
+      }
+      let str =
+        "上传文件(" +
+        detail.obj.upload_number +
+        "/" +
+        detail.obj.upload_file_count +
+        ") " +
+        name +
+        " " +
+        this.bytesHuman(total) +
+        " " +
+        this.bytesHuman(offset) +
+        " " +
+        this.bytesHuman(sleep) +
+        "/s " +
+        percentStr +
+        "%";
+      if (useTime > 0) {
+        str += "   用时:" + this.tool.formatTimeStr(useTime);
+      }
+      if (overT > 0) {
+        str += "   预计:" + this.tool.formatTimeStr(overT * 1000);
+      }
+      this.term.write("\r" + str);
     },
     send_block_files(session, files, options) {
       let that = this;

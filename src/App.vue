@@ -134,30 +134,27 @@ export default {
         if (this.$route.query.mainWindowKey) {
           this.source.isOtherWindow = true;
           this.source.mainWindowKey = this.$route.query.mainWindowKey;
-          let jwt = await this.tool.electronGetCache(source.mainWindowKey);
+          let jwt = await this.tool.electronGetCache(this.source.mainWindowKey);
           this.tool.setJWT(jwt);
         }
       }
-      if (this.source.isDialogWindow) {
-        let data = await this.tool.electronGetCache(
-          source.mainWindowKey + "-data"
-        );
-        this.source.init(data);
-        let sessionData = await this.tool.electronGetCache(
-          source.mainWindowKey + "-session"
-        );
-        this.source.initSession(sessionData);
-      } else {
-        await this.tool.init();
-        await this.tool.initSession();
-      }
-      try {
-        window.onMonacoLoad(() => {
-          this.tool.registerLanguages();
-        });
-      } catch (e) {
-        this.tool.error(e.toString());
-      }
+      window.onMonacoLoad(async () => {
+        if (this.source.isDialogWindow) {
+          let data = await this.tool.electronGetCache(
+            this.source.mainWindowKey + "-data"
+          );
+          this.source.init(data);
+          let sessionData = await this.tool.electronGetCache(
+            this.source.mainWindowKey + "-session"
+          );
+          this.source.initSession(sessionData);
+        } else {
+          await this.tool.init();
+          await this.tool.initSession();
+        }
+        document.getElementById("app-loading").style.display = "none";
+        this.tool.registerLanguages();
+      });
       this.tool.newDialogWindow = async (options) => {
         options = options || {};
         options.windowKey = this.tool.generatekey(20);
