@@ -7,9 +7,9 @@
       <div class="toolbox-context-box-header">
         <div class="ft-16 pdl-10 pdt-5">
           工具箱
-          <span class="color-orange mgl-20 ft-12"
-            >请右击进行操作，点击某个分组，查看一分组的各类工具</span
-          >
+          <span class="color-orange mgl-20 ft-12">
+            请右击进行操作分组或工具，拖动分组可以排序，点击某个分组，查看一分组的各类工具
+          </span>
         </div>
         <div
           style="
