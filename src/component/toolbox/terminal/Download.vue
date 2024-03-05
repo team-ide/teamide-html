@@ -20,7 +20,7 @@ export default {
       //**B00000000000000
       //zsentry consume error:Error: Unhandled header: ZRQINIT
       //rz waiting to receive.**B0100000023be50
-//zsentry consume error:Error: Unhandled header: ZRINIT
+      //zsentry consume error:Error: Unhandled header: ZRINIT
     },
     stop() {
       if (this.last_xfer) {
@@ -114,24 +114,35 @@ export default {
       let sleep = 0;
       let nowTime = new Date().getTime();
       let startTime = xfer.startTime;
-      if (nowTime - startTime > 0) {
-        sleep = ((offset * 1000) / (nowTime - startTime)).toFixed(2);
+      let useTime = nowTime - startTime;
+      if (useTime > 0) {
+        sleep = ((offset * 1000) / useTime).toFixed(2);
       }
+      let overS = total - offset;
+      let overT = -1;
+      if (overS > 0 && sleep > 0) {
+        overT = (overS / sleep).toFixed(2);
+      }
+      let str =
+        "下载文件" +
+        name +
+        " " +
+        this.bytesHuman(total) +
+        " " +
+        this.bytesHuman(offset) +
+        " " +
+        this.bytesHuman(sleep) +
+        "/s " +
+        percentStr +
+        "%";
 
-      this.term.write(
-        "\r" +
-          "下载文件" +
-          name +
-          " " +
-          this.bytesHuman(total) +
-          " " +
-          this.bytesHuman(offset) +
-          " " +
-          this.bytesHuman(sleep) +
-          "/s " +
-          percentStr +
-          "%"
-      );
+      if (useTime > 0) {
+        str += "   用时:" + this.tool.formatTimeStr(useTime);
+      }
+      if (overT > 0) {
+        str += "   预计:" + this.tool.formatTimeStr(overT * 1000);
+      }
+      this.term.write("\r" + str);
     },
     saveFile(xfer, buffer) {
       let name = xfer.get_details().name;

@@ -255,7 +255,7 @@ export default {
         this.onKeyUp(e);
       });
       window.document.body.addEventListener("contextmenu", (e) => {
-        let tags = ["input", "textarea", "canvas"];
+        let tags = ["input", "textarea", "canvas", "img"];
         if (tags.indexOf(("" + e.target.tagName).toLowerCase()) >= 0) {
           return;
         }

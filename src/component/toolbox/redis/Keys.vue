@@ -408,6 +408,7 @@ export default {
         title: `编辑[${data.key}]数据`,
         type: "data",
         key: data.key,
+        keyBase64: data.keyBase64,
         database: data.database,
         onlyOpenOneKey: "redis:data:key" + data.key,
       };
@@ -417,22 +418,23 @@ export default {
       this.tool
         .confirm("确认删除[" + data.key + "]？")
         .then(async () => {
-          this.doDelete(data.database, data.key);
+          this.doDelete(data.database, data.key, data.keyBase64);
         })
         .catch((e) => {});
     },
-    toDeletePattern(database, pattern) {
+    toDeletePattern(database, pattern, keyBase64) {
       this.tool
         .confirm("将删除所有匹配[" + pattern + "]的Key，确定删除？")
         .then(async () => {
-          this.doDeletePattern(database, pattern);
+          this.doDeletePattern(database, pattern, keyBase64);
         })
         .catch((e) => {});
     },
-    async doDelete(database, key) {
+    async doDelete(database, key, keyBase64) {
       let param = this.toolboxWorker.getWorkParam({
         database: Number(database),
         key: key,
+        keyBase64: keyBase64,
       });
       let res = await this.server.redis.delete(param);
       if (res.code == 0) {

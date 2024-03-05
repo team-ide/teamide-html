@@ -118,6 +118,15 @@
             >
             </Javascript>
           </template>
+          <template v-else-if="item.extend.type == 'QRCode'">
+            <QRCode
+              :source="source"
+              :toolboxWorker="toolboxWorker"
+              :extend="item.extend"
+              :tabId="item.tabId"
+            >
+            </QRCode>
+          </template>
         </template>
       </WorkspaceSpans>
     </div>
@@ -137,6 +146,7 @@ import RandomNumber from "./RandomNumber";
 import RandomString from "./RandomString";
 import GeneratePassword from "./GeneratePassword";
 import Javascript from "./Javascript";
+import QRCode from "./QRCode";
 
 export default {
   components: {
@@ -151,6 +161,7 @@ export default {
     RandomString,
     GeneratePassword,
     Javascript,
+    QRCode,
   },
   props: ["source", "toolboxWorker"],
   data() {

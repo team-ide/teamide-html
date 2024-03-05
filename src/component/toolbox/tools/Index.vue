@@ -37,6 +37,7 @@ export default {
         { type: "json", text: "JSON", disable: false },
         { type: "yaml", text: "Yaml", disable: false },
         { type: "timestamp", text: "时间戳", disable: false },
+        { type: "QRCode", text: "二维码", disable: false },
         { type: "javascript", text: "Javascript在线运行", disable: false },
         { type: "crontab", text: "Crontab", disable: true },
         { type: "urlEncode", text: "URL编码解码", disable: false },

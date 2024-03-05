@@ -677,20 +677,25 @@ export default {
       try {
         this.zsentry.consume(data);
       } catch (e) {
-        try {
-          this.worker.isUploading = false;
-          this.worker.isDownloading = false;
-          if (this.last_session) {
-            this.last_session.close();
-          }
-        } catch (e) {}
         if (this.term == null) {
           return;
         }
-        this.term.write("\r\nzsentry consume error:" + e.toString());
-        this.term.write("\r\n关闭当前会话");
-        this.zsentry = this.NewSentry();
-        this.worker.closeSocket();
+        console.log("zsentry consume error:", e);
+        try {
+          this.worker.isUploading = false;
+          this.worker.isDownloading = false;
+
+          if (this.last_session && this.last_session.close) {
+            this.last_session.close();
+            this.last_session = null;
+          }
+          this.zsentry = this.NewSentry();
+          this.writeCommand("\x03");
+        } catch (e) {}
+        // this.term.write("\r\nzsentry consume error:" + e.toString());
+        // this.term.write("\r\n关闭当前会话");
+        // this.zsentry = this.NewSentry();
+        // this.worker.closeSocket();
       }
       // if (typeof data === "string") {
       //   this.term.write(data);
@@ -1436,9 +1441,11 @@ export default {
   },
   beforeDestroy() {
     this.isDestroyed = true;
-    if (this.term != null) {
+    let t = this.term;
+    this.term = null;
+    if (t != null) {
       try {
-        this.term.dispose();
+        t.dispose();
       } catch (e) {}
     }
     this.worker.close();

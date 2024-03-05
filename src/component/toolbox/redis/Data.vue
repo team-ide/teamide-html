@@ -336,6 +336,17 @@ export default {
     reloadForm() {
       this.initForm();
     },
+    getKeyBase64() {
+      if (
+        this.extend &&
+        this.extend.key &&
+        this.extend.keyBase64 &&
+        this.extend.key == this.form.key
+      ) {
+        return this.extend.keyBase64;
+      }
+      return null;
+    },
     async initForm() {
       this.loading = true;
       this.form.value = null;
@@ -348,7 +359,11 @@ export default {
       this.hashList = [];
 
       if (this.tool.isNotEmpty(this.form.key)) {
-        let keyData = await this.load(this.form.database, this.form.key);
+        let keyData = await this.load(
+          this.form.database,
+          this.form.key,
+          this.getKeyBase64()
+        );
         this.initFormData(keyData);
       }
       if (this.tool.isEmpty(this.form.valueType)) {
@@ -356,10 +371,11 @@ export default {
       }
       this.loading = false;
     },
-    async load(database, key) {
+    async load(database, key, keyBase64) {
       let param = this.toolboxWorker.getWorkParam({
         database: Number(database),
         key: key,
+        keyBase64: keyBase64 || null,
         valueSize: Number(this.form.valueSize),
       });
       let res = await this.server.redis.get(param);
@@ -439,6 +455,7 @@ export default {
       data = data || {};
       data.database = Number(this.form.database);
       data.key = this.form.key;
+      data.keyBase64 = this.getKeyBase64();
       if (this.tool.isEmpty(doType)) {
         this.tool.error("操作类型不能为空！");
         return;
@@ -504,6 +521,7 @@ export default {
       this.form.valueSize = Number(this.form.valueSize);
       this.form.expire = Number(this.form.expire);
       let param = this.toolboxWorker.getWorkParam(Object.assign({}, this.form));
+      param.keyBase64 = this.getKeyBase64();
       let res = await this.server.redis.set(param);
 
       if (res.code == 0) {
