@@ -2,7 +2,7 @@
   <div class="toolbox-database-owner">
     <template v-if="ready">
       <tm-layout height="100%">
-        <tm-layout height="80px">
+        <tm-layout height="60px">
           <div class="pdlr-10 pdt-10 toolbox-database-owner-btns">
             <div class="tm-btn tm-btn-xs bg-grey-6" @click="refresh">刷新</div>
             <div class="tm-btn tm-btn-xs bg-teal-8" @click="toOwnerCreate">
@@ -25,66 +25,78 @@
             </div>
           </div>
         </tm-layout>
-        <tm-layout height="auto" class="app-scroll-bar">
-          <div class="pd-10">
-            <el-input placeholder="输入关键字进行过滤" v-model="filterText">
-            </el-input>
-            <el-tree
-              ref="tree"
-              :load="loadNode"
-              lazy
-              :props="defaultProps"
-              :default-expanded-keys="expands"
-              node-key="key"
-              :expand-on-click-node="false"
-              @node-click="nodeClick"
-              @node-contextmenu="nodeContextmenu"
-              @node-expand="nodeExpand"
-              @node-collapse="nodeCollapse"
-              :filter-node-method="filterNode"
-            >
-              <span
-                class="toolbox-editor-tree-span"
-                slot-scope="{ node, data }"
+        <tm-layout height="auto">
+          <div class="pd-10" style="height: 100%">
+            <div style="height: 36px">
+              <el-input
+                placeholder="输入关键字进行过滤"
+                size="mini"
+                v-model="filterText"
               >
-                <span>{{ node.label }}</span>
-                <div class="toolbox-editor-tree-btn-group">
-                  <div
-                    v-if="data.isOwner || data.isOwnerTables"
-                    class="tm-link color-grey ft-14 mgr-4"
-                    @click="toReloadChildren(data)"
-                  >
-                    <i class="mdi mdi-reload"></i>
+              </el-input>
+            </div>
+            <div
+              style="height: calc(100% - 36px)"
+              class="app-scroll-bar"
+              ref="treeBox"
+            >
+              <el-tree
+                ref="tree"
+                :load="loadNode"
+                lazy
+                :props="defaultProps"
+                :default-expanded-keys="expands"
+                node-key="key"
+                :expand-on-click-node="false"
+                @node-click="nodeClick"
+                @node-contextmenu="nodeContextmenu"
+                @node-expand="nodeExpand"
+                @node-collapse="nodeCollapse"
+                :filter-node-method="filterNode"
+              >
+                <span
+                  class="toolbox-editor-tree-span"
+                  slot-scope="{ node, data }"
+                >
+                  <span>{{ node.label }}</span>
+                  <div class="toolbox-editor-tree-btn-group">
+                    <div
+                      v-if="data.isOwner || data.isOwnerTables"
+                      class="tm-link color-grey ft-14 mgr-4"
+                      @click="toReloadChildren(data)"
+                    >
+                      <i class="mdi mdi-reload"></i>
+                    </div>
+                    <div
+                      v-if="data.isTable"
+                      class="tm-link color-grey ft-14 mgr-4"
+                      title="表数据"
+                      @click="toTableOpen(data)"
+                    >
+                      <i class="mdi mdi-database-outline"></i>
+                    </div>
+                    <div
+                      v-if="data.isOwner || data.isTable"
+                      class="tm-link color-grey ft-13 mgr-4"
+                      title="DDL"
+                      @click="toShowDDL(data)"
+                    >
+                      <IconFont
+                        class="teamide-suffix-sql"
+                        style="vertical-align: -1px"
+                      ></IconFont>
+                    </div>
+                    <div
+                      v-if="data.isOwner || data.isTable"
+                      class="tm-link color-orange ft-15 mgr-4"
+                      @click="toDelete(data)"
+                    >
+                      <i class="mdi mdi-delete-outline"></i>
+                    </div>
                   </div>
-                  <div
-                    v-if="data.isTable"
-                    class="tm-link color-grey ft-14 mgr-4"
-                    title="表数据"
-                    @click="toTableOpen(data)"
-                  >
-                    <i class="mdi mdi-database-outline"></i>
-                  </div>
-                  <div
-                    v-if="data.isOwner || data.isTable"
-                    class="tm-link color-grey ft-13 mgr-4"
-                    title="DDL"
-                    @click="toShowDDL(data)"
-                  >
-                    <IconFont
-                      class="teamide-suffix-sql"
-                      style="vertical-align: -1px"
-                    ></IconFont>
-                  </div>
-                  <div
-                    v-if="data.isOwner || data.isTable"
-                    class="tm-link color-orange ft-15 mgr-4"
-                    @click="toDelete(data)"
-                  >
-                    <i class="mdi mdi-delete-outline"></i>
-                  </div>
-                </div>
-              </span>
-            </el-tree>
+                </span>
+              </el-tree>
+            </div>
           </div>
         </tm-layout>
       </tm-layout>
@@ -96,12 +108,7 @@
 <script>
 export default {
   components: {},
-  props: [
-    "source",
-    "toolboxWorker",
-    "extend",
-    "ownersChange",
-  ],
+  props: ["source", "toolboxWorker", "extend", "ownersChange"],
   data() {
     return {
       ready: false,
@@ -535,11 +542,11 @@ export default {
       }
     },
     initTreeWidth() {
-      // setTimeout(() => {
-      //   this.$nextTick(() => {
-      //     this.tool.initTreeWidth(this.$refs.tree, this.$refs.treeBox);
-      //   });
-      // }, 100);
+      setTimeout(() => {
+        this.$nextTick(() => {
+          this.tool.initTreeWidth(this.$refs.tree, this.$refs.treeBox);
+        });
+      }, 100);
     },
     toOwnerCreate() {
       this.toolboxWorker.showOwnerCreate(() => {

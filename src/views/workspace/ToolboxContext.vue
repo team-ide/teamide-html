@@ -105,6 +105,12 @@
                     <template v-else-if="toolboxType.name == 'zookeeper'">
                       <IconFont class="teamide-zookeeper"> </IconFont>
                     </template>
+                    <template v-else-if="toolboxType.name == 'mongodb'">
+                      <IconFont class="teamide-mongodb"> </IconFont>
+                    </template>
+                    <template v-else-if="toolboxType.name == 'thrift'">
+                      <IconFont class="teamide-thrift"> </IconFont>
+                    </template>
                     <template v-else-if="toolboxType.name == 'ssh'">
                       <IconFont class="teamide-ssh"> </IconFont>
                       <IconFont class="teamide-ftp"> </IconFont>

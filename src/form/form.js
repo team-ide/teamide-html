@@ -462,6 +462,34 @@ let node = {
         ],
     },
 };
+let mongodb = {
+    collection: {
+        fields: [
+            {
+                label: "库名称",
+                name: "databaseName",
+                rules: [
+                    {
+                        required: true,
+                        message: `库名称不能为空!`
+                    },
+
+                ],
+            },
+            {
+                label: "集合名称",
+                name: "collectionName",
+                rules: [
+                    {
+                        required: true,
+                        message: `集合名称不能为空!`
+                    },
+
+                ],
+            },
+        ],
+    }
+}
 export default {
     login,
     register,
@@ -469,6 +497,7 @@ export default {
     model,
     toolbox,
     node,
+    mongodb,
     sshToolboxOptions,
     toolboxGroupOptions,
 };

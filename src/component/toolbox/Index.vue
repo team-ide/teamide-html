@@ -93,6 +93,14 @@
         <Page :source="source" :extend="extend" :toolboxWorker="toolboxWorker">
         </Page>
       </template>
+      <template v-else-if="toolboxType == 'mongodb'">
+        <MongodbEditor
+          :source="source"
+          :extend="extend"
+          :toolboxWorker="toolboxWorker"
+        >
+        </MongodbEditor>
+      </template>
     </template>
   </div>
 </template>
@@ -106,6 +114,7 @@ import FileManagerEditor from "./file-manager/Index.vue";
 import TerminalEditor from "./terminal/Index.vue";
 import toolboxWorker_ from "./toolboxWorker.js";
 import ThriftEditor from "./thrift/Index.vue";
+import MongodbEditor from "./mongodb/Index.vue";
 
 export default {
   components: {
@@ -114,6 +123,7 @@ export default {
     FileManagerEditor,
     TerminalEditor,
     ThriftEditor,
+    MongodbEditor,
   },
   props: ["source", "extend", "toolboxType", "toolboxId", "openId"],
   data() {

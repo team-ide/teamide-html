@@ -506,6 +506,12 @@ export default {
         case "kafka":
           item.iconFont = "teamide-kafka";
           break;
+        case "mongodb":
+          item.iconFont = "teamide-mongodb";
+          break;
+        case "thrift":
+          item.iconFont = "teamide-thrift";
+          break;
         case "ssh":
           item.icon = "mdi-console";
           if (item.extend && item.extend.isFTP) {

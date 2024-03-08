@@ -6,6 +6,20 @@
   "description": "",
   "glyphs": [
     {
+      "icon_id": "10215379",
+      "name": "thrift",
+      "font_class": "thrift",
+      "unicode": "e738",
+      "unicode_decimal": 59192
+    },
+    {
+      "icon_id": "21053626",
+      "name": "mongodb",
+      "font_class": "mongodb",
+      "unicode": "e66d",
+      "unicode_decimal": 58989
+    },
+    {
       "icon_id": "2654344",
       "name": "SQL",
       "font_class": "sql",

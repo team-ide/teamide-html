@@ -90,6 +90,8 @@ export default {
           res = await this.server.kafka.check(toolboxData);
         } else if (toolboxData.toolboxType == "ssh") {
           res = await this.server.terminal.check(toolboxData);
+        } else if (toolboxData.toolboxType == "mongodb") {
+          res = await this.server.mongodb.check(toolboxData);
         }
         if (res.code == 0) {
           this.checkOk = true;
@@ -108,7 +110,9 @@ export default {
       }
     },
     async getFormList() {
-      if (this.options.formType == "es-index") {
+      if (this.options.formType == "mongodb-collection") {
+        return [this.form.mongodb.collection];
+      } else if (this.options.formType == "es-index") {
         return [this.form.toolbox.elasticsearch.index];
       } else if (this.options.formType == "kafka-topic") {
         return [this.form.toolbox.kafka.topic];
@@ -171,7 +175,7 @@ export default {
           },
         ];
       } else {
-        this.tool.error("不识别的表单类型[formType]");
+        this.tool.error("不识别的表单类型[" + this.options.formType + "]");
       }
       return [];
     },
@@ -204,7 +208,10 @@ export default {
       let data = dataList[0];
       let param = this.options.param || {};
       let res = null;
-      if (this.options.formType == "es-index") {
+      if (this.options.formType == "mongodb-collection") {
+        Object.assign(param, data);
+        res = await this.server.mongodb.collection.create(param);
+      } else if (this.options.formType == "es-index") {
         Object.assign(param, data);
         res = await this.server.elasticsearch.createIndex(param);
       } else if (this.options.formType == "kafka-topic") {
@@ -270,7 +277,7 @@ export default {
         };
         res = await this.server.toolbox.extend.save(param);
       } else {
-        this.tool.error("不识别的表单类型[formType]");
+        this.tool.error("不识别的表单类型[" + this.options.formType + "]");
         return false;
       }
       let error = null;
