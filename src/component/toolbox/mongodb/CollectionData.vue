@@ -214,13 +214,15 @@
                         v-if="column.name == '_id' && scope.row.isObjectID"
                         class=""
                       >
-                        <span class="color-orange">ObjectId('</span>
-                        {{ tool.getStringValue(scope.row.data[column.name]) }}
+                        <span class="color-orange">ObjectID('</span>
+                        <span class="">{{
+                          tool.getStringValue(scope.row.data[column.name])
+                        }}</span>
                         <span class="color-orange">')</span>
                       </span>
-                      <span v-else class="">
-                        {{ tool.getStringValue(scope.row.data[column.name]) }}
-                      </span>
+                      <span v-else class="">{{
+                        tool.getStringValue(scope.row.data[column.name])
+                      }}</span>
                     </template>
                   </el-table-column>
                 </template>
