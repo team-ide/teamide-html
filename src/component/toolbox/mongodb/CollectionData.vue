@@ -4,7 +4,16 @@
       <tm-layout height="100%">
         <tm-layout height="120px" style="overflow: hidden">
           <tm-layout width="auto">
-            <ul class="part-box app-scroll-bar mg-0">
+            <div v-show="useWhereDoc" style="width: 100%; height: 100%">
+              <Editor
+                ref="whereDoc"
+                :source="source"
+                :value="whereDoc"
+                language="json"
+                :change="onChangeWhereDoc"
+              ></Editor>
+            </div>
+            <ul v-show="!useWhereDoc" class="part-box app-scroll-bar mg-0">
               <template v-for="(one, index) in searchForm.whereList">
                 <li :key="index">
                   <input v-model="one.checked" type="checkbox" />
@@ -158,6 +167,12 @@
         <tm-layout height="35px">
           <div class="pdl-10 pdt-4">
             <div
+              class="tm-btn tm-btn-sm bg-grey ft-13"
+              @click="useWhereDoc = !useWhereDoc"
+            >
+              {{ useWhereDoc ? "表单输入" : "文本输入" }}
+            </div>
+            <div
               class="tm-btn tm-btn-sm bg-teal-8 ft-13"
               @click="toSearch"
               :class="{ 'tm-disabled': dataListLoading }"
@@ -280,6 +295,8 @@ export default {
         whereList: [],
         orderList: [],
       },
+      useWhereDoc: false,
+      whereDoc: `{\n\t"_id":"ObjectID('xxx')"\n}`,
       pageIndex: 1,
       pageSize: 50,
       total: 0,
@@ -295,6 +312,9 @@ export default {
   computed: {},
   watch: {},
   methods: {
+    onChangeWhereDoc(value) {
+      this.whereDoc = value;
+    },
     toExportData() {
       let dataList = [];
       this.dataList.forEach((one) => {
@@ -611,116 +631,6 @@ export default {
       } catch (error) {}
       return sourceJSON;
     },
-    getFilter() {
-      let filter = {};
-
-      this.searchForm.whereList.forEach((one) => {
-        if (one.checked) {
-          let v = one.value;
-          if (one.dataType == "number") {
-            let numV = Number(v);
-            if (numV != null) {
-              v = numV;
-            }
-          }
-          filter[one.name] = v;
-          switch (one.conditionalOperation) {
-            case "like":
-              filter[one.name] = {
-                $regex: v,
-              };
-              break;
-            case "like start":
-              filter[one.name] = {
-                $regex: "^" + v + "",
-              };
-              break;
-            case "like end":
-              filter[one.name] = {
-                $regex: v + "$",
-              };
-              break;
-            case "<>":
-              filter[one.name] = {
-                $ne: v,
-              };
-              break;
-            case ">":
-              filter[one.name] = {
-                $gt: v,
-              };
-              break;
-            case ">=":
-              filter[one.name] = {
-                $gte: v,
-              };
-              break;
-            case "<":
-              filter[one.name] = {
-                $lt: v,
-              };
-              break;
-            case "<=":
-              filter[one.name] = {
-                $lte: v,
-              };
-              break;
-            case "between": {
-              let b = one.before;
-              let a = one.after;
-              if (one.dataType == "number") {
-                b = Number(b);
-                a = Number(a);
-              }
-              filter[one.name] = {
-                $gte: b,
-                $lte: a,
-              };
-              break;
-            }
-            case "in": {
-              let vs = [];
-              if (this.tool.isNotEmpty(one.value)) {
-                vs = one.value.split(",");
-
-                if (one.dataType == "number") {
-                  let list = [];
-                  vs.forEach((v) => {
-                    list.push(Number(v));
-                  });
-                  vs = list;
-                }
-              }
-              filter[one.name] = {
-                $in: vs,
-              };
-              break;
-            }
-          }
-        }
-      });
-      return filter;
-    },
-    getSort() {
-      let sort = [];
-
-      this.searchForm.orderList.forEach((one) => {
-        if (one.checked) {
-          if (one.ascDesc == "ASC") {
-            sort.push({
-              key: one.name,
-              value: 1,
-            });
-          } else {
-            sort.push({
-              key: one.name,
-              value: -1,
-            });
-          }
-        }
-      });
-      return sort;
-    },
     async doSearch() {
       this.dataListLoading = true;
       try {
@@ -728,14 +638,22 @@ export default {
         let data = {};
         Object.assign(data, this.searchForm);
 
-        data.filter = this.getFilter();
-        data.sort = this.getSort();
         data.pageIndex = Number(this.pageIndex);
         data.pageSize = Number(this.pageSize);
-        this.searchForm.whereList.forEach((one) => {
-          if (one.checked && one.dataType == "objectID") {
-            data.isObjectID = true;
-            data.objectIDKey = one.name;
+        data.whereList = [];
+        if (this.useWhereDoc) {
+          data.whereDoc = this.whereDoc;
+        } else {
+          this.searchForm.whereList.forEach((one) => {
+            if (one.checked) {
+              data.whereList.push(one);
+            }
+          });
+        }
+        data.orderList = [];
+        this.searchForm.orderList.forEach((one) => {
+          if (one.checked) {
+            data.orderList.push(one);
           }
         });
         let param = this.toolboxWorker.getWorkParam(data);
