@@ -341,31 +341,46 @@ const newWorker = function (workerOption) {
                 dir: dir,
                 fullPath: fullPath || "",
             };
-            let form = new FormData();
-            for (let key in param) {
-                form.append(key, param[key]);
+
+            let chunkSize = 1024 * 1024; // 每个片段的大小，这里设置为 1MB
+
+            let offset = 0; // 当前片段的偏移量
+            let chunkUploadKey = null
+            while (offset < file.size) {
+                let end = offset + chunkSize
+                const chunk = file.slice(offset, offset + chunkSize); // 切分片段
+                let form = new FormData();
+                let res = null
+                form.append("chunk", chunk);
+                form.append("offset", offset);
+                if (end >= file.size) {
+                    form.append("isEnd", 1);
+                }
+                if (offset == 0) {
+                    for (let key in param) {
+                        form.append(key, param[key]);
+                    }
+                    form.append("filename", file.name);
+                    form.append("size", file.size);
+                    res = await server.fileManager.upload(form);
+                } else {
+                    form.append("chunkUploadKey", chunkUploadKey);
+                    res = await server.fileManager.upload(form);
+                }
+                if (res.code != 0) {
+                    if (res.msg == 'closed') {
+                        return false;
+                    }
+                    tool.error(res.msg);
+                    return false;
+                }
+                if (res.data != null) {
+                    chunkUploadKey = res.data
+                }
+                offset += chunkSize; // 更新偏移量，准备切分下一个片段
             }
-            form.append("file", file);
-            let res = await server.fileManager.upload(form);
-            if (res.code != 0) {
-                tool.error(res.msg);
-                return false;
-            } else {
-                // let files = res.data || [];
-                // files.forEach(one => {
-                //     if (!this.pathIsSubfile(one.path)) {
-                //         return
-                //     }
-                //     this.formatFile(one);
-                //     let index = this.getFileIndex(one.path);
-                //     if (index >= 0) {
-                //         this.fileList.splice(index, 1, one)
-                //     } else {
-                //         this.fileList.push(one)
-                //     }
-                // })
-                return true;
-            }
+
+            return true;
         },
         onAddFileInfo(fileInfo) {
             if (fileInfo == null) {
