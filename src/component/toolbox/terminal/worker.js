@@ -174,7 +174,7 @@ const newWorker = function (workerOption) {
             param.rows = Number(worker.rows)
             let res = await server.terminal.changeSize(param);
             if (res.code != 0) {
-                tool.error(res.msg);
+                // tool.error(res.msg);
             }
             return res.data;
         },
@@ -184,7 +184,7 @@ const newWorker = function (workerOption) {
             let param = worker.getParam();
             let res = await server.terminal.close(param);
             if (res.code != 0) {
-                tool.error(res.msg);
+                // tool.error(res.msg);
             }
             return res.data;
         },
