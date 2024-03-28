@@ -119,7 +119,7 @@ export default {
     doUpload(files) {
       this.isFileSelect = true;
       this.showDialog = false;
-      this.term.write("\r\n注意：显示文件上传的进度为本地到应用服务的进度\r\n");
+      // this.term.write("\r\n注意：显示文件上传的进度为本地到应用服务的进度\r\n");
 
       this.send_block_files(this.zsession, files, {
         on_offer_response: (obj, xfer) => {

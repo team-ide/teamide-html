@@ -61,9 +61,6 @@ const newWorker = function (workerOption) {
                 if (worker.socket != null) {
                     worker.socket.close();
                 }
-                if (worker.uploadSocket != null) {
-                    worker.uploadSocket.close();
-                }
             } catch (e) {
                 console.log("closeSocket error:", e)
             }
@@ -113,41 +110,30 @@ const newWorker = function (workerOption) {
             socket.onerror = () => {
                 worker.onSocketError();
             };
-            this.newUploadSocket();
         },
         wait(timeout) {
             return new Promise((resolve, reject) => {
                 setTimeout(() => { resolve() }, timeout)
             });
         },
-        async uploadSocketSend(data) {
-            if (worker.uploadSocket == null) {
-                return;
+        async upload(octets) {
+            let form = new FormData();
+            let binaryString = '';
+            octets.forEach((byte) => {
+                binaryString += String.fromCharCode(byte);
+            });
+            let value = window
+                ? window.btoa(binaryString)
+                : Buffer.from(binaryString).toString('base64');
+            // console.log(octets)
+            // console.log(binaryString)
+            // console.log(value)
+            form.append("value", value);
+            form.append("key", worker.key);
+            let res = await server.terminal.upload(form);
+            if (res.code != 0) {
+                throw new Error(res.msg);
             }
-            worker.uploadSocket.send(new Uint8Array(data));
-        },
-        newUploadSocket() {
-            let url = source.api;
-            url = url.substring(url.indexOf(":"));
-            if (location.protocol.indexOf("https") == 0) {
-                url = "wss" + url + "api/terminal/uploadWebsocket";
-            } else {
-                url = "ws" + url + "api/terminal/uploadWebsocket";
-            }
-            url += "?key=" + encodeURIComponent(worker.key);
-            url = tool.appendUrlBaseParam(url);
-            let uploadSocket = new WebSocket(url);
-            worker.uploadSocket = uploadSocket;
-            uploadSocket.binaryType = "arraybuffer"
-            uploadSocket.onopen = () => {
-            };
-            uploadSocket.onclose = () => {
-                worker.uploadSocket = null;
-            };
-            uploadSocket.onerror = () => {
-            };
-            uploadSocket.onmessage = () => {
-            };
         },
         getParam() {
             let param = {

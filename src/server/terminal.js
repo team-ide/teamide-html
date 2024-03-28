@@ -22,6 +22,9 @@ let terminal = {
     cleanLog(param) {
         return http.post('api/terminal/cleanLog', param);
     },
+    upload(param) {
+        return http.post('api/terminal/upload', param);
+    },
     downloadLog(param) {
         return http.post('api/terminal/downloadLog', param);
     },

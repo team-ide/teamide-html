@@ -1159,7 +1159,7 @@ export default {
         },
         // 将流量发送到的处理程序对等方。例如，如果您的应用程序使用 WebSocket 进行通信到对等方，使用它将数据发送到 WebSocket 实例。
         sender: async (octets) => {
-          await worker.uploadSocketSend(octets);
+          await worker.upload(octets);
         },
       });
     },
