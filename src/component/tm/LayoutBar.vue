@@ -69,8 +69,10 @@ export default {
       this.mouseDownY = event.clientY;
       this.downMoveSize = this.lastMoveSize;
       this.mouseDowned = true;
+      this.tool.jQuery(document.body).addClass("tm-layout-move-active");
     },
     mouseup(event) {
+      this.tool.jQuery(document.body).removeClass("tm-layout-move-active");
       if (this.isDestroyed) {
         return;
       }
@@ -145,6 +147,7 @@ export default {
     document.removeEventListener("mouseup", this.mouseup);
     document.removeEventListener("mousemove", this.mousemove);
     this.isDestroyed = true;
+    this.tool.jQuery(document.body).removeClass("tm-layout-move-active");
   },
 };
 </script>
