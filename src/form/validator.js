@@ -114,48 +114,29 @@ let buildFormValidator = function (form) {
     return validatorForm;
 };
 
-let validateFields = function (data, fields, all) {
+let validateFields = async function (data, fields, all) {
     validateReset(fields);
-    return new Promise((resolve, reject) => {
-        if (fields == null || fields.length == 0) {
-            resolve({
-                valid: true,
-            })
-            return
+    if (fields == null || fields.length == 0) {
+        return {
+            valid: true,
         }
-        let errors = [];
-        let process = function (index) {
-            if (index >= fields.length) {
-                resolve({
-                    valid: errors.length == 0,
-                    errors: errors,
-                })
-                return;
+    }
+    let fails = [];
+    for (let i = 0; i < fields.length; i++) {
+        let field = fields[i];
+        await validateField(data, field);
+        if (!field.valid) {
+            fails.push(field)
+            if (!all) {
+                break;
             }
-            if (!all && errors.length > 0) {
-                resolve({
-                    valid: errors.length == 0,
-                    errors: errors,
-                })
-                return;
-            }
-            let field = fields[index];
-            validateField(data, field).then(valid => {
-                if (!valid) {
-                    errors.push(field);
-                }
-                process(index + 1);
-            }).catch(err => {
-                reject(err);
-            });
         }
-        process(0);
-    })
+    }
+    return {
+        valid: fails.length == 0,
+        errors: fails,
+    }
 };
-
-// new Promise((resolve, reject)=>{
-
-// })
 
 let execVIf = function (vIf, data) {
     if (vIf == null || vIf === "") {
@@ -174,119 +155,103 @@ let execVIf = function (vIf, data) {
     }
     return false;
 };
-let validateField = function (data, field) {
-    return new Promise((resolve, reject) => {
-        if (field.type == 'jsonView') {
-            resolve(true)
-            return;
-        }
-        let value = data[field.name];
-        if (value != null) {
-            if (field.isNumber) {
-                data[field.name] = Number(value);
-            } else if (field.type == 'json') {
-                let jsonValue = null;
-                if (field.jsonStringValue != "") {
-                    try {
-                        jsonValue = JSON.parse(field.jsonStringValue);
-                    } catch (error) {
-                        try {
-                            jsonValue = eval("(" + field.jsonStringValue + ")");
-                        } catch (error2) {
-                            field.valid = false;//无效的 验证失败
-                            field.validMessage = error;
-                            resolve(false)
-                            return;
-                        }
-                    }
+let validateField = async function (data, field) {
+    if (field.type == 'jsonView') {
+        field.valid = true;
+        return;
+    }
+    if (field.type == 'json') {
+        let jsonValue = null;
+        if (field.jsonStringValue != "") {
+            try {
+                jsonValue = JSON.parse(field.jsonStringValue);
+            } catch (error) {
+                try {
+                    jsonValue = eval("(" + field.jsonStringValue + ")");
+                } catch (error2) {
+                    field.valid = false;//无效的 验证失败
+                    field.validMessage = error;
+                    return;
                 }
-                data[field.name] = jsonValue;
             }
+            data[field.name] = jsonValue;
         }
-        if (!execVIf(field.vIf, data)) {
-            resolve(true)
+    }
+    let value = data[field.name];
+    if (value != null) {
+        if (field.isNumber) {
+            if (isNaN(Number(value))) {
+                field.valid = false;//无效的 验证失败
+                field.validMessage = "" + value + " 不是有效数字";
+                return;
+            }
+            data[field.name] = Number(value);
+        }
+    }
+    // 返回 true 表示 字段展示 返回 false 表示字段隐藏 不需要验证
+    if (!execVIf(field.vIf, data)) {
+        field.valid = true;
+        return;
+    }
+    let rules = field.rules || [];
+    for (let i = 0; i < rules.length; i++) {
+        let rule = rules[i];
+        if (!await validateRule(data, field, rule)) {
             return;
         }
-        let rules = field.rules || [];
-        let valid = true;
-        let process = function (index) {
-            if (index >= rules.length) {
-                resolve(valid)
-                return;
-            }
-            if (!valid) {
-                resolve(valid)
-                return;
-            }
-            let rule = rules[index];
-            validateRule(data, field, rule).then(res => {
-                valid = res;
-                process(index + 1);
-            }).catch(err => {
-                reject(err);
-            });
-        }
-        process(0);
-    })
-
+    }
+    field.valid = true;
+    return;
 };
 
-let validateRule = function (data, field, rule) {
+let validateRule = async function (data, field, rule) {
 
-    return new Promise((resolve, reject) => {
-        let value = data[field.name];
-        let valid = true;
-        // required 必填
-        // pattern 正则
-        // range 区间
-        // length 长度
-        // enum 可枚举值
-        if (valid && rule.required && isEmpty(value)) {
-            valid = false;
+    let value = data[field.name];
+    let valid = true;
+    // required 必填
+    // pattern 正则
+    // range 区间
+    // length 长度
+    // enum 可枚举值
+    if (valid && rule.required && isEmpty(value)) {
+        valid = false;
+    }
+    if (valid && rule.length && ('' + value).length > rule.length) {
+        valid = false;
+    }
+    if (valid && rule.minLength && ('' + value).length < rule.minLength) {
+        valid = false;
+    }
+    if (valid && rule.maxLength && ('' + value).length > rule.maxLength) {
+        valid = false;
+    }
+    if (valid && rule.min && value < rule.min) {
+        valid = false;
+    }
+    if (valid && rule.max && value > rule.max) {
+        valid = false;
+    }
+    if (valid && rule.pattern && !rule.pattern.test(value)) {
+        valid = false;
+    }
+    let msg = null;
+    if (valid && rule.validate) {
+        try {
+            valid = await rule.validate()
+        } catch (error) {
+            valid = false
+            msg = error;
         }
-        if (valid && rule.length && ('' + value).length > rule.length) {
-            valid = false;
-        }
-        if (valid && rule.minLength && ('' + value).length < rule.minLength) {
-            valid = false;
-        }
-        if (valid && rule.maxLength && ('' + value).length > rule.maxLength) {
-            valid = false;
-        }
-        if (valid && rule.min && value < rule.min) {
-            valid = false;
-        }
-        if (valid && rule.max && value > rule.max) {
-            valid = false;
-        }
-        if (valid && rule.pattern && !rule.pattern.test(value)) {
-            valid = false;
-        }
-        let msg = null;
-        let process = function () {
-            if (valid) {
-                field.valid = true;//有效的 验证成功
-                field.validMessage = null;
-            } else {
-                msg = msg || rule.message || field.message;
-                field.valid = false;//无效的 验证失败
-                field.validMessage = msg;
-            }
-            resolve(valid);
-        }
-        if (valid && rule.validate) {
-            rule.validate().then((resValid, resMsg) => {
-                valid = resValid;
-                msg = resMsg;
-                process();
-            }).then(err => {
-                reject(err);
-            });
-        } else {
-            process();
-        }
-    })
-
+    }
+    if (valid) {
+        field.valid = true;//有效的 验证成功
+        field.validMessage = null;
+    } else {
+        msg = msg || rule.message || field.message;
+        field.valid = false;//无效的 验证失败
+        field.validMessage = msg;
+    }
+    return valid
 };
 let validateReset = function (fields) {
     fields.forEach(field => {

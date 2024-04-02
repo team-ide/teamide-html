@@ -142,11 +142,11 @@
                       v-model="jsonStringMap[field.name].value"
                       :autosize="{ minRows: 5, maxRows: 20 }"
                       @input="
-                        valueChange(field) &&
+                        valueChange(field) &
                           jsonStringChange(jsonStringMap[field.name])
                       "
                       @change="
-                        valueChange(field) &&
+                        valueChange(field) &
                           jsonStringChange(jsonStringMap[field.name])
                       "
                     >
