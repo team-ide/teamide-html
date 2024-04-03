@@ -477,6 +477,7 @@ export default {
       item.toolboxId = open.toolboxId;
       item.toolboxGroupId = open.toolboxGroupId;
       item.sequence = open.sequence;
+      item.openTime = new Date(open.openTime).getTime();
       item.extend = this.tool.getOptionJSON(open.extend);
 
       if (this.tool.isNotEmpty(item.extend.title)) {
@@ -577,6 +578,9 @@ export default {
       });
       if (res.code != 0) {
         this.tool.error(res.msg);
+      }
+      if (res.data && res.data.open) {
+        item.openTime = new Date(res.data.open.openTime).getTime();
       }
       this.tool.hideToolboxContext();
     },

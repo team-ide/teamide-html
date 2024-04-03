@@ -35,7 +35,7 @@ const newItemsWorker = function (workerOption) {
         initItems() {
             let showCount = 0;
             this.items.forEach(one => {
-                if (this.show) {
+                if (one.show) {
                     showCount++
                 }
             })
@@ -121,6 +121,15 @@ const newItemsWorker = function (workerOption) {
                 let nextIndex = index - 1;
                 if (nextIndex < 0) {
                     nextIndex = 0;
+                }
+                if (worker.items.length > 1 && worker.items[0].openTime != null) {
+                    let openTime = 0;
+                    worker.items.forEach((one, index) => {
+                        if (one.openTime > openTime) {
+                            openTime = one.openTime;
+                            nextIndex = index;
+                        }
+                    });
                 }
                 worker.toActiveItem(worker.items[nextIndex]);
             }

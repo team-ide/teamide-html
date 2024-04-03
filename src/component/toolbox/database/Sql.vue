@@ -279,7 +279,7 @@ export default {
           "sql-files/toolbox-" +
           this.toolboxWorker.toolboxId +
           "-" +
-          this.tool.formatDate(new Date(), "yyyyMMddhhmmssS") +
+          this.tool.formatDate(new Date(), "yyyyMMddhhmmss") +
           "-" +
           this.tool.getNumber() +
           ".sql";

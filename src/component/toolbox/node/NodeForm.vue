@@ -30,7 +30,7 @@ export default {
       this.tool.stopEvent();
       let data = {
         name: this.source.login.user.name + "-本地节点",
-        bindAddress: ":21090",
+        bindAddress: "",
         bindToken: this.tool.md5("bindToken" + new Date().getTime()),
       };
 

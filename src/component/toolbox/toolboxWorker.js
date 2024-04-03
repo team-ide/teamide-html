@@ -14,6 +14,9 @@ const newToolboxWorker = function (workerOption) {
             if (res.code != 0) {
                 tool.error(res.msg);
             }
+            if (res.data && res.data.tab) {
+                item.openTime = new Date(res.data.tab.openTime).getTime();
+            }
         },
         async toCopyItem(item) {
             worker.openTabByExtend(item.extend, item, item.sequence)
@@ -162,6 +165,7 @@ const newToolboxWorker = function (workerOption) {
                 tabId: data.tabId,
                 openId: worker.openId,
                 sequence: data.sequence,
+                openTime: new Date(data.openTime).getTime(),
                 comment: "",
             };
 

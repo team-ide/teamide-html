@@ -246,13 +246,13 @@ let node = {
                 ],
             },
             {
-                label: "绑定地址(ip:port)",
+                label: "如果希望其它节点连接到本机，请输入监听信息(ip:port)",
                 name: "bindAddress",
                 rules: [
-                    {
-                        required: true,
-                        message: `绑定地址不能为空!`
-                    },
+                    // {
+                    //     required: true,
+                    //     message: `绑定地址不能为空!`
+                    // },
 
                 ],
             },

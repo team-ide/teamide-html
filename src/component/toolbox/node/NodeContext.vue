@@ -4,6 +4,7 @@
       <tm-layout height="150px" class="app-scroll-bar">
         <div class="node-context-box-header">
           <div class="pdlr-20 ft-12 pdtb-10">
+            <div class="color-grey">右击新增本地节点</div>
             <div class="color-grey">
               节点程序下载地址:
               <span class="color-green pdlr-10">
@@ -34,7 +35,7 @@
                 -connAddress 目标节点的ip:port -connToken 目标节点的Token
               </span>
             </div>
-            <template v-if="localNodeConnList.length > 0">
+            <template v-if="localNodeConnList.length != 0">
               <div class="color-grey">
                 当前节点连接到其它节点:
                 <span class="color-orange pdlr-10"> 右击节点进行操作 </span>
@@ -54,24 +55,13 @@
       </tm-layout>
       <tm-layout height="auto" class="">
         <div class="node-context-body" v-if="ready">
-          <template v-if="localNodeConnList.length == 0">
-            <div class="text-center pdt-50">
-              <div
-                class="tm-btn bg-green tm-btn-lg"
-                @click="toolboxWorker.toInsertLocalNode()"
-              >
-                设置本地节点
-              </div>
-            </div>
-          </template>
-          <template v-else>
-            <NodeView
-              :source="source"
-              :nodeList="nodeList"
-              :onNodeMoved="toolboxWorker.onNodeMoved"
-              :toolboxWorker="toolboxWorker"
-            ></NodeView>
-          </template>
+          <NodeView
+            :source="source"
+            :nodeList="nodeList"
+            :onNodeMoved="toolboxWorker.onNodeMoved"
+            :toolboxWorker="toolboxWorker"
+          >
+          </NodeView>
         </div>
       </tm-layout>
     </tm-layout>
@@ -138,7 +128,7 @@ export default {
         }
       });
       this.localNodeConnList = localNodeConnList;
-      this.nodeList = this.nodeContext.nodeList;
+      this.nodeList = this.nodeContext.nodeList || [];
     },
   },
   created() {},

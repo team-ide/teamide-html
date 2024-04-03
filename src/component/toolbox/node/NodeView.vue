@@ -1,5 +1,5 @@
 <template>
-  <div class="node-view-box">
+  <div class="node-view-box" @contextmenu="contextmenu">
     <div ref="container" class="node-view-container"></div>
   </div>
 </template>
@@ -14,9 +14,7 @@ export default {
   components: {},
   props: ["source", "nodeList", "onNodeMoved", "toolboxWorker"],
   data() {
-    return {
-      nodeWrapList: null,
-    };
+    return {};
   },
   computed: {},
   watch: {
@@ -45,7 +43,6 @@ export default {
           },
         },
       });
-
       Graph.unregisterNode("node-info");
       Graph.registerNode("node-info", {
         inherit: "vue-shape",
@@ -149,7 +146,6 @@ export default {
             y: y,
             width: one.width,
             height: one.height,
-            source: this.source,
             data: one,
           });
           nodeMap[one.id] = gNode;
@@ -194,7 +190,6 @@ export default {
           });
         });
       });
-
       graph.on("node:moved", ({ e, x, y, node, view }) => {
         this.onNodeMoved && this.onNodeMoved(node.data, { x: x, y: y });
       });
@@ -250,23 +245,38 @@ export default {
         //     });
         //   }
         // }
-        if (!data.isLocal) {
-          menus.push({
-            text: "删除",
-            onClick: () => {
-              this.toolboxWorker.toDeleteNode(data);
-            },
-          });
-        }
+        // if (!data.isLocal) {
+        menus.push({
+          text: "删除",
+          onClick: () => {
+            this.toolboxWorker.toDeleteNode(data);
+          },
+        });
+        // }
 
         if (menus.length > 0) {
           this.tool.showContextmenu(menus);
         }
       });
     },
+    contextmenu() {
+      let menus = [];
+      menus.push({
+        text: "添加本地节点",
+        onClick: () => {
+          this.toolboxWorker.toInsertLocalNode();
+        },
+      });
+      this.tool.showContextmenu(menus);
+    },
   },
   created() {},
   updated() {},
+  beforeDestroy() {
+    if (this.graph) {
+      this.graph.dispose();
+    }
+  },
   mounted() {
     this.init();
   },

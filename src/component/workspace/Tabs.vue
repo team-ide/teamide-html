@@ -6,7 +6,7 @@
     <div class="workspace-tabs-left">
       <slot name="leftExtend"></slot>
       <el-dropdown
-        v-if="leftTabs.length > 0"
+        v-if="leftTabs.length != 0"
         trigger="click"
         @command="handleCommand"
         class="workspace-tabs-nav-dropdown"

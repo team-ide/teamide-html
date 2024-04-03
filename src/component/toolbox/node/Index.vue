@@ -1,5 +1,5 @@
 <template>
-  <div class="toolbox-node-editor">
+  <div class="toolbox-node-editor" v-if="ready">
     <template v-if="type == 'node-context'">
       <NodeContext
         :source="source"
@@ -53,6 +53,7 @@ export default {
   props: ["source", "toolboxWorker", "extend"],
   data() {
     return {
+      ready: false,
       type: null,
       serverId: null,
       nodeContext: {
@@ -74,6 +75,7 @@ export default {
       }
       this.toolboxWorker.initNodeContext = this.initNodeContext;
       await this.initNodeContext();
+      this.ready = true;
       this.server.addListenOnEvent("node-data-change", this.onNodeDataChange);
     },
     onNodeDataChange(data) {
