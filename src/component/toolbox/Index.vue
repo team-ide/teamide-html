@@ -81,6 +81,14 @@
         >
         </TerminalEditor>
       </template>
+      <template v-else-if="toolboxType == 'connection'">
+        <ConnectionEditor
+          :source="source"
+          :extend="extend"
+          :toolboxWorker="toolboxWorker"
+        >
+        </ConnectionEditor>
+      </template>
       <template v-else-if="toolboxType == 'thrift'">
         <ThriftEditor
           :source="source"
@@ -115,6 +123,7 @@ import TerminalEditor from "./terminal/Index.vue";
 import toolboxWorker_ from "./toolboxWorker.js";
 import ThriftEditor from "./thrift/Index.vue";
 import MongodbEditor from "./mongodb/Index.vue";
+import ConnectionEditor from "./connection/Index.vue";
 
 export default {
   components: {
@@ -124,6 +133,7 @@ export default {
     TerminalEditor,
     ThriftEditor,
     MongodbEditor,
+    ConnectionEditor,
   },
   props: ["source", "extend", "toolboxType", "toolboxId", "openId"],
   data() {

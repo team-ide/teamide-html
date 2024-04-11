@@ -17,6 +17,7 @@ import power from "./power.js";
 import thrift from "./thrift.js";
 import datamove from "./datamove.js";
 import mongodb from "./mongodb.js";
+import connection from "./connection.js";
 
 import tool from '../tool/index.js';
 import source from '../source/index.js';
@@ -36,6 +37,7 @@ let server = {
     thrift,
     datamove,
     mongodb,
+    connection,
     data(param) {
         param = param || {};
         param.origin = location.origin;

@@ -92,6 +92,13 @@ export default {
           res = await this.server.terminal.check(toolboxData);
         } else if (toolboxData.toolboxType == "mongodb") {
           res = await this.server.mongodb.check(toolboxData);
+        } else {
+          if (
+            this.server[toolboxData.toolboxType] &&
+            this.server[toolboxData.toolboxType].check
+          ) {
+            res = await this.server[toolboxData.toolboxType].check(toolboxData);
+          }
         }
         if (res.code == 0) {
           this.checkOk = true;
