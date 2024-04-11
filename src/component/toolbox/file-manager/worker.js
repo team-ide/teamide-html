@@ -20,8 +20,8 @@ const newWorker = function (workerOption) {
         async init() {
 
         },
-        refresh() {
-            this.loadFiles(this.dir);
+        refresh(isInputOnEnter) {
+            this.loadFiles(this.dir, isInputOnEnter);
         },
         openDir(dir) {
             this.loadFiles(dir);
@@ -99,7 +99,7 @@ const newWorker = function (workerOption) {
         },
         toSelectAll() {
             this.fileList.forEach((one, i) => {
-                if (one.name == "..") {
+                if (one.name == ".." || !one.show) {
                     this.setUnselect(one);
                 } else {
                     this.setSelect(one);
@@ -134,7 +134,7 @@ const newWorker = function (workerOption) {
                 this.fileList.forEach((one, i) => {
                     if (one.name == "..") {
                         this.setUnselect(one);
-                    } else if (i >= startIndex && i <= endIndex) {
+                    } else if (one.show && i >= startIndex && i <= endIndex) {
                         this.setSelect(one);
                     } else {
                         this.setUnselect(one);
@@ -153,8 +153,8 @@ const newWorker = function (workerOption) {
             }
             return file;
         },
-        async loadFiles(dir) {
-            if (this.dir != dir) {
+        async loadFiles(dir, isInputOnEnter) {
+            if (this.dir != dir || isInputOnEnter) {
                 if (this.onChangeOpenDir) {
                     this.onChangeOpenDir(dir)
                 }

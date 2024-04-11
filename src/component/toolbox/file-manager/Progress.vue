@@ -246,6 +246,9 @@ export default {
 
           if (progress.startTime && progress.timestamp) {
             let usetime = progress.timestamp - progress.startTime;
+            if (progress.data && progress.data.timestamp) {
+              usetime = progress.data.timestamp - progress.startTime;
+            }
             if (progress.endTime) {
               usetime = progress.endTime - progress.startTime;
             }
@@ -264,23 +267,21 @@ export default {
         }
       }
 
-      if (progress.isEnd) {
-        if (progress.work == "upload") {
-          if (progress.data) {
-            if (progress.data.fileInfo) {
-              this.onAddFileInfo &&
-                this.onAddFileInfo(progress, progress.data.fileInfo);
-            }
-            if (progress.data.fileDir) {
-              this.onAddFileInfo &&
-                this.onAddFileInfo(progress, progress.data.fileDir);
-            }
-          }
-        } else if (progress.work == "copy") {
-          if (progress.data && progress.data.fileInfo) {
+      if (progress.work == "upload") {
+        if (progress.data) {
+          if (progress.data.fileInfo) {
             this.onAddFileInfo &&
               this.onAddFileInfo(progress, progress.data.fileInfo);
           }
+          if (progress.data.fileDir) {
+            this.onAddFileInfo &&
+              this.onAddFileInfo(progress, progress.data.fileDir);
+          }
+        }
+      } else if (progress.work == "copy") {
+        if (progress.data && progress.data.fileInfo) {
+          this.onAddFileInfo &&
+            this.onAddFileInfo(progress, progress.data.fileInfo);
         }
       }
 

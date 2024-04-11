@@ -194,7 +194,7 @@ export default {
       e = e || window.event;
       var charCode = e.charCode ? e.charCode : e.which ? e.which : e.keyCode;
       if (charCode == 13 || charCode == 3) {
-        this.fileWorker.refresh();
+        this.fileWorker.refresh(true);
       }
     },
     filesBoxClick(e) {
