@@ -18,6 +18,7 @@ import thrift from "./thrift.js";
 import datamove from "./datamove.js";
 import mongodb from "./mongodb.js";
 import connection from "./connection.js";
+import maker from "./maker.js";
 
 import tool from '../tool/index.js';
 import source from '../source/index.js';
@@ -38,6 +39,7 @@ let server = {
     datamove,
     mongodb,
     connection,
+    maker,
     data(param) {
         param = param || {};
         param.origin = location.origin;

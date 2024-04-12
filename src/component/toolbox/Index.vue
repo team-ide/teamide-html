@@ -97,6 +97,15 @@
         >
         </ThriftEditor>
       </template>
+      <template v-else-if="toolboxType == 'maker'">
+        <MakerEditor
+          :source="source"
+          :extend="extend"
+          :toolboxWorker="toolboxWorker"
+        >
+        </MakerEditor>
+      </template>
+
       <template v-else-if="toolboxType == 'page'">
         <Page :source="source" :extend="extend" :toolboxWorker="toolboxWorker">
         </Page>
@@ -124,6 +133,7 @@ import toolboxWorker_ from "./toolboxWorker.js";
 import ThriftEditor from "./thrift/Index.vue";
 import MongodbEditor from "./mongodb/Index.vue";
 import ConnectionEditor from "./connection/Index.vue";
+import MakerEditor from "./maker/Index.vue";
 
 export default {
   components: {
@@ -134,6 +144,7 @@ export default {
     ThriftEditor,
     MongodbEditor,
     ConnectionEditor,
+    MakerEditor,
   },
   props: ["source", "extend", "toolboxType", "toolboxId", "openId"],
   data() {
