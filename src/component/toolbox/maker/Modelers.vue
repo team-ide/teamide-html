@@ -1,49 +1,53 @@
 <template>
   <div class="toolbox-maker-modelers">
     <template v-if="ready">
-      <div class="pd-10" style="height: 100%">
-        <div style="height: 36px">
-          <el-input
-            placeholder="输入关键字进行过滤"
-            size="mini"
-            v-model="filterText"
-          >
-          </el-input>
-        </div>
-        <div
-          style="height: calc(100% - 36px)"
-          class="app-scroll-bar"
-          ref="treeBox"
-        >
-          <el-tree
-            ref="tree"
-            :load="loadNode"
-            lazy
-            :props="defaultProps"
-            :default-expanded-keys="expands"
-            node-key="key"
-            :expand-on-click-node="false"
-            @node-click="nodeClick"
-            @node-contextmenu="nodeContextmenu"
-            @node-expand="nodeExpand"
-            @node-collapse="nodeCollapse"
-            :filter-node-method="filterNode"
-          >
-            <span class="toolbox-editor-tree-span" slot-scope="{ node, data }">
-              <span>{{ node.label }}</span>
-              <div class="toolbox-editor-tree-btn-group">
-                <div
-                  v-if="data.hasChildren"
-                  class="tm-link color-grey ft-14 mgr-4"
-                  @click="toReloadChildren(data)"
-                >
-                  <i class="mdi mdi-reload"></i>
-                </div>
-              </div>
-            </span>
-          </el-tree>
-        </div>
-      </div>
+      <tm-layout height="100%">
+        <tm-layout height="60px">
+          <div class="pdlr-10 pdt-10 toolbox-database-owner-btns">
+            <div class="tm-btn tm-btn-xs bg-grey-6" @click="refresh()">
+              刷新
+            </div>
+            <div class="tm-btn tm-btn-xs bg-blue-8" @click="toExport()">
+              导出
+            </div>
+          </div>
+        </tm-layout>
+        <tm-layout height="auto">
+          <div class="pd-10" style="height: 100%">
+            <div style="height: 36px">
+              <el-input
+                placeholder="输入关键字进行过滤"
+                size="mini"
+                v-model="filterText"
+              >
+              </el-input>
+            </div>
+            <div
+              style="height: calc(100% - 36px)"
+              class="app-scroll-bar"
+              ref="treeBox"
+            >
+              <el-tree
+                ref="tree"
+                :data="worker.treeData"
+                :props="defaultProps"
+                :default-expanded-keys="expands"
+                node-key="key"
+                :expand-on-click-node="true"
+                @node-click="nodeClick"
+                @node-contextmenu="nodeContextmenu"
+                @node-expand="nodeExpand"
+                @node-collapse="nodeCollapse"
+                :filter-node-method="filterNode"
+              >
+                <span class="toolbox-editor-tree-span" slot-scope="{ node }">
+                  <span>{{ node.label }}</span>
+                </span>
+              </el-tree>
+            </div>
+          </div>
+        </tm-layout>
+      </tm-layout>
     </template>
   </div>
 </template>
@@ -52,7 +56,7 @@
 <script>
 export default {
   components: {},
-  props: ["source", "toolboxWorker", "extend"],
+  props: ["source", "toolboxWorker", "extend", "worker"],
   data() {
     return {
       ready: false,
@@ -69,6 +73,11 @@ export default {
   watch: {
     filterText(val) {
       this.$refs.tree.filter(val);
+      if (this.tool.isEmpty(val)) {
+        this.$nextTick(() => {
+          this.initDefaultExpands();
+        });
+      }
     },
   },
   methods: {
@@ -78,8 +87,28 @@ export default {
       }
       this.ready = true;
     },
-    refresh() {
-      this.reloadChildren(this.$refs.tree.root);
+    async refresh() {
+      await this.worker.build();
+    },
+    initDefaultExpands() {
+      this.is_initDefaultExpands = true;
+      let expands = this.expands;
+      let children = this.$refs.tree.children || [];
+      children.forEach((data) => {
+        let node = this.$refs.tree.getNode(data.key);
+        if (node == null || !node.expanded) {
+          return;
+        }
+        node.collapse();
+      });
+      expands.forEach((key) => {
+        let node = this.$refs.tree.getNode(key);
+        if (node == null || node.expanded) {
+          return;
+        }
+        node.expand();
+      });
+      this.is_initDefaultExpands = false;
     },
     filterNode(value, data) {
       if (!value) return true;
@@ -88,6 +117,9 @@ export default {
       );
     },
     nodeExpand(data) {
+      if (this.is_initDefaultExpands) {
+        return;
+      }
       let index = this.expands.indexOf(data.key);
       if (index < 0) {
         this.expands.push(data.key);
@@ -95,11 +127,15 @@ export default {
           expands: this.expands,
         });
       }
+      this.initTreeWidth();
     },
     nodeCollapse(data) {
+      if (this.is_initDefaultExpands) {
+        return;
+      }
       let needDeletes = [];
       needDeletes.push(data.key);
-      if (data.hasChildren) {
+      if (!data.leaf) {
         this.expands.forEach((one) => {
           if (("" + one).startsWith("" + data.key + ":")) {
             needDeletes.push(one);
@@ -117,25 +153,7 @@ export default {
           expands: this.expands,
         });
       }
-    },
-    toReloadChildren(data) {
-      this.tool.stopEvent();
-      this.reloadChildren(data);
-    },
-    reloadChildren(key) {
-      this.tool.stopEvent();
-      let node = this.$refs.tree.getNode(key);
-      if (node) {
-        if (node.data && node.data.isOwner && node.loaded && node.childNodes) {
-          node.childNodes.forEach((one) => {
-            one.loaded = false;
-            one.expand();
-          });
-          return;
-        }
-        node.loaded = false;
-        node.expand();
-      }
+      this.initTreeWidth();
     },
     nodeClick(data, node, nodeView) {
       let nowTime = new Date().getTime();
@@ -150,20 +168,14 @@ export default {
       }
     },
     nodeDbClick(data, node, nodeView) {
-      if (data.isOwner) {
+      if (!data.leaf) {
         if (node.expanded) {
           node.collapse();
         } else {
           node.expand();
         }
-      } else if (data.isOwnerTables) {
-        if (node.expanded) {
-          node.collapse();
-        } else {
-          node.expand();
-        }
-      } else if (data.isTable) {
-        this.toTableOpen(data);
+      } else {
+        this.toOpen(data);
       }
     },
     nodeContextmenu(event, data, node, nodeView) {
@@ -175,55 +187,13 @@ export default {
     },
     toOpen(data) {
       let extend = {
-        name: data.owner.ownerName + "." + data.tableName,
-        title: data.owner.ownerName + "." + data.tableName,
-        type: "data",
-        ownerName: data.owner.ownerName,
-        tableName: data.tableName,
+        name: data.modelTypeText + "." + data.name,
+        title: data.modelTypeText + "." + data.name,
+        type: "model-" + data.modelType,
+        modelName: data.name,
+        modelType: data.modelType,
       };
       this.toolboxWorker.openTabByExtend(extend);
-    },
-    async loadNode(node, resolve) {
-      if (node.level === 0) {
-        let context = await this.toolboxWorker.loadContext();
-        console.log(context);
-        let list = [];
-        resolve(list);
-        this.initTreeWidth();
-        return;
-      }
-      if (node.data.isOwner) {
-        let owner = node.data;
-        resolve([
-          {
-            text: "Tables",
-            isOwnerTables: true,
-            key: "owner:tables:" + owner.ownerName,
-            leaf: false,
-            owner: owner,
-          },
-        ]);
-        this.initTreeWidth();
-        return;
-      }
-      if (node.data.isOwnerTables) {
-        let owner = node.data.owner;
-        let tables = await this.toolboxWorker.loadTables(owner.ownerName);
-        let list = [];
-        tables.forEach((one) => {
-          let table = {};
-          table.tableName = one.tableName;
-          table.text = one.tableName;
-          table.owner = owner;
-          table.isTable = true;
-          table.key = "owner:" + owner.ownerName + ":" + table.tableName;
-          table.leaf = true;
-
-          list.push(table);
-        });
-        resolve(list);
-        this.initTreeWidth();
-      }
     },
     initTreeWidth() {
       setTimeout(() => {

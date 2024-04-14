@@ -2,12 +2,13 @@
   <div class="toolbox-maker-editor">
     <template v-if="ready">
       <tm-layout height="100%">
-        <tm-layout width="200px" class="">
+        <tm-layout width="280px" class="">
           <Modelers
             ref="Modelers"
             :source="source"
             :toolboxWorker="toolboxWorker"
             :extend="extend"
+            :worker="worker"
           >
           </Modelers>
         </tm-layout>
@@ -17,40 +18,43 @@
             :source="source"
             :toolboxWorker="toolboxWorker"
             :extend="extend"
+            :worker="worker"
           >
           </Tabs>
         </tm-layout>
       </tm-layout>
     </template>
-    <Base :source="source" :toolboxWorker="toolboxWorker" :extend="extend">
-    </Base>
   </div>
 </template>
 
 
 <script>
+import _worker from "./worker.js";
+
 import Modelers from "./Modelers";
 import Tabs from "./Tabs";
-import Base from "./Base";
 
 export default {
-  components: { Modelers, Tabs, Base },
+  components: { Modelers, Tabs },
   props: ["source", "toolboxWorker", "extend"],
   data() {
+    let worker = _worker.newWorker({
+      toolboxWorker: this.toolboxWorker,
+    });
     return {
+      worker,
       ready: false,
     };
   },
   computed: {},
   watch: {},
   methods: {
-    init() {
+    async init() {
+      await this.worker.build();
       this.ready = true;
     },
-    refresh() {
-      this.$nextTick(() => {
-        this.$refs.Modelers && this.$refs.Modelers.refresh();
-      });
+    async refresh() {
+      await this.worker.build();
     },
   },
   created() {},
@@ -58,8 +62,7 @@ export default {
     this.init();
   },
   beforeDestroy() {
-    let param = this.toolboxWorker.getWorkParam({});
-    this.server.maker.close(param);
+    this.worker.close();
   },
 };
 </script>
