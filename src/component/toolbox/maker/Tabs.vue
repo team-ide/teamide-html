@@ -7,12 +7,18 @@
     <div class="default-spans-container">
       <WorkspaceSpans :source="source" :itemsWorker="toolboxWorker.itemsWorker">
         <template v-slot:span="{ item }">
-          <template v-if="item.extend.type == 'data'"> </template>
-          <template v-else-if="item.extend.type == 'datamove'">
-            <DataMove
+          <template v-if="item.extend.type == 'model-editor'">
+            <ModelEditor
               :source="source"
-              :options_="item.extend.options"
-            ></DataMove>
+              :extend="item.extend"
+              :toolboxWorker="toolboxWorker"
+              :worker="worker"
+            >
+            </ModelEditor>
+          </template>
+          <template v-else-if="item.extend.type == 'datamove'">
+            <DataMove :source="source" :options_="item.extend.options">
+            </DataMove>
           </template>
         </template>
       </WorkspaceSpans>
@@ -22,9 +28,11 @@
 
 
 <script>
+import ModelEditor from "./ModelEditor";
+
 export default {
-  components: {},
-  props: ["source", "toolboxWorker", "extend"],
+  components: { ModelEditor },
+  props: ["source", "toolboxWorker", "worker", "extend"],
   data() {
     return {
       ready: false,

@@ -13,78 +13,6 @@ const newWorker = function (workerOption) {
         refresh() {
             this.build()
         },
-        appendTypeModels(modelType, app) {
-            let children = [];
-            let models = app[modelType.name] || []
-            let packCache = {};
-            models.forEach(model => {
-                model.modelType = modelType.name;
-                model.modelTypeText = modelType.text;
-                model.text = model.name;
-                model.key = modelType.name + ":" + model.name;
-
-                let packNames = model.name.split('/');
-                if (packNames.length == 1) {
-                    children.push(model);
-                } else {
-                    let parentPack = null
-                    for (let i = 0; i < packNames.length; i++) {
-                        let packName = packNames[i];
-                        if (i == packNames.length - 1) {
-                            model.key = parentPack.key + ":" + packName;
-                            model.text = packName;
-                            parentPack.children.push(model);
-                        } else {
-                            let packKey = parentPack ? (parentPack.key + ":" + packName) : modelType.key + ":" + packName;
-                            let pack = packCache[packKey]
-                            if (pack == null) {
-                                pack = {
-                                    key: packKey,
-                                    text: packName,
-                                    children: [],
-                                    isPack: true,
-                                    modelType: modelType.name,
-                                    path: parentPack ? (parentPack.path + "/" + packName) : packName,
-                                }
-                                packCache[packKey] = pack
-                                if (parentPack != null) {
-                                    parentPack.children.push(pack);
-                                } else {
-                                    children.push(pack);
-                                }
-                            }
-                            parentPack = pack
-                        }
-                    }
-
-                }
-            })
-            modelType.children = children;
-        },
-        appendType(treeData, modelType, app, parentKey) {
-            modelType.text = modelType.comment || modelType.name
-            modelType.key = modelType.name
-            modelType.modelType = modelType.name;
-            modelType.modelTypeText = modelType.text;
-            if (tool.isNotEmpty(parentKey)) {
-                modelType.key = parentKey + ":" + modelType.key
-            }
-            if (tool.isEmpty(parentKey)) {
-                treeData.push(modelType);
-            }
-            if (modelType.children && modelType.children.length > 0) {
-                modelType.children.forEach(one => {
-                    worker.appendType(modelType.children, one, app, modelType.key)
-                })
-                return
-            }
-            if (tool.isNotEmpty(modelType.fileName)) {
-                return
-            }
-            worker.appendTypeModels(modelType, app)
-
-            console.log(modelType);
-        },
         async build() {
             if (this.build_ing) {
                 return
@@ -94,13 +22,8 @@ const newWorker = function (workerOption) {
                 let context = await worker.loadContext();
                 context = context || {}
                 let app = context.app || {}
-                let typeList = context.types || []
-                let treeData = [];
-                typeList.forEach(modelType => {
-                    worker.appendType(treeData, modelType, app)
-                })
-                // console.log(context);
-                worker.treeData = treeData
+                let children = app.children || []
+                worker.treeData = children
             } catch (error) {
                 console.error("build error:", error);
             } finally {
@@ -126,6 +49,73 @@ const newWorker = function (workerOption) {
             let res = await server.maker.close(param);
             if (res.code != 0) {
                 // tool.error(res.msg);
+            }
+            return res.data;
+        },
+        async get(modelType, modelName) {
+
+            let param = worker.getParam({
+                modelType: modelType,
+                modelName: modelName,
+            });
+            let res = await server.maker.get(param);
+            if (res.code != 0) {
+                tool.error(res.msg);
+            }
+            return res.data;
+        },
+        async getList(modelType) {
+
+            let param = worker.getParam({
+                modelType: modelType,
+            });
+            let res = await server.maker.save(param);
+            if (res.code != 0) {
+                tool.error(res.msg);
+            }
+            return res.data;
+        },
+        async insert(modelType, modelName, model) {
+
+            let param = worker.getParam({
+                modelType: modelType,
+                modelName: modelName,
+                model: model,
+            });
+            let res = await server.maker.insert(param);
+            if (res.code != 0) {
+                tool.error(res.msg);
+            } else {
+                tool.success("新增成功");
+            }
+            return res.data;
+        },
+        async save(modelType, modelName, model) {
+
+            let param = worker.getParam({
+                modelType: modelType,
+                modelName: modelName,
+                model: model,
+            });
+            let res = await server.maker.save(param);
+            if (res.code != 0) {
+                tool.error(res.msg);
+            } else {
+                tool.success("保存成功");
+            }
+            return res.data;
+        },
+        async delete(modelType, modelName) {
+
+            let param = worker.getParam({
+                modelType: modelType,
+                modelName: modelName,
+            });
+            let res = await server.maker.delete(param);
+            if (res.code != 0) {
+                tool.error(res.msg);
+            } else {
+                tool.success("删除成功");
             }
             return res.data;
         },

@@ -3,12 +3,12 @@
     <template v-if="ready">
       <tm-layout height="100%">
         <tm-layout height="60px">
-          <div class="pdlr-10 pdt-10 toolbox-database-owner-btns">
+          <div class="pdlr-10 pdt-10">
             <div class="tm-btn tm-btn-xs bg-grey-6" @click="refresh()">
               刷新
             </div>
-            <div class="tm-btn tm-btn-xs bg-blue-8" @click="toExport()">
-              导出
+            <div class="tm-btn tm-btn-xs bg-grey-6" @click="collapseAll()">
+              收起所有
             </div>
           </div>
         </tm-layout>
@@ -64,7 +64,6 @@ export default {
       defaultProps: {
         children: "children",
         label: "text",
-        isLeaf: "leaf",
       },
       filterText: "",
     };
@@ -89,6 +88,20 @@ export default {
     },
     async refresh() {
       await this.worker.build();
+    },
+    collapseAll() {
+      let children = this.$refs.tree.children || [];
+      children.forEach((data) => {
+        let node = this.$refs.tree.getNode(data.key);
+        if (node == null || !node.expanded) {
+          return;
+        }
+        node.collapse();
+      });
+      this.expands = [];
+      this.toolboxWorker.updateExtend({
+        expands: this.expands,
+      });
     },
     initDefaultExpands() {
       this.is_initDefaultExpands = true;
@@ -135,13 +148,11 @@ export default {
       }
       let needDeletes = [];
       needDeletes.push(data.key);
-      if (!data.leaf) {
-        this.expands.forEach((one) => {
-          if (("" + one).startsWith("" + data.key + ":")) {
-            needDeletes.push(one);
-          }
-        });
-      }
+      this.expands.forEach((one) => {
+        if (("" + one).startsWith("" + data.key + "/")) {
+          needDeletes.push(one);
+        }
+      });
       if (needDeletes.length > 0) {
         needDeletes.forEach((one) => {
           let index = this.expands.indexOf(one);
@@ -168,7 +179,7 @@ export default {
       }
     },
     nodeDbClick(data, node, nodeView) {
-      if (!data.leaf) {
+      if (data.children && data.children.length > 0) {
         if (node.expanded) {
           node.collapse();
         } else {
@@ -185,12 +196,13 @@ export default {
         this.tool.showContextmenu(menus);
       }
     },
-    toOpen(data) {
+    async toOpen(data) {
+      let name = data.modelName;
       let extend = {
-        name: data.modelTypeText + "." + data.name,
-        title: data.modelTypeText + "." + data.name,
-        type: "model-" + data.modelType,
-        modelName: data.name,
+        name: data.modelTypeText + "/" + name,
+        title: data.modelTypeText + "/" + name,
+        type: "model-editor",
+        modelName: name,
         modelType: data.modelType,
       };
       this.toolboxWorker.openTabByExtend(extend);
