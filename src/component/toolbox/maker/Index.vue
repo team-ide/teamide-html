@@ -23,6 +23,7 @@
           </Tabs>
         </tm-layout>
       </tm-layout>
+      <ModeForm :source="source" :worker="worker"></ModeForm>
     </template>
   </div>
 </template>
@@ -33,9 +34,10 @@ import _worker from "./worker.js";
 
 import Modelers from "./Modelers";
 import Tabs from "./Tabs";
+import ModeForm from "./ModeForm";
 
 export default {
-  components: { Modelers, Tabs },
+  components: { Modelers, Tabs, ModeForm },
   props: ["source", "toolboxWorker", "extend"],
   data() {
     let worker = _worker.newWorker({
@@ -60,9 +62,12 @@ export default {
   created() {},
   mounted() {
     this.init();
+    this.worker.bindListen();
   },
   beforeDestroy() {
+    this.worker.isDestroyed = true;
     this.worker.close();
+    this.worker.unbindListen();
   },
 };
 </script>

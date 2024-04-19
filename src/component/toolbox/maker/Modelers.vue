@@ -40,7 +40,31 @@
                 @node-collapse="nodeCollapse"
                 :filter-node-method="filterNode"
               >
-                <span class="toolbox-editor-tree-span" slot-scope="{ node }">
+                <span
+                  class="toolbox-editor-tree-span"
+                  slot-scope="{ node, data }"
+                >
+                  <template v-if="data.isModel">
+                    <i
+                      class="mdi mdi-file"
+                      style="vertical-align: 0px; margin-right: 5px"
+                    >
+                    </i>
+                  </template>
+                  <template v-else-if="data.isType">
+                    <i
+                      class="mdi mdi-apps-box color-orange"
+                      style="vertical-align: 0px; margin-right: 5px"
+                    >
+                    </i>
+                  </template>
+                  <template v-else-if="data.isPack">
+                    <i
+                      class="mdi mdi-folder color-orange-3"
+                      style="vertical-align: 0px; margin-right: 5px"
+                    >
+                    </i>
+                  </template>
                   <span>{{ node.label }}</span>
                 </span>
               </el-tree>
@@ -191,18 +215,111 @@ export default {
     },
     nodeContextmenu(event, data, node, nodeView) {
       let menus = [];
-
+      if (data.key == "config") {
+        return;
+      }
+      console.log(data);
+      let modelType = data.modelType;
+      let modelName = data.key.substring(data.modelType.length + 1);
+      let parentModelName = "";
+      if (data.isType) {
+        modelType = data.key;
+      }
+      if (data.isPack) {
+        parentModelName = data.key.substring(modelType.length + 1);
+      }
+      if (data.isModel) {
+        menus.push({
+          text: "打开模型",
+          onClick: () => {
+            this.toOpen(data);
+          },
+        });
+      } else {
+        let newModelName = "xxx";
+        if (this.tool.isNotEmpty(parentModelName)) {
+          newModelName = parentModelName + "/" + newModelName;
+        }
+        menus.push({
+          text: "新建模型",
+          onClick: () => {
+            this.worker.showModelForm({
+              title: "新建模型",
+              isPack: false,
+              modelName: newModelName,
+              modelType: modelType,
+            });
+          },
+        });
+        menus.push({
+          text: "新建包",
+          onClick: () => {
+            this.worker.showModelForm({
+              title: "新建包",
+              isPack: true,
+              modelName: newModelName,
+              modelType: modelType,
+            });
+          },
+        });
+      }
+      if (!data.isType) {
+        menus.push({
+          text: "重命名",
+          onClick: () => {
+            this.worker.showModelForm({
+              title: "重命名" + modelName,
+              isPack: data.isPack,
+              modelName: modelName,
+              modelType: modelType,
+              isUpdate: true,
+            });
+          },
+        });
+        menus.push({
+          text: "删除",
+          onClick: () => {
+            this.tool
+              .confirm("删除路径[" + modelName + "]后将无法恢复，确定删除？")
+              .then(async () => {
+                await this.worker.remove(modelType, modelName, data.isPack);
+              })
+              .catch((e) => {});
+          },
+        });
+      }
       if (menus.length > 0) {
         this.tool.showContextmenu(menus);
       }
     },
     async toOpen(data) {
-      let name = data.modelName;
+      if (
+        data == null ||
+        this.tool.isEmpty(data.modelType) ||
+        this.tool.isEmpty(data.key)
+      ) {
+        return;
+      }
+      if (!data.isModel) {
+        return;
+      }
+      let modelName = data.key.substring(data.modelType.length + 1);
+      let name = data.modelTypeText + "/" + modelName;
+      let title = data.modelTypeText + "/" + modelName;
+      if (data.isType) {
+        title = "";
+        if (data.parent) {
+          title += data.parent.text + "/";
+        }
+        title += data.modelTypeText;
+        name = title;
+        modelName = data.text;
+      }
       let extend = {
-        name: data.modelTypeText + "/" + name,
-        title: data.modelTypeText + "/" + name,
+        name: name,
+        title: title,
         type: "model-editor",
-        modelName: name,
+        modelName: modelName,
         modelType: data.modelType,
       };
       this.toolboxWorker.openTabByExtend(extend);

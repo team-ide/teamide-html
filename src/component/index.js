@@ -99,4 +99,11 @@ Vue.component('DataMove', DataMove);
 import ScriptValueDescription from './ScriptValueDescription.vue'
 Vue.component('ScriptValueDescription', ScriptValueDescription);
 
+
+import EditorStep from './toolbox/maker/EditorStep.vue'
+Vue.component('EditorStep', EditorStep);
+
+import EditorSteps from './toolbox/maker/EditorSteps.vue'
+Vue.component('EditorSteps', EditorSteps);
+
 export default {};

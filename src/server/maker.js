@@ -19,8 +19,11 @@ let maker = {
     insert(param) {
         return http.post('api/maker/insert', param);
     },
-    delete(param) {
-        return http.post('api/maker/delete', param);
+    remove(param) {
+        return http.post('api/maker/remove', param);
+    },
+    rename(param) {
+        return http.post('api/maker/rename', param);
     },
 };
 
