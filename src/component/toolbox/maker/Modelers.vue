@@ -53,14 +53,14 @@
                   </template>
                   <template v-else-if="data.isType">
                     <i
-                      class="mdi mdi-apps-box color-orange"
+                      class="mdi mdi-apps-box color-amber-7"
                       style="vertical-align: 0px; margin-right: 5px"
                     >
                     </i>
                   </template>
                   <template v-else-if="data.isPack">
                     <i
-                      class="mdi mdi-folder color-orange-3"
+                      class="mdi mdi-folder color-amber"
                       style="vertical-align: 0px; margin-right: 5px"
                     >
                     </i>
