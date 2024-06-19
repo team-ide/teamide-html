@@ -9,7 +9,8 @@
       :border="true"
       style="width: 100%"
       size="mini"
-      height="160px"
+      height="120px"
+      empty-text="未配置参数"
     >
       <el-table-column label="参数名称" fixed width="220">
         <template slot-scope="scope">
@@ -21,23 +22,12 @@
       <el-table-column label="类型" width="160">
         <template slot-scope="scope">
           <div class="">
-            <el-select
-              placeholder="选择类型"
-              v-model="scope.row.type"
-              filterable
-              clearable
+            <ValueTypeSelect
+              :source="source"
+              :worker="worker"
+              :data="scope.row.type"
             >
-              <el-option
-                v-for="(one, index) in worker.valueTypeList"
-                :key="index"
-                :value="one.name"
-                :label="
-                  one.name +
-                  (tool.isEmpty(one.comment) ? '' : '(' + one.comment + ')')
-                "
-              >
-              </el-option>
-            </el-select>
+            </ValueTypeSelect>
           </div>
         </template>
       </el-table-column>
@@ -65,28 +55,7 @@
         </template>
       </el-table-column>
     </el-table>
-    <el-form class="mgt-10" ref="form" size="mini" @submit.native.prevent>
-      <el-form-item label="返回值类型" class="mgb-5">
-        <el-select
-          placeholder="选择类型"
-          v-model="returnType"
-          filterable
-          clearable
-        >
-          <el-option
-            v-for="(one, index) in worker.valueTypeList"
-            :key="index"
-            :value="one.name"
-            :label="
-              one.name +
-              (tool.isEmpty(one.comment) ? '' : '(' + one.comment + ')')
-            "
-          >
-          </el-option>
-        </el-select>
-      </el-form-item>
-    </el-form>
-    <div style="height: calc(100% - 240px)">
+    <div style="height: calc(100% - 150px)">
       <Editor
         ref="funcEditor"
         :source="source"
@@ -138,7 +107,7 @@ export default {
     },
     add(one, after) {
       one = one || {};
-      one.name = one.name || "";
+      one.name = one.name || "arg" + (this.list.length + 1);
       one.type = one.type || "string";
       one.comment = one.comment || "";
 

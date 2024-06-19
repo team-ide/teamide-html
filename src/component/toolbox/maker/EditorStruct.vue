@@ -4,7 +4,9 @@
       <span class="color-grey">字段列表</span>
       <div class="tm-link color-green mgl-10" @click="add({})">新增</div>
       <div class="color-orange ft-12">
-        <div>映射JSON名称：可以不填写，默认使用字段名称，填写 `-` 忽略该字段</div>
+        <div>
+          映射JSON名称：可以不填写，默认使用字段名称，填写 `-` 忽略该字段
+        </div>
         <div>映射JSON省略空值：选中后，如果值为空，则忽略该字段</div>
       </div>
     </div>
@@ -25,23 +27,12 @@
       <el-table-column label="类型" width="160">
         <template slot-scope="scope">
           <div class="">
-            <el-select
-              placeholder="选择类型"
-              v-model="scope.row.type"
-              filterable
-              clearable
+            <ValueTypeSelect
+              :source="source"
+              :worker="worker"
+              :data="scope.row.type"
             >
-              <el-option
-                v-for="(one, index) in worker.valueTypeList"
-                :key="index"
-                :value="one.name"
-                :label="
-                  one.name +
-                  (tool.isEmpty(one.comment) ? '' : '(' + one.comment + ')')
-                "
-              >
-              </el-option>
-            </el-select>
+            </ValueTypeSelect>
           </div>
         </template>
       </el-table-column>
@@ -70,6 +61,13 @@
         <template slot-scope="scope">
           <div class="">
             <el-switch v-model="scope.row.jsonOmitempty" />
+          </div>
+        </template>
+      </el-table-column>
+      <el-table-column label="映射字段">
+        <template slot-scope="scope">
+          <div class="">
+            <el-input v-model="scope.row.columnName" />
           </div>
         </template>
       </el-table-column>
@@ -139,6 +137,7 @@ export default {
       one.comment = one.comment || "";
       one.jsonName = one.jsonName || "";
       one.jsonOmitempty = one.jsonOmitempty || false;
+      one.columnName = one.columnName || "";
       one.isList = one.isList || false;
 
       let appendIndex = this.list.indexOf(after);

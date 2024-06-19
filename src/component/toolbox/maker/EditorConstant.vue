@@ -21,23 +21,12 @@
       <el-table-column label="类型" width="160">
         <template slot-scope="scope">
           <div class="">
-            <el-select
-              placeholder="选择类型"
-              v-model="scope.row.type"
-              filterable
-              clearable
+            <ValueTypeSelect
+              :source="source"
+              :worker="worker"
+              :data="scope.row.type"
             >
-              <el-option
-                v-for="(one, index) in worker.valueTypeList"
-                :key="index"
-                :value="one.name"
-                :label="
-                  one.name +
-                  (tool.isEmpty(one.comment) ? '' : '(' + one.comment + ')')
-                "
-              >
-              </el-option>
-            </el-select>
+            </ValueTypeSelect>
           </div>
         </template>
       </el-table-column>

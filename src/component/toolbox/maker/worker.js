@@ -147,7 +147,7 @@ const newWorker = function (workerOption) {
                 context = context || {}
                 let app = context.app || {}
 
-                let valueTypes = app.valueTypes || []
+                let valueTypes = context.valueTypes || []
 
                 worker.valueTypeList = valueTypes;
 
@@ -237,6 +237,33 @@ const newWorker = function (workerOption) {
                 tool.error(res.msg);
             } else {
                 tool.success("保存成功");
+            }
+            return res.data;
+        },
+        async gen(modelType) {
+
+            let param = worker.getParam({
+                modelType: modelType,
+            });
+            let res = await server.maker.gen(param);
+            if (res.code != 0) {
+                tool.error(res.msg);
+            } else {
+                tool.success("生成成功");
+            }
+            return;
+        },
+        async invoke(modelType, invokeParam) {
+
+            let param = worker.getParam({
+                modelType: modelType,
+                invokeParam: invokeParam,
+            });
+            let res = await server.maker.invoke(param);
+            if (res.code != 0) {
+                tool.error(res.msg);
+            } else {
+                tool.success("执行成功");
             }
             return res.data;
         },

@@ -25,6 +25,12 @@ let maker = {
     rename(param) {
         return http.post('api/maker/rename', param);
     },
+    gen(param) {
+        return http.post('api/maker/gen', param);
+    },
+    invoke(param) {
+        return http.post('api/maker/invoke', param);
+    },
 };
 
 

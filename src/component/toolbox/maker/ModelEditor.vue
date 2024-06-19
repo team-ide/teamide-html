@@ -7,6 +7,20 @@
             重新加载
           </div>
           <div class="tm-btn tm-btn-sm bg-green" @click="save()">保存</div>
+          <template
+            v-if="
+              modelType == 'func' ||
+              modelType == 'storage' ||
+              modelType == 'service'
+            "
+          >
+            <div class="tm-btn tm-btn-sm bg-green" @click="invoke()">
+              模拟执行
+            </div>
+          </template>
+          <template v-if="modelType == 'language/golang'">
+            <div class="tm-btn tm-btn-sm bg-green" @click="gen()">生成源码</div>
+          </template>
         </div>
         <el-form
           ref="form"
@@ -14,26 +28,15 @@
           label-width="300px"
           @submit.native.prevent
         >
-          <el-form-item
-            label="说明（简要说明，方便查看）"
-            class="mgb-5"
-            style="width: 100%"
-          >
+          <el-form-item label="说明" class="mgb-5" style="width: 100%">
             <el-input v-model="model.comment" />
-          </el-form-item>
-          <el-form-item
-            label="注释（详细说明，用户源码输出）"
-            class="mgb-5"
-            style="width: 100%"
-          >
-            <el-input type="textarea" v-model="model.note" resize="none" />
           </el-form-item>
         </el-form>
       </tm-layout>
       <tm-layout height="auto">
         <EditorConstant
           ref="Editor"
-          v-if="this.modelType == 'constant'"
+          v-if="modelType == 'constant'"
           class="toolbox-maker-model-editor-body"
           :source="source"
           :worker="worker"
@@ -42,7 +45,7 @@
         </EditorConstant>
         <EditorError
           ref="Editor"
-          v-else-if="this.modelType == 'error'"
+          v-else-if="modelType == 'error'"
           class="toolbox-maker-model-editor-body"
           :source="source"
           :worker="worker"
@@ -51,94 +54,58 @@
         </EditorError>
         <EditorStruct
           ref="Editor"
-          v-else-if="this.modelType == 'struct'"
+          v-else-if="modelType == 'struct'"
           class="toolbox-maker-model-editor-body"
           :source="source"
           :worker="worker"
           :model="model"
         >
         </EditorStruct>
-        <EditorConfigDatabase
-          ref="Editor"
-          v-else-if="this.modelType == 'config/database'"
-          class="toolbox-maker-model-editor-body"
-          :source="source"
-          :worker="worker"
-          :model="model"
-        >
-        </EditorConfigDatabase>
-        <EditorConfigRedis
-          ref="Editor"
-          v-else-if="this.modelType == 'config/redis'"
-          class="toolbox-maker-model-editor-body"
-          :source="source"
-          :worker="worker"
-          :model="model"
-        >
-        </EditorConfigRedis>
-        <EditorConfigZookeeper
-          ref="Editor"
-          v-else-if="this.modelType == 'config/zookeeper'"
-          class="toolbox-maker-model-editor-body"
-          :source="source"
-          :worker="worker"
-          :model="model"
-        >
-        </EditorConfigZookeeper>
-        <EditorConfigKafka
-          ref="Editor"
-          v-else-if="this.modelType == 'config/kafka'"
-          class="toolbox-maker-model-editor-body"
-          :source="source"
-          :worker="worker"
-          :model="model"
-        >
-        </EditorConfigKafka>
-        <EditorConfigElasticsearch
-          ref="Editor"
-          v-else-if="this.modelType == 'config/elasticsearch'"
-          class="toolbox-maker-model-editor-body"
-          :source="source"
-          :worker="worker"
-          :model="model"
-        >
-        </EditorConfigElasticsearch>
-        <EditorConfigMongodb
-          ref="Editor"
-          v-else-if="this.modelType == 'config/mongodb'"
-          class="toolbox-maker-model-editor-body"
-          :source="source"
-          :worker="worker"
-          :model="model"
-        >
-        </EditorConfigMongodb>
         <EditorFunc
           ref="Editor"
-          v-else-if="this.modelType == 'func'"
+          v-else-if="modelType == 'func'"
           class="toolbox-maker-model-editor-body"
           :source="source"
           :worker="worker"
           :model="model"
         >
         </EditorFunc>
-        <EditorDao
+        <EditorStorage
           ref="Editor"
-          v-else-if="this.modelType == 'dao'"
+          v-else-if="modelType == 'storage'"
           class="toolbox-maker-model-editor-body"
           :source="source"
           :worker="worker"
           :model="model"
         >
-        </EditorDao>
+        </EditorStorage>
         <EditorService
           ref="Editor"
-          v-else-if="this.modelType == 'service'"
+          v-else-if="modelType == 'service'"
           class="toolbox-maker-model-editor-body"
           :source="source"
           :worker="worker"
           :model="model"
         >
         </EditorService>
+        <EditorApp
+          ref="Editor"
+          v-else-if="modelType == 'app'"
+          class="toolbox-maker-model-editor-body"
+          :source="source"
+          :worker="worker"
+          :model="model"
+        >
+        </EditorApp>
+        <EditorLanguageGolang
+          ref="Editor"
+          v-else-if="modelType == 'language/golang'"
+          class="toolbox-maker-model-editor-body"
+          :source="source"
+          :worker="worker"
+          :model="model"
+        >
+        </EditorLanguageGolang>
       </tm-layout>
     </tm-layout>
   </div>
@@ -149,30 +116,22 @@
 import EditorConstant from "./EditorConstant";
 import EditorError from "./EditorError";
 import EditorStruct from "./EditorStruct";
-import EditorConfigDatabase from "./EditorConfigDatabase";
-import EditorConfigRedis from "./EditorConfigRedis";
-import EditorConfigZookeeper from "./EditorConfigZookeeper";
-import EditorConfigKafka from "./EditorConfigKafka";
-import EditorConfigElasticsearch from "./EditorConfigElasticsearch";
-import EditorConfigMongodb from "./EditorConfigMongodb";
+import EditorApp from "./EditorApp";
 import EditorFunc from "./EditorFunc";
-import EditorDao from "./EditorDao";
+import EditorStorage from "./EditorStorage";
 import EditorService from "./EditorService";
+import EditorLanguageGolang from "./EditorLanguageGolang";
 
 export default {
   components: {
     EditorConstant,
     EditorError,
     EditorStruct,
-    EditorConfigDatabase,
-    EditorConfigRedis,
-    EditorConfigZookeeper,
-    EditorConfigKafka,
-    EditorConfigElasticsearch,
-    EditorConfigMongodb,
+    EditorApp,
     EditorFunc,
-    EditorDao,
+    EditorStorage,
     EditorService,
+    EditorLanguageGolang,
   },
   props: ["source", "toolboxWorker", "extend", "worker"],
   data() {
@@ -222,6 +181,13 @@ export default {
         }
       }
       await this.worker.save(this.modelType, this.modelName, model, false);
+    },
+    async gen() {
+      await this.worker.gen(this.modelType);
+    },
+    async invoke() {
+      let param = {};
+      await this.worker.invoke(this.modelType, param);
     },
   },
   created() {},
