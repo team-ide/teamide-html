@@ -172,6 +172,55 @@ const newWorker = function (workerOption) {
             let context = res.data;
             return context;
         },
+        forEachTreeData(call) {
+            worker.forEachChildren(worker.treeData, call)
+        },
+        forEachChildren(children, call) {
+            if (children == null || children.length == 0) {
+                return
+            }
+            children.forEach((data) => {
+                call(data)
+                worker.forEachChildren(data.children, call)
+            })
+        },
+        initRegisterCompletion() {
+
+            let monaco = window.monaco;
+            let suggestions = [
+            ]
+
+            worker.forEachTreeData(data => {
+                if (data.isModel) {
+                    let one = { kind: monaco.languages.CompletionItemKind.Keyword, }
+                    let name = data.key;
+                    name = name.replaceAll("/", ".")
+                    one.label = name;
+                    one.insertText = name
+                    suggestions.push(one)
+                }
+            })
+
+            worker.registerCompletion.suggestions = suggestions
+        },
+        registerCompletionItemProvider() {
+            let monaco = window.monaco;
+            if (monaco == null) {
+                return
+            }
+            monaco.languages.registerCompletionItemProvider("javascript", {
+                provideCompletionItems: (model, position) => {
+                    let data = null
+                    if (source.registerCompletion) {
+                        data = source.registerCompletion[model.id]
+                    }
+                    if (data == null) {
+                        data = { suggestions: [] }
+                    }
+                    return data;
+                },
+            });
+        },
         getParam(data) {
             let param = worker.toolboxWorker.getWorkParam(data)
             return param;

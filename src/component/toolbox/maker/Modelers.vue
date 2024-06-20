@@ -321,6 +321,7 @@ export default {
         type: "model-editor",
         modelName: modelName,
         modelType: data.modelType,
+        onlyOpenOneKey: data.key,
       };
       this.toolboxWorker.openTabByExtend(extend);
     },

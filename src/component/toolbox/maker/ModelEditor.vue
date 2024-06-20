@@ -1,7 +1,7 @@
 <template>
   <div class="toolbox-maker-model-editor" v-if="ready">
     <tm-layout height="100%">
-      <tm-layout height="150px">
+      <tm-layout height="80px">
         <div class="pdlr-10 pdtb-10">
           <div class="tm-btn tm-btn-sm bg-grey-6" @click="refresh()">
             重新加载
@@ -41,6 +41,7 @@
           :source="source"
           :worker="worker"
           :model="model"
+          :save="save"
         >
         </EditorConstant>
         <EditorError
@@ -50,6 +51,7 @@
           :source="source"
           :worker="worker"
           :model="model"
+          :save="save"
         >
         </EditorError>
         <EditorStruct
@@ -59,35 +61,42 @@
           :source="source"
           :worker="worker"
           :model="model"
+          :save="save"
         >
         </EditorStruct>
-        <EditorFunc
+        <EditorCode
           ref="Editor"
           v-else-if="modelType == 'func'"
           class="toolbox-maker-model-editor-body"
           :source="source"
           :worker="worker"
           :model="model"
+          codeType="func"
+          :save="save"
         >
-        </EditorFunc>
-        <EditorStorage
+        </EditorCode>
+        <EditorCode
           ref="Editor"
           v-else-if="modelType == 'storage'"
           class="toolbox-maker-model-editor-body"
           :source="source"
           :worker="worker"
           :model="model"
+          codeType="storage"
+          :save="save"
         >
-        </EditorStorage>
-        <EditorService
+        </EditorCode>
+        <EditorCode
           ref="Editor"
           v-else-if="modelType == 'service'"
           class="toolbox-maker-model-editor-body"
           :source="source"
           :worker="worker"
           :model="model"
+          codeType="service"
+          :save="save"
         >
-        </EditorService>
+        </EditorCode>
         <EditorApp
           ref="Editor"
           v-else-if="modelType == 'app'"
@@ -95,6 +104,7 @@
           :source="source"
           :worker="worker"
           :model="model"
+          :save="save"
         >
         </EditorApp>
         <EditorLanguageGolang
@@ -104,6 +114,7 @@
           :source="source"
           :worker="worker"
           :model="model"
+          :save="save"
         >
         </EditorLanguageGolang>
       </tm-layout>
@@ -117,9 +128,7 @@ import EditorConstant from "./EditorConstant";
 import EditorError from "./EditorError";
 import EditorStruct from "./EditorStruct";
 import EditorApp from "./EditorApp";
-import EditorFunc from "./EditorFunc";
-import EditorStorage from "./EditorStorage";
-import EditorService from "./EditorService";
+import EditorCode from "./EditorCode";
 import EditorLanguageGolang from "./EditorLanguageGolang";
 
 export default {
@@ -128,9 +137,7 @@ export default {
     EditorError,
     EditorStruct,
     EditorApp,
-    EditorFunc,
-    EditorStorage,
-    EditorService,
+    EditorCode,
     EditorLanguageGolang,
   },
   props: ["source", "toolboxWorker", "extend", "worker"],

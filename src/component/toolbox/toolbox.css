@@ -154,6 +154,39 @@
     appearance: auto;
 }
 
+.part-box .el-select input {
+    width: auto;
+    min-width: auto;
+    border: 0px dashed transparent;
+    background-color: transparent;
+    width: 100%;
+    padding: 0px 5px;
+    box-sizing: border-box;
+    outline: none;
+    font-size: 12px;
+    line-height: 25px;
+    color: unset;
+}
+
+.part-box .el-select .el-select__tags-text {
+    font-size: 12px;
+}
+
+
+.part-box .el-select .el-input__inner {
+    height: 25px;
+    line-height: 25px;
+    padding: 0 5px;
+    border: 0px;
+    outline: none;
+    text-align: left;
+}
+
+.part-box .el-select .el-input__icon {
+    line-height: 28px;
+
+}
+
 
 .part-box input[type="checkbox"] {
     width: 10px;
