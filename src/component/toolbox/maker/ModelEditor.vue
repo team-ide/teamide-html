@@ -1,12 +1,14 @@
 <template>
   <div class="toolbox-maker-model-editor" v-if="ready">
     <tm-layout height="100%">
-      <tm-layout height="80px">
-        <div class="pdlr-10 pdtb-10">
-          <div class="tm-btn tm-btn-sm bg-grey-6" @click="refresh()">
+      <tm-layout height="35px">
+        <div class="pdlr-10 pdtb-6">
+          <div class="tm-btn tm-btn-xs pdtb-3 bg-grey-6" @click="refresh()">
             重新加载
           </div>
-          <div class="tm-btn tm-btn-sm bg-green" @click="save()">保存</div>
+          <div class="tm-btn tm-btn-xs pdtb-3 bg-green" @click="save()">
+            保存
+          </div>
           <template
             v-if="
               modelType == 'func' ||
@@ -14,24 +16,16 @@
               modelType == 'service'
             "
           >
-            <div class="tm-btn tm-btn-sm bg-green" @click="invoke()">
+            <div class="tm-btn tm-btn-xs pdtb-3 bg-green" @click="invoke()">
               模拟执行
             </div>
           </template>
           <template v-if="modelType == 'language/golang'">
-            <div class="tm-btn tm-btn-sm bg-green" @click="gen()">生成源码</div>
+            <div class="tm-btn tm-btn-xs pdtb-3 bg-green" @click="gen()">
+              生成源码
+            </div>
           </template>
         </div>
-        <el-form
-          ref="form"
-          size="mini"
-          label-width="300px"
-          @submit.native.prevent
-        >
-          <el-form-item label="说明" class="mgb-5" style="width: 100%">
-            <el-input v-model="model.comment" />
-          </el-form-item>
-        </el-form>
       </tm-layout>
       <tm-layout height="auto">
         <EditorConstant
@@ -117,6 +111,16 @@
           :save="save"
         >
         </EditorLanguageGolang>
+        <EditorFlowchart
+          ref="Editor"
+          v-else-if="modelType == 'flowchart'"
+          class="toolbox-maker-model-editor-body"
+          :source="source"
+          :worker="worker"
+          :model="model"
+          :save="save"
+        >
+        </EditorFlowchart>
       </tm-layout>
     </tm-layout>
   </div>
@@ -130,6 +134,7 @@ import EditorStruct from "./EditorStruct";
 import EditorApp from "./EditorApp";
 import EditorCode from "./EditorCode";
 import EditorLanguageGolang from "./EditorLanguageGolang";
+import EditorFlowchart from "./EditorFlowchart";
 
 export default {
   components: {
@@ -139,6 +144,7 @@ export default {
     EditorApp,
     EditorCode,
     EditorLanguageGolang,
+    EditorFlowchart,
   },
   props: ["source", "toolboxWorker", "extend", "worker"],
   data() {

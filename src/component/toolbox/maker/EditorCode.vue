@@ -1,6 +1,16 @@
 <template>
-  <div v-if="ready" style="height: 100%" class="pd-10">
+  <div v-if="ready" style="height: 100%" class="pdlr-10">
     <ul ref="partBox" class="part-box" style="height: auto">
+      <li>
+        <span class="color-grey mgr-10">说明</span>
+        <span class="mgr-20">
+          <input
+            v-model="model.comment"
+            placeholder="说明"
+            style="min-width: 200px"
+          />
+        </span>
+      </li>
       <li>
         <span class="color-grey mgr-10">func</span>
         <span class="color-green mgr-10">{{ model.name }}</span>
@@ -101,7 +111,7 @@ export default {
           let partBox = this.tool.jQuery(this.$refs.partBox);
           let editorBox = this.tool.jQuery(this.$refs.editorBox);
           editorBox.height(
-            "calc(100% - " + (partBox.outerHeight() + 20) + "px)"
+            "calc(100% - " + (partBox.outerHeight() + 30) + "px)"
           );
         }
       });

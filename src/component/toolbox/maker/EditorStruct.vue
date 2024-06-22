@@ -1,5 +1,17 @@
 <template>
-  <div v-if="ready" style="height: 100%" class="pd-10">
+  <div v-if="ready" style="height: 100%" class="pdlr-10">
+    <ul class="part-box" style="height: auto">
+      <li>
+        <span class="color-grey mgr-10">说明</span>
+        <span class="mgr-20">
+          <input
+            v-model="model.comment"
+            placeholder="说明"
+            style="min-width: 200px"
+          />
+        </span>
+      </li>
+    </ul>
     <div class="pdtb-5 ft-13">
       <span class="color-grey">字段列表</span>
       <div class="tm-link color-green mgl-10" @click="add({})">新增</div>
@@ -8,13 +20,16 @@
           映射JSON名称：可以不填写，默认使用字段名称，填写 `-` 忽略该字段
         </div>
         <div>映射JSON省略空值：选中后，如果值为空，则忽略该字段</div>
+        <div>
+          数据库字段：可以不填写，默认使用字段名称，填写 `-` 忽略该字段
+        </div>
       </div>
     </div>
     <el-table
       :data="list"
       :border="true"
       style="width: 100%"
-      height="calc(100% - 60px)"
+      height="calc(100% - 110px)"
       size="mini"
     >
       <el-table-column label="字段名称" fixed width="160">
@@ -64,7 +79,7 @@
           </div>
         </template>
       </el-table-column>
-      <el-table-column label="映射字段">
+      <el-table-column label="数据库字段">
         <template slot-scope="scope">
           <div class="">
             <el-input v-model="scope.row.columnName" />

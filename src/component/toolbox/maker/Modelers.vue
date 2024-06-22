@@ -44,7 +44,7 @@
                   class="toolbox-editor-tree-span"
                   slot-scope="{ node, data }"
                 >
-                  <template v-if="data.isModel">
+                  <template v-if="data.isModel && data.parent != null">
                     <i
                       class="mdi mdi-file"
                       style="vertical-align: 0px; margin-right: 5px"

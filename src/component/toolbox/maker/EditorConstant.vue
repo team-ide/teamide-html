@@ -1,5 +1,17 @@
 <template>
-  <div v-if="ready" style="height: 100%" class="pd-10">
+  <div v-if="ready" style="height: 100%" class="pdlr-10">
+    <ul class="part-box" style="height: auto">
+      <li>
+        <span class="color-grey mgr-10">说明</span>
+        <span class="mgr-20">
+          <input
+            v-model="model.comment"
+            placeholder="说明"
+            style="min-width: 200px"
+          />
+        </span>
+      </li>
+    </ul>
     <div class="pdtb-5 ft-13">
       <span class="color-grey">常量列表</span>
       <div class="tm-link color-green mgl-10" @click="add({})">新增</div>
@@ -8,7 +20,7 @@
       :data="list"
       :border="true"
       style="width: 100%"
-      height="calc(100% - 30px)"
+      height="calc(100% - 60px)"
       size="mini"
     >
       <el-table-column label="常量名称" fixed width="220">

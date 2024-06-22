@@ -103,5 +103,11 @@ Vue.component('ScriptValueDescription', ScriptValueDescription);
 import ValueTypeSelect from './toolbox/maker/ValueTypeSelect.vue'
 Vue.component('ValueTypeSelect', ValueTypeSelect);
 
+import Flowchart from './flowchart/Index.vue'
+Vue.component('Flowchart', Flowchart);
+
+import FlowchartNode from './flowchart/Node.vue'
+Vue.component('FlowchartNode', FlowchartNode);
+
 
 export default {};
