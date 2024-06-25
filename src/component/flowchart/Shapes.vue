@@ -40,7 +40,8 @@
 
 
 <script>
-import flowchart from "./index.js";
+
+import flowchart from '@/component/flowchart'
 
 export default {
   components: {},
