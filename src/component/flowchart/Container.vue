@@ -53,10 +53,24 @@ export default {
         { type: "circle", height: 50, bgColor: "grey" },
         { type: "rect", height: 50 },
         { type: "rect", height: 50, bgColor: "grey" },
+        { type: "rect", height: 50, round: 4 },
+        { type: "rect", height: 50, bgColor: "grey", round: 4 },
         { type: "rect", height: 50, leftCircle: true },
+        { type: "rect", height: 50, bgColor: "grey", leftCircle: true },
+        { type: "rect", width: 50, leftCircle: true },
+        { type: "rect", width: 50, bgColor: "grey", leftCircle: true },
+        { type: "rect", height: 50, rightCircle: true },
         { type: "rect", height: 50, bgColor: "grey", rightCircle: true },
+        { type: "rect", width: 50, rightCircle: true },
+        { type: "rect", width: 50, bgColor: "grey", rightCircle: true },
         { type: "rect", height: 50, topCircle: true },
         { type: "rect", height: 50, bgColor: "grey", topCircle: true },
+        { type: "rect", width: 50, topCircle: true },
+        { type: "rect", width: 50, bgColor: "grey", topCircle: true },
+        { type: "rect", height: 50, bottomCircle: true },
+        { type: "rect", height: 50, bgColor: "grey", bottomCircle: true },
+        { type: "rect", width: 50, bottomCircle: true },
+        { type: "rect", width: 50, bgColor: "grey", bottomCircle: true },
       ];
 
       let rowIndex = 1;
@@ -70,7 +84,7 @@ export default {
         one.width = one.width || 100;
         one.height = one.height || 100;
         one.bColor = one.bColor || "#fff";
-        one.bWidth = one.bWidth || 6;
+        one.bWidth = one.bWidth || 4;
 
         one.left = (rowIndex - 1) * 150;
         one.top = (colIndex - 1) * 150;

@@ -85,7 +85,13 @@ class BaseDraw {
     }
     initProp() {
         this.w = this.opts.width
+        if (this.w < 20) {
+            this.w = 20
+        }
         this.h = this.opts.height
+        if (this.h < 20) {
+            this.h = 20
+        }
         this.l = this.opts.left
         this.t = this.opts.top
         this.bW = Number(this.opts.bWidth || 1);
@@ -171,21 +177,49 @@ class RectDraw extends BaseDraw {
     refreshSize() {
         super.refreshSize()
         let ctx = this.ctx
+        let round = this.opts.round || 0;
+        let circleW = this.w / 4
+        circleW = Math.max(circleW, 15)
+        let circleH = this.h / 4
+        circleH = Math.max(circleH, 15)
+        let lCircleW = this.opts.leftCircle ? circleW : 0;
+        let rCircleW = this.opts.rightCircle ? circleW : 0;
+        let tCircleH = this.opts.topCircle ? circleH : 0;
+        let bCircleH = this.opts.bottomCircle ? circleH : 0;
+        let cW = lCircleW + rCircleW;
+        let cH = tCircleH + bCircleH;
         if (this.hasBg) {
             ctx.beginPath();
             ctx.fillStyle = this.bColor;
-            ctx.roundRect(0, 0, this.w, this.h, 6);
+            ctx.roundRect(0 + lCircleW, 0 + tCircleH, this.w - cW, this.h - cH, round);
             ctx.fill();
 
             ctx.beginPath();
             ctx.fillStyle = this.bgColor;
-            ctx.roundRect(this.bW, this.bW, this.w - this.bW * 2, this.h - this.bW * 2, 3);
+            ctx.roundRect(this.bW + lCircleW, this.bW + tCircleH, this.w - this.bW * 2 - cW, this.h - this.bW * 2 - cH, round / 2);
             ctx.fill();
         } else {
             ctx.lineWidth = this.bW;
-            ctx.beginPath();
             ctx.strokeStyle = this.bColor;
-            ctx.roundRect(this.bW / 2, this.bW / 2, this.w - this.bW, this.h - this.bW, 3);
+
+            if (lCircleW > 0) {
+                ctx.beginPath();
+                ctx.moveTo(lCircleW, tCircleH);
+
+                ctx.arcTo(
+                    0, 0,
+                    0, this.h / 2,
+                    this.h / 2,
+                );
+                // ctx.quadraticCurveTo(
+                //     0, this.h / 2,
+                //     this.bW / 2 + lCircleW, this.bW / 2 + tCircleH + this.h - this.bW - cH,
+                // );
+                ctx.stroke();
+            }
+
+            ctx.beginPath();
+            ctx.roundRect(this.bW / 2 + lCircleW, this.bW / 2 + tCircleH, this.w - this.bW - cW, this.h - this.bW - cH, round / 2);
             ctx.stroke();
         }
     }
