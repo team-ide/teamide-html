@@ -138,23 +138,20 @@ export default {
           this.tool.setJWT(jwt);
         }
       }
-      window.onMonacoLoad(async () => {
-        if (this.source.isDialogWindow) {
-          let data = await this.tool.electronGetCache(
-            this.source.mainWindowKey + "-data"
-          );
-          this.source.init(data);
-          let sessionData = await this.tool.electronGetCache(
-            this.source.mainWindowKey + "-session"
-          );
-          this.source.initSession(sessionData);
-        } else {
-          await this.tool.init();
-          await this.tool.initSession();
-        }
-        document.getElementById("app-loading").style.display = "none";
-        this.tool.registerLanguages();
-      });
+      if (this.source.isDialogWindow) {
+        let data = await this.tool.electronGetCache(
+          this.source.mainWindowKey + "-data"
+        );
+        this.source.init(data);
+        let sessionData = await this.tool.electronGetCache(
+          this.source.mainWindowKey + "-session"
+        );
+        this.source.initSession(sessionData);
+      } else {
+        await this.tool.init();
+        await this.tool.initSession();
+      }
+      document.getElementById("app-loading").style.display = "none";
       this.tool.newDialogWindow = async (options) => {
         options = options || {};
         options.windowKey = this.tool.generatekey(20);

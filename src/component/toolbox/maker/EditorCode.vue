@@ -102,7 +102,7 @@ export default {
         this.initHeight();
         window.onMonacoLoad(() => {
           this.initEditor();
-        });
+        }, "component-maker-editor-code");
       });
     },
     initHeight() {

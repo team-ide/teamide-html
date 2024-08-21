@@ -129,7 +129,7 @@ export default {
       if (this.lineNumbers !== null) {
         lineNumbers = this.lineNumbers;
       }
-      
+
       this.monacoInstance = monaco.editor.create(this.$refs.editor, {
         theme: this.getTheme(), //官方自带三种主题vs, hc-black, or vs-dark
         minimap: { enabled: false }, // 缩略导航
@@ -200,8 +200,9 @@ export default {
   },
   mounted() {
     window.onMonacoLoad(() => {
+      this.tool.registerLanguages();
       this.init();
-    });
+    }, "component-editor");
   },
   beforeDestroy() {
     if (this.monacoInstance != null) {

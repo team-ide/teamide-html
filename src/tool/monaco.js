@@ -36,8 +36,12 @@ let addSqlName = (a) => {
         sqlNames.push(a)
     }
 }
-
+let registerLanguagesEd = false;
 let registerLanguages = () => {
+    if (registerLanguagesEd) {
+        return;
+    }
+    registerLanguagesEd = true;
     registerSql()
 }
 
