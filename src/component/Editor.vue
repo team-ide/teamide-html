@@ -17,6 +17,7 @@ export default {
   data() {
     return {
       hints: [],
+      lastSetValue: null,
     };
   },
   watch: {
@@ -31,6 +32,7 @@ export default {
   },
   methods: {
     setValue(value) {
+      this.lastSetValue = value;
       if (this.monacoInstance) {
         if (value == null) {
           value = "";
@@ -133,7 +135,7 @@ export default {
       this.monacoInstance = monaco.editor.create(this.$refs.editor, {
         theme: this.getTheme(), //官方自带三种主题vs, hc-black, or vs-dark
         minimap: { enabled: false }, // 缩略导航
-        value: this.value || "", //编辑器初始显示文字
+        value: this.lastSetValue || this.value || "", //编辑器初始显示文字
         language: language.id,
         selectOnLineNumbers: true, //显示行号
         lineNumbers: lineNumbers, //显示行号
