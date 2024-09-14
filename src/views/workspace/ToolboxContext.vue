@@ -81,6 +81,9 @@
               v-model="toolboxSearch"
               placeholder="输入过滤"
             />
+            <div class="tm-btn bg-green mgl-20 tm-btn-sm" @click="tool.showSync()">
+              同步配置
+            </div>
           </div>
           <div
             class="toolbox-type-box app-scroll-bar"

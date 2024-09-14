@@ -116,6 +116,14 @@ let server = {
             return http.post('api/tools/md5', param || {},);
         },
     },
+    sync: {
+        checkFile(param) {
+            return http.post('api/sync/checkFile', param || {},);
+        },
+        importFile(param) {
+            return http.post('api/sync/importFile', param || {},);
+        },
+    },
 };
 var listenStartInt = false
 const listenStart = async (errorCount) => {

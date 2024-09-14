@@ -33,6 +33,14 @@
       :options_="cacheData"
     >
     </DataMove>
+    <Sync
+      v-else-if="type == 'Sync'"
+      :source="source"
+      :options="cacheData"
+      :onSave="onSave"
+      :hide="windowClose"
+    >
+    </Sync>
   </div>
 </template>
 
@@ -43,6 +51,7 @@ import Markdown from "./Markdown";
 import MarkdownView from "./MarkdownView";
 import JSONData from "./JSONData";
 import CommonForm from "./CommonForm";
+import Sync from "./Sync";
 
 export default {
   components: {
@@ -52,6 +61,7 @@ export default {
     Markdown,
     MarkdownView,
     CommonForm,
+    Sync,
   },
   props: ["source"],
   data() {
