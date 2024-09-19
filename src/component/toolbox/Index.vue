@@ -118,6 +118,14 @@
         >
         </MongodbEditor>
       </template>
+      <template v-else-if="toolboxType == 'http'">
+        <HttpEditor
+          :source="source"
+          :extend="extend"
+          :toolboxWorker="toolboxWorker"
+        >
+        </HttpEditor>
+      </template>
     </template>
   </div>
 </template>
@@ -133,6 +141,7 @@ import toolboxWorker_ from "./toolboxWorker.js";
 import ThriftEditor from "./thrift/Index.vue";
 import MongodbEditor from "./mongodb/Index.vue";
 import ConnectionEditor from "./connection/Index.vue";
+import HttpEditor from "./http/Index.vue";
 import MakerEditor from "./maker/Index.vue";
 
 export default {
@@ -144,6 +153,7 @@ export default {
     ThriftEditor,
     MongodbEditor,
     ConnectionEditor,
+    HttpEditor,
     MakerEditor,
   },
   props: ["source", "extend", "toolboxType", "toolboxId", "openId"],

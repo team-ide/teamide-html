@@ -124,6 +124,11 @@ let server = {
             return http.post('api/sync/importFile', param || {},);
         },
     },
+    http: {
+        execute(param) {
+            return http.post('api/http/execute', param || {},);
+        },
+    },
 };
 var listenStartInt = false
 const listenStart = async (errorCount) => {
