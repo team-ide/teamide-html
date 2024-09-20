@@ -1,35 +1,13 @@
 <template>
-  <div class="toolbox-thrift-invoke">
+  <div class="toolbox-http-invoke">
     <template v-if="ready">
       <tm-layout height="100%">
-        <tm-layout height="200px">
-          <div class="pdlr-10 pdtb-5">
-            文件:
-            <span class="color-green pdr-10">
-              {{ relativePath }}
-            </span>
-            服务:
-            <span class="color-green pdr-10">
-              {{ serviceName }}
-            </span>
-            方法:
-            <span class="color-green pdr-10">
-              {{ methodName }}
-            </span>
-          </div>
-          <el-form class="pdt-10 pdlr-10" size="mini" inline>
-            <el-form-item label="服务地址(127.0.0.1:10001)" class="mgb-5">
-              <el-input v-model="serverAddress" />
-            </el-form-item>
-
-            <el-form-item label="ProtocolFactory类型">
-              <el-select
-                v-model="protocolFactory"
-                placeholder="binary"
-                style="width: 100px"
-              >
+        <tm-layout height="100px">
+          <el-form class="pdt-10 pdlr-10" inline>
+            <el-form-item label="">
+              <el-select v-model="method" style="width: 100px">
                 <el-option
-                  v-for="(one, index) in protocolFactoryTypes"
+                  v-for="(one, index) in methods"
                   :key="index"
                   :value="one.value"
                   :label="one.text"
@@ -38,214 +16,187 @@
                 </el-option>
               </el-select>
             </el-form-item>
-            <el-form-item label="Buffered" class="mgb-5">
-              <el-switch v-model="buffered" />
-            </el-form-item>
-            <el-form-item label="Framed" class="mgb-5">
-              <el-switch v-model="framed" />
-            </el-form-item>
-            <el-form-item label="连接和响应超时时间(毫秒)" class="mgb-5">
-              <el-input v-model="timeout" style="width: 80px" />
-            </el-form-item>
-
             <el-form-item label="" class="mgb-5">
-              <div
-                class="tm-btn tm-btn-sm bg-green-6"
-                @click="toInvoke({ isTest: false })"
-              >
-                执行一次
-              </div>
+              <el-input v-model="path" style="width: 400px" />
             </el-form-item>
-            <br />
-
-            <el-form-item label="并发线程" class="mgb-5">
-              <el-input v-model="worker" style="width: 80px" />
-            </el-form-item>
-            <el-form-item label="执行时间(分钟)" class="mgb-5">
-              <el-input v-model="duration" style="width: 80px" />
-            </el-form-item>
-            <el-form-item label="执行次数(优先级高于执行时间)" class="mgb-5">
-              <el-input v-model="frequency" style="width: 80px" />
-            </el-form-item>
-            <el-form-item
-              label="统计间隔(秒)"
-              title="统计间隔(每秒统计 输入 1 默认 10 秒)"
-              class="mgb-5"
-            >
-              <el-input v-model="countSecond" style="width: 80px" />
-            </el-form-item>
-            <el-form-item
-              label="保存执行记录"
-              title="保存每条执行记录，可下载查看，消耗性能"
-              class="mgb-5"
-            >
-              <el-switch v-model="saveRecords" />
-            </el-form-item>
-            <el-form-item
-              label="统计T99"
-              title="统计 T99 T90 T80等，高并发下 消耗内存将增加"
-              class="mgb-5"
-            >
-              <el-switch v-model="countTop" />
-            </el-form-item>
-
             <el-form-item label="" class="mgb-5">
-              <div
-                class="tm-btn tm-btn-sm bg-green-6"
-                @click="toInvoke({ isTest: true })"
-              >
-                性能测试
+              <div class="tm-btn tm-btn-smx bg-green-6" @click="toInvoke()">
+                请求
               </div>
-              <div class="tm-btn tm-btn-sm bg-grey-6" @click="toInvokeReports">
-                测试记录
+              <div class="tm-btn tm-btn-smx bg-grey-6" @click="toSave()">
+                保存
               </div>
             </el-form-item>
           </el-form>
         </tm-layout>
-        <tm-layout height="50px">
-          <div class="color-orange pdlr-10 ft-12 pdt-10">
-            参数可以使用${xx}来使用表达式生成动态参数 如：
-            "${index}"、"xx-${index}"：可以取到当前执行索引，从0开始；
-            “${workerIndex}”：可以取到当前线程索引，从0开始；
-            可以使用表达式、函数等，
-            <a
-              class="tm-link color-green tm-pointer mgl-10"
-              @click="tool.showJavascriptFunc()"
-            >
-              点击查看内置函数
-            </a>
-            <a
-              class="tm-link color-green tm-pointer mgl-10"
-              @click="tool.showJavascriptExample()"
-            >
-              示例代码
-            </a>
-          </div>
-        </tm-layout>
-        <tm-layout height="300px">
-          <template v-for="(argField, index) in argFields">
-            <tm-layout-bar
-              :key="'layout-bar-' + index"
-              right
-              v-if="index > 0"
-            ></tm-layout-bar>
-            <tm-layout
-              :key="'layout-' + index"
-              :width="argField.width"
-              height="100%"
-            >
-              <div class="ft-12 pdlr-10 pdtb-5">
-                参数:{{ argField.num }}:{{ argField.name }}
-              </div>
-              <div style="height: calc(100% - 30px)">
-                <Editor
-                  ref="argEditor"
-                  :source="source"
-                  language="json"
-                  lineNumbers="off"
-                ></Editor>
-              </div>
-            </tm-layout>
-          </template>
-        </tm-layout>
-        <tm-layout height="120px" class="app-scroll-bar">
-          <div class="pdlr-10 pdt-5">
-            <div v-if="result != null" class="mgt-10 ft-12">
-              <template v-if="result.isTest">
-                <div class="color-orange pdlr-5">
-                  性能测试任务已提交，请点击测试记录查看
+        <tm-layout height="400px">
+          <div class="toolbox-http-invoke-tabs-box">
+            <el-tabs v-model="requestActiveName">
+              <el-tab-pane
+                :label="'Params (' + params.length + ')'"
+                name="params"
+              >
+                <div style="height: 100%">
+                  <DataTable
+                    :source="source"
+                    :toolboxWorker="toolboxWorker"
+                    :dataList="params"
+                    :isForm="false"
+                  >
+                  </DataTable>
                 </div>
-              </template>
-              <div v-if="result.start > 0">
-                开始时间:
-                <span class="color-green pdlr-5">
-                  {{
-                    tool.formatDate(
-                      new Date(result.start),
-                      "yyyy-MM-dd hh:mm:ss.S"
-                    )
-                  }}
-                </span>
-                结束时间:
-                <span class="color-green pdlr-5">
-                  {{
-                    tool.formatDate(
-                      new Date(result.end),
-                      "yyyy-MM-dd hh:mm:ss.S"
-                    )
-                  }}
-                </span>
-                总耗时:
-                <span class="color-green pdlr-5">
-                  {{ tool.formatTimeStr(result.end - result.start) }}
-                </span>
-                <template v-if="result.writeEnd > 0 && result.readStart > 0">
-                  执行耗时:
-                  <span class="color-green pdlr-5">
-                    {{ tool.formatTimeStr(result.readStart - result.writeEnd) }}
-                  </span>
-                </template>
-              </div>
-              <div v-if="result.writeStart > 0">
-                写入开始时间:
-                <span class="color-green pdlr-5">
-                  {{
-                    tool.formatDate(
-                      new Date(result.writeStart),
-                      "yyyy-MM-dd hh:mm:ss.S"
-                    )
-                  }}
-                </span>
-                写入结束时间:
-                <span class="color-green pdlr-5">
-                  {{
-                    tool.formatDate(
-                      new Date(result.writeEnd),
-                      "yyyy-MM-dd hh:mm:ss.S"
-                    )
-                  }}
-                </span>
-                写入耗时:
-                <span class="color-green pdlr-5">
-                  {{ tool.formatTimeStr(result.writeEnd - result.writeStart) }}
-                </span>
-              </div>
-              <div v-if="result.readStart > 0">
-                读取开始时间:
-                <span class="color-green pdlr-5">
-                  {{
-                    tool.formatDate(
-                      new Date(result.readStart),
-                      "yyyy-MM-dd hh:mm:ss.S"
-                    )
-                  }}
-                </span>
-                读取结束时间:
-                <span class="color-green pdlr-5">
-                  {{
-                    tool.formatDate(
-                      new Date(result.readEnd),
-                      "yyyy-MM-dd hh:mm:ss.S"
-                    )
-                  }}
-                </span>
-                读取耗时:
-                <span class="color-green pdlr-5">
-                  {{ tool.formatTimeStr(result.readEnd - result.readStart) }}
-                </span>
-              </div>
-
-              <template v-if="tool.isNotEmpty(result.error)">
-                <div class="mgt-5 color-error">
-                  异常: <span>{{ result.error }}</span>
+              </el-tab-pane>
+              <el-tab-pane
+                :label="'Headers (' + headers.length + ')'"
+                name="headers"
+              >
+                <div style="height: 100%">
+                  <DataTable
+                    :source="source"
+                    :toolboxWorker="toolboxWorker"
+                    :dataList="headers"
+                    :isForm="false"
+                  >
+                  </DataTable>
                 </div>
-              </template>
-            </div>
+              </el-tab-pane>
+              <el-tab-pane label="Body" name="body">
+                <div style="height: 100%">
+                  <div class="pdlr-10">
+                    <el-form class="mg-0 pd-0" size="mini" inline>
+                      <el-form-item label="" class="mg-0 pd-0">
+                        <el-radio-group v-model="bodyType" v-remove-aria-hidden>
+                          <el-radio
+                            v-for="(one, index) in bodyTypes"
+                            :key="index"
+                            :label="one.value"
+                            :disabled="one.disabled"
+                            class="mgr-20"
+                          >
+                            {{ one.text }}
+                          </el-radio>
+                        </el-radio-group>
+                      </el-form-item>
+                      <el-form-item label="" class="mg-0 pd-0">
+                        <el-select
+                          v-model="textType"
+                          style="width: 100px"
+                          v-if="bodyType == 'text'"
+                        >
+                          <el-option
+                            v-for="(one, index) in textTypes"
+                            :key="index"
+                            :value="one.value"
+                            :label="one.text"
+                            :disabled="one.disabled"
+                          >
+                          </el-option>
+                        </el-select>
+                      </el-form-item>
+                    </el-form>
+                  </div>
+                  <div style="height: calc(100% - 30px)">
+                    <template v-if="bodyType == 'form'">
+                      <DataTable
+                        :source="source"
+                        :toolboxWorker="toolboxWorker"
+                        :dataList="formData"
+                        :isForm="true"
+                      >
+                      </DataTable>
+                    </template>
+                    <template v-if="bodyType == 'binary'">
+                      <span
+                        v-for="(one, index) in files"
+                        :key="index"
+                        class="mgl-10 mgr-10 ft-12"
+                      >
+                        <span>{{ one.name }}</span>
+                        <span @click="removeOne(files, one)">
+                          <Icon
+                            class="mdi-close color-orange-8 mgl-10"
+                            style="vertical-align: 5px"
+                          ></Icon>
+                        </span>
+                      </span>
+                      <el-upload
+                        v-if="uploadReady"
+                        :action="source.api + 'upload'"
+                        :limit="5"
+                        multiple
+                        :data="{ place: 'other' }"
+                        :headers="{ JWT: tool.getJWT() }"
+                        name="file"
+                        :on-success="onFileUpload"
+                        :show-file-list="false"
+                        style="display: inline-block; margin-left: 10px"
+                      >
+                        <div class="tm-link color-green-8">点击上传</div>
+                      </el-upload>
+                    </template>
+                    <template v-if="bodyType == 'text'">
+                      <Editor
+                        v-show="textType == 'text'"
+                        ref="editor-text"
+                        :source="source"
+                        :value="text.text"
+                        language="text"
+                        :change="textChangeText"
+                      >
+                      </Editor>
+                      <Editor
+                        v-show="textType == 'json'"
+                        ref="editor-json"
+                        :source="source"
+                        :value="text.json"
+                        language="json"
+                        :change="textChangeJson"
+                      >
+                      </Editor>
+                      <Editor
+                        v-show="textType == 'xml'"
+                        ref="editor-xml"
+                        :source="source"
+                        :value="text.xml"
+                        language="xml"
+                        :change="textChangeXml"
+                      >
+                      </Editor>
+                    </template>
+                  </div>
+                </div>
+              </el-tab-pane>
+            </el-tabs>
           </div>
         </tm-layout>
         <tm-layout-bar bottom></tm-layout-bar>
         <tm-layout height="auto">
-          <Editor ref="resultEditor" :source="source" language="json"></Editor>
+          <div class="toolbox-http-invoke-tabs-box" v-if="result != null">
+            <el-tabs v-model="resultActiveName">
+              <el-tab-pane label="请求" name="request">
+                <div style="height: 100%">
+                  <Editor
+                    ref="editor-text"
+                    :source="source"
+                    :value="result.request.body"
+                    language="json"
+                  >
+                  </Editor>
+                </div>
+              </el-tab-pane>
+              <el-tab-pane label="响应" name="response">
+                <div style="height: 100%">
+                  <Editor
+                    ref="editor-text"
+                    :source="source"
+                    :value="result.response.body"
+                    language="json"
+                  >
+                  </Editor>
+                </div>
+              </el-tab-pane>
+            </el-tabs>
+          </div>
         </tm-layout>
       </tm-layout>
     </template>
@@ -254,36 +205,52 @@
 
 
 <script>
+import DataTable from "./DataTable";
+
 export default {
-  components: {},
-  props: ["source", "toolboxWorker", "extend", "tabId"],
+  components: { DataTable },
+  props: ["source", "toolboxWorker", "tabId", "extend"],
   data() {
     return {
       ready: false,
-      protocolFactoryTypes: [
-        { text: "compact", value: "compact" },
-        { text: "simpleJSON", value: "simpleJSON" },
-        { text: "json", value: "json" },
-        { text: "binary", value: "binary" },
+      requestActiveName: "params",
+      method: "GET",
+      name: "",
+      path: "",
+      methods: [
+        { text: "GET", value: "GET" },
+        { text: "POST", value: "POST" },
+        { text: "PUT", value: "PUT" },
+        { text: "DELETE", value: "DELETE" },
+        { text: "PATCH", value: "PATCH" },
       ],
-      relativePath: null,
-      serviceName: null,
-      methodName: null,
-      argFields: null,
-      structCache: null,
-      argForm: null,
-      serverAddress: "127.0.0.1:10001",
+      bodyType: "none",
+      bodyTypes: [
+        { text: "空", value: "none" },
+        { text: "表单(可传文件)", value: "form" },
+        { text: "二进制", value: "binary" },
+        { text: "text / json / xml 等", value: "text" },
+      ],
+      textType: "json",
+      textTypes: [
+        { text: "text", value: "text" },
+        { text: "json", value: "json" },
+        { text: "xml", value: "xml" },
+      ],
+      text: {
+        text: "",
+        json: "",
+        xml: "",
+      },
+      files: [],
+      params: [],
+      formData: [],
+      headers: [],
+      uploadReady: true,
+      resultActiveName: "response",
       result: null,
-      worker: 10, // 并发数
-      duration: 0, // 执行时长 分钟
-      frequency: 10, // 任务执行次数，和执行时间互斥，只能一个生效，优先级高于执行时间
-      timeout: 5000, // 超时时间
-      countSecond: 10, // 统计间隔秒 如 每秒统计 输入 1 默认 10 秒统计
-      protocolFactory: "binary",
-      buffered: false,
-      framed: true,
-      saveRecords: false, // 保存执行记录
-      countTop: false, // 统计T99
+      extendId: null,
+      parentId: null,
     };
   },
   computed: {},
@@ -291,190 +258,110 @@ export default {
   methods: {
     async init() {
       let extend = this.extend || {};
-      this.relativePath = extend.relativePath;
-      this.serviceName = extend.serviceName;
-      this.methodName = extend.methodName;
-      this.serverAddress = extend.serverAddress || "127.0.0.1:10001";
-      this.worker = extend.worker || 10;
-      this.duration = extend.duration || 0;
-      this.frequency = extend.frequency || 10;
-      this.timeout = extend.timeout || 5000;
-      this.countSecond = extend.countSecond || 10;
-      this.protocolFactory = extend.protocolFactory || "binary";
-      if (extend.buffered != null) {
-        this.buffered = extend.buffered;
-      }
-      if (extend.framed != null) {
-        this.framed = extend.framed;
-      }
-      if (extend.saveRecords != null) {
-        this.saveRecords = extend.saveRecords;
-      }
-      if (extend.countTop != null) {
-        this.countTop = extend.countTop;
-      }
-      await this.refresh();
-      this.ready = true;
-
-      let argData = extend.argData || {};
-      let argFields = this.argFields || [];
-      this.$nextTick(() => {
-        let editors = this.$refs.argEditor;
-        argFields.forEach((one, index) => {
-          var v = one.demoData;
-          if (this.tool.isNotEmpty(argData[one.name])) {
-            if (typeof argData[one.name] == "string") {
-              v = argData[one.name];
-            }
+      this.extendId = extend.extendId;
+      if (this.extendId != null) {
+        let find = await this.toolboxWorker.getExtend(this.extendId);
+        if (find) {
+          find.extend = find.extend || {};
+          this.name = find.name;
+          for (let k in find.extend) {
+            this[k] = find.extend[k];
           }
-          let editor = editors[index] || editors;
-          editor.setValue && editor.setValue(v);
-        });
-      });
-    },
-    async refresh() {
-      await this.loadData();
-
-      // this.initArgForm();
-    },
-    toInvokeReports() {
-      let extend = {
-        name: this.serviceName + "." + this.methodName + "测试记录",
-        title: this.serviceName + "." + this.methodName + "测试记录",
-        type: "invokeReports",
-        relativePath: this.relativePath,
-        serviceName: this.serviceName,
-        methodName: this.methodName,
-        protocolFactory: this.protocolFactory,
-        buffered: this.buffered,
-        framed: this.framed,
-        saveRecords: this.saveRecords,
-        countTop: this.countTop,
-        timeout: Number(this.timeout),
-        countSecond: Number(this.countSecond),
-      };
-      this.toolboxWorker.openTabByExtend(extend);
-    },
-    initArgForm() {
-      let argForm = {
-        fields: [],
-      };
-      let argFields = this.argFields || [];
-      argFields.forEach((one) => {
-        let field = this.getFieldByModel(one);
-        argForm.fields.push(field);
-      });
-
-      this.argForm = argForm;
-    },
-    getFieldByModel(model) {
-      let field = Object.assign({}, model);
-      if (this.tool.isNotEmpty(field.structName)) {
-        let structForm = this.getStructFormByModel(
-          field.structInclude,
-          field.structName
-        );
-        field.structForm = structForm;
+        }
       }
-      field.num = model.num;
+      this.ready = true;
     },
-    getStructFormByModel(structInclude, structName) {},
-    async toInvoke(options) {
-      options = options || {};
-      let argFields = this.argFields || [];
-      let editors = this.$refs.argEditor;
-      var args = [];
-      let argData = {};
-      argFields.forEach((one, index) => {
-        let editor = editors[index] || editors;
-        let v = editor.getValue();
-        argData[one.name] = v;
-        args.push(v);
-      });
-      this.saveExtend(argData);
-      let param = this.toolboxWorker.getWorkParam({
-        relativePath: this.relativePath,
-        serviceName: this.serviceName,
-        methodName: this.methodName,
-        args: args,
-        serverAddress: this.serverAddress,
-        protocolFactory: this.protocolFactory,
-        buffered: this.buffered,
-        framed: this.framed,
-        saveRecords: this.saveRecords,
-        countTop: this.countTop,
-        timeout: Number(this.timeout),
-      });
-      param.isTest = options.isTest;
-      if (param.isTest) {
-        param.worker = Number(this.worker);
-        param.duration = Number(this.duration);
-        param.frequency = Number(this.frequency);
-        param.timeout = Number(this.timeout);
-        param.countSecond = Number(this.countSecond);
+    removeOne(list, one) {
+      let index = list.indexOf(one);
+      if (index >= 0) {
+        list.splice(index, 1);
       }
-
-      let res = await this.server.thrift.invokeByServerAddress(param);
-      let result = res.data || {};
-      result.error = null;
+    },
+    onFileUpload(response) {
+      this.uploadReady = false;
+      this.$nextTick(() => {
+        this.uploadReady = true;
+      });
+      if (response.code != 0) {
+        this.tool.error(response.msg);
+        return false;
+      }
+      response.data.files.forEach((one) => {
+        this.files.push(one);
+      });
+    },
+    textChangeText(v) {
+      this.text.text = v;
+    },
+    textChangeJson(v) {
+      this.text.json = v;
+    },
+    textChangeXml(v) {
+      this.text.xml = v;
+    },
+    getRequest() {
+      let request = {};
+      request.requestActiveName = this.requestActiveName;
+      request.method = this.method;
+      request.path = this.path;
+      request.params = this.params;
+      request.headers = this.headers;
+      request.bodyType = this.bodyType;
+      request.textType = this.textType;
+      request.text = this.text;
+      request.files = this.files;
+      request.formData = this.formData;
+      request.result = this.result;
+      return request;
+    },
+    async toSave() {
+      let request = this.getRequest();
+      request.parentId = this.parentId;
+      let res = await this.toolboxWorker.saveExtend({
+        name: this.name,
+        extendId: this.extendId,
+        extendType: "http-api",
+        extend: request,
+      });
+      if (res && res.data) {
+        if (res.data.extendId != this.extendId) {
+          this.extendId = res.data.extendId;
+          let keyValueMap = {};
+          keyValueMap.id = res.data.extendId;
+          await this.toolboxWorker.updateOpenTabExtend(this.tabId, keyValueMap);
+        }
+      }
+    },
+    async refresh() {},
+    async toInvoke() {
+      let request = this.getRequest();
+      delete request.result;
+      delete request.requestActiveName;
+      delete request.text;
+      if (request.bodyType != "form") {
+        delete request.formData;
+      }
+      if (request.bodyType != "binary") {
+        delete request.files;
+      }
+      if (request.bodyType != "text") {
+        delete request.textType;
+      }
+      if (request.bodyType == "text") {
+        request.text = this.text[request.textType];
+      }
+      let param = this.toolboxWorker.getWorkParam(request);
+      let res = await this.server.http.execute(param);
       if (res.code != 0) {
-        result.error = res.msg;
         this.tool.error(res.msg);
       } else {
-        if (param.isTest) {
-          this.tool.success("性能测试任务已提交，请点击测试记录查看");
-        }
+        let result = res.data;
+        this.result = null;
+        this.$nextTick(() => {
+          this.result = result;
+        });
+        this.tool.success("执行成功");
       }
-      this.result = result;
-      this.result.isTest = param.isTest;
-      if (this.$refs.resultEditor) {
-        if (typeof result.result == "object") {
-          result.result = JSON.stringify(result.result);
-        }
-        this.$refs.resultEditor.setValue(result.result);
-      }
-    },
-    async saveExtend(argData) {
-      let keyValueMap = {};
-      keyValueMap.serverAddress = this.serverAddress;
-      keyValueMap.argData = argData;
-      keyValueMap.worker = this.worker;
-      keyValueMap.duration = this.duration;
-      keyValueMap.frequency = this.frequency;
-      keyValueMap.timeout = this.timeout;
-      keyValueMap.saveRecords = this.saveRecords;
-      keyValueMap.countTop = this.countTop;
-
-      await this.toolboxWorker.updateOpenTabExtend(this.tabId, keyValueMap);
-    },
-    async loadData() {
-      let param = this.toolboxWorker.getWorkParam({
-        relativePath: this.relativePath,
-        serviceName: this.serviceName,
-        methodName: this.methodName,
-      });
-
-      let res = await this.server.thrift.getMethodArgFields(param);
-      if (res.code != 0) {
-        this.tool.error(res.msg);
-      }
-      res.data = res.data || {};
-      let argFields = res.data.argFields || [];
-      let argDemoDataList = res.data.argDemoDataList || [];
-      let structCache = res.data.structCache || {};
-
-      let argLength = argFields.length;
-      argFields.forEach((one, index) => {
-        one.demoData = argDemoDataList[index];
-        if (index >= argLength - 1) {
-          one.width = "auto";
-        } else {
-          one.width = "" + 100 / argLength + "%";
-          // one.width = "200px";
-        }
-      });
-      this.argFields = argFields;
-      this.structCache = structCache;
     },
   },
   created() {},
@@ -485,8 +372,39 @@ export default {
 </script>
 
 <style>
-.toolbox-thrift-invoke {
+.toolbox-http-invoke {
   width: 100%;
   height: 100%;
+}
+
+.toolbox-http-invoke-tabs-box {
+  width: 100%;
+  height: 100%;
+}
+.toolbox-http-invoke-tabs-box .el-tabs {
+  height: 100%;
+}
+.toolbox-http-invoke-tabs-box .el-tabs__content {
+  height: calc(100% - 55px);
+}
+.toolbox-http-invoke-tabs-box .el-tab-pane {
+  height: 100%;
+}
+.toolbox-http-invoke-tabs-box .el-tabs__item {
+  color: darkgrey;
+  padding-left: 20px !important;
+}
+.toolbox-http-invoke-tabs-box .el-tabs__item.is-active {
+  color: inherit;
+}
+.toolbox-http-invoke-tabs-box .el-tabs__active-bar {
+  background-color: #ffffff;
+}
+.toolbox-http-invoke-tabs-box .el-tabs__nav-wrap::after {
+  background-color: transparent;
+}
+
+.toolbox-http-invoke-tabs-box .el-radio__label {
+  padding-left: 5px;
 }
 </style>

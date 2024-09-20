@@ -46,6 +46,21 @@ const newToolboxWorker = function (workerOption) {
             data.toolboxType = worker.toolboxType
             return data;
         },
+        async saveExtend(data) {
+            let param = worker.getWorkParam(data);
+            let res = await server.toolbox.extend.save(param);
+            if (res.code != 0) {
+                tool.error(res.msg);
+            } else {
+                tool.success("保存成功");
+            }
+            return res;
+        },
+        async getExtend(extendId) {
+            let param = worker.getWorkParam({ extendId: extendId });
+            let res = await server.toolbox.extend.get(param);
+            return res.data;
+        },
         async updateOpenTabExtend(tabId, keyValueMap) {
             if (keyValueMap == null) {
                 return;

@@ -356,12 +356,30 @@ tool.up = function (bean, name, value) {
         }
     }
 };
+tool.upList = function (list, value) {
+    if (list != null && list.indexOf) {
+        let index = list.indexOf(value);
+        if (index > 0) {
+            list.splice(index, 1);
+            list.splice(index - 1, 0, value);
+        }
+    }
+};
 tool.down = function (bean, name, value) {
     if (bean != null && bean[name] != null) {
         let index = bean[name].indexOf(value);
         if (index >= 0 && index < bean[name].length - 1) {
             bean[name].splice(index, 1);
             bean[name].splice(index + 1, 0, value);
+        }
+    }
+};
+tool.downList = function (list, value) {
+    if (list != null && list.indexOf) {
+        let index = list.indexOf(value);
+        if (index >= 0 && index < list.length - 1) {
+            list.splice(index, 1);
+            list.splice(index + 1, 0, value);
         }
     }
 };

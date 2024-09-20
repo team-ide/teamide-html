@@ -127,15 +127,22 @@ export default {
           language = iniLanguage;
         }
       }
+      console.log(language);
       let lineNumbers = "on";
       if (this.lineNumbers !== null) {
         lineNumbers = this.lineNumbers;
       }
-
+      let value = this.lastSetValue;
+      if (value == null) {
+        value = this.value;
+        if (value == null) {
+          value = "";
+        }
+      }
       this.monacoInstance = monaco.editor.create(this.$refs.editor, {
         theme: this.getTheme(), //官方自带三种主题vs, hc-black, or vs-dark
         minimap: { enabled: false }, // 缩略导航
-        value: this.lastSetValue || this.value || "", //编辑器初始显示文字
+        value: value, //编辑器初始显示文字
         language: language.id,
         selectOnLineNumbers: true, //显示行号
         lineNumbers: lineNumbers, //显示行号

@@ -35,7 +35,14 @@ import server from '@/server'
 
 Vue.prototype.tool = tool
 Vue.prototype.server = server
-
+Vue.directive('remove-aria-hidden', {
+  bind(el, binding) {
+    let ariaEls = el.querySelectorAll('.el-radio__original');
+    ariaEls.forEach((item) => {
+      item.removeAttribute('aria-hidden');
+    });
+  }
+});
 import '@mdi/font/css/materialdesignicons.css'
 
 

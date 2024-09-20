@@ -17,15 +17,6 @@
             >
             </Invoke>
           </template>
-          <template v-else-if="item.extend.type == 'invokeReports'">
-            <InvokeReports
-              :source="source"
-              :toolboxWorker="toolboxWorker"
-              :extend="item.extend"
-              :tabId="item.tabId"
-            >
-            </InvokeReports>
-          </template>
         </template>
       </WorkspaceSpans>
     </div>
@@ -35,10 +26,9 @@
 
 <script>
 import Invoke from "./Invoke";
-import InvokeReports from "./InvokeReports";
 
 export default {
-  components: { Invoke, InvokeReports },
+  components: { Invoke },
   props: ["source", "toolboxWorker"],
   data() {
     return {};

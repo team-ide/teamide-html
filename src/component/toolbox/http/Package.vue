@@ -31,6 +31,9 @@
               @node-click="nodeClick"
               :expand-on-click-node="false"
               :filter-node-method="filterNode"
+              @node-expand="nodeExpand"
+              @node-collapse="nodeCollapse"
+              :default-expanded-keys="expands"
             >
               <span
                 class="toolbox-editor-tree-span"
@@ -78,17 +81,32 @@ export default {
         label: "name",
         isLeaf: "leaf",
       },
+      expands: [],
       dataListLoading: false,
     };
   },
   computed: {},
   watch: {
     filterText(val) {
+      this.treeFilterIng = true;
       this.$refs.tree.filter(val);
+      this.$nextTick(() => {
+        this.treeFilterIng = false;
+        if (this.tool.isEmpty(val)) {
+          this.$refs.tree.$children.forEach((one) => {
+            if (one.node.expanded && this.expands.indexOf(one.node.key) < 0) {
+              one.node.expanded = false;
+            }
+          });
+        }
+      });
     },
   },
   methods: {
     init() {
+      if (this.extend && this.extend.expands) {
+        this.expands = this.extend.expands;
+      }
       this.ready = true;
       this.load();
     },
@@ -101,9 +119,32 @@ export default {
     filterNode(value, data) {
       if (!value) return true;
       return (
-        data.searchText &&
-        data.searchText.toLowerCase().indexOf(value.toLowerCase()) !== -1
+        data.name && data.name.toLowerCase().indexOf(value.toLowerCase()) !== -1
       );
+    },
+    nodeExpand(data) {
+      let index = this.expands.indexOf(data.key);
+      if (index < 0) {
+        this.expands.push(data.key);
+        this.toolboxWorker.updateExtend({
+          expands: this.expands,
+        });
+      }
+    },
+    nodeCollapse(data) {
+      let needDeletes = [];
+      needDeletes.push(data.key);
+      if (needDeletes.length > 0) {
+        needDeletes.forEach((one) => {
+          let index = this.expands.indexOf(one);
+          if (index >= 0) {
+            this.expands.splice(index, 1);
+          }
+        });
+        this.toolboxWorker.updateExtend({
+          expands: this.expands,
+        });
+      }
     },
     nodeClick(data, node) {
       this.rowClickTimeCache = this.rowClickTimeCache || {};
@@ -123,22 +164,38 @@ export default {
         if (!one.node.expanded) {
           // one.node.expand();
           one.node.expanded = true;
+          let index = this.expands.indexOf(one.node.data.key);
+          if (index < 0) {
+            this.expands.push(one.node.data.key);
+          }
         }
+      });
+      this.toolboxWorker.updateExtend({
+        expands: this.expands,
       });
     },
     collapseAll() {
       this.$refs.tree.$children.forEach((one) => {
         if (one.node.expanded) {
           one.node.expanded = false;
+          let index = this.expands.indexOf(one.node.data.key);
+          if (index >= 0) {
+            this.expands.splice(index, 1);
+          }
         }
+      });
+      this.toolboxWorker.updateExtend({
+        expands: this.expands,
       });
     },
     nodeDbClick(node) {
       if (!node.isLeaf) {
         if (node.expanded) {
           node.expanded = false;
+          this.nodeCollapse(node.data);
         } else {
           node.expanded = true;
+          this.nodeExpand(node.data);
         }
         return;
       } else {
@@ -155,7 +212,8 @@ export default {
         name: data.name,
         title: data.name,
         type: "invoke",
-        id: data.id,
+        extendId: data.id,
+        parentId: data.parentId,
       };
       this.toolboxWorker.openTabByExtend(extend);
     },
@@ -184,6 +242,7 @@ export default {
         }
         let data = {
           id: one.extendId,
+          key: one.extendId,
           name: one.name,
           parentId: one.extend.parentId,
           children: childrenCache[one.extendId],
