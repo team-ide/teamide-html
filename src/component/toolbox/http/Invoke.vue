@@ -209,7 +209,7 @@ import DataTable from "./DataTable";
 
 export default {
   components: { DataTable },
-  props: ["source", "toolboxWorker", "tabId", "extend"],
+  props: ["source", "toolboxWorker", "tabId", "extend", "config"],
   data() {
     return {
       ready: false,

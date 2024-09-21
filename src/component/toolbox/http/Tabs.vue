@@ -14,8 +14,19 @@
               :toolboxWorker="toolboxWorker"
               :extend="item.extend"
               :tabId="item.tabId"
+              :config="config"
             >
             </Invoke>
+          </template>
+          <template v-else-if="item.extend.type == 'config'">
+            <Config
+              :source="source"
+              :toolboxWorker="toolboxWorker"
+              :extend="item.extend"
+              :tabId="item.tabId"
+              :config="config"
+            >
+            </Config>
           </template>
         </template>
       </WorkspaceSpans>
@@ -26,10 +37,11 @@
 
 <script>
 import Invoke from "./Invoke";
+import Config from "./Config";
 
 export default {
-  components: { Invoke },
-  props: ["source", "toolboxWorker"],
+  components: { Invoke, Config },
+  props: ["source", "toolboxWorker", "config"],
   data() {
     return {};
   },

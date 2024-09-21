@@ -19,18 +19,10 @@
         />
       </template>
     </el-table-column>
-    <el-table-column label="是文件" width="100" v-if="isForm">
-      <template slot-scope="scope">
-        <el-checkbox
-          v-model="scope.row.isFile"
-          @change="initUpload(scope.row)"
-        />
-      </template>
-    </el-table-column>
     <el-table-column label="Value">
       <template slot-scope="scope">
         <div class="" v-if="!scope.row.isFile">
-          <el-input v-model="scope.row.value" type="text" />
+          <el-input v-model="scope.row.value" type="textarea" :rows="1" />
         </div>
         <div class="" v-if="scope.row.isFile" style="white-space: normal">
           <span
@@ -67,6 +59,14 @@
     <el-table-column label="备注" width="200">
       <template slot-scope="scope">
         <el-input v-model="scope.row.comment" />
+      </template>
+    </el-table-column>
+    <el-table-column label="是文件" width="100" v-if="isForm">
+      <template slot-scope="scope">
+        <el-checkbox
+          v-model="scope.row.isFile"
+          @change="initUpload(scope.row)"
+        />
       </template>
     </el-table-column>
     <el-table-column label="操作" width="120">

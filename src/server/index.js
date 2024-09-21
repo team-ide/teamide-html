@@ -128,6 +128,9 @@ let server = {
         execute(param) {
             return http.post('api/http/execute', param || {},);
         },
+        close(param) {
+            return http.post('api/http/close', param || {},);
+        },
     },
 };
 var listenStartInt = false

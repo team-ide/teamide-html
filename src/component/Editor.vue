@@ -127,7 +127,7 @@ export default {
           language = iniLanguage;
         }
       }
-      console.log(language);
+      // console.log(language);
       let lineNumbers = "on";
       if (this.lineNumbers !== null) {
         lineNumbers = this.lineNumbers;

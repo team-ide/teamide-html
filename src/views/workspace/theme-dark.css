@@ -111,12 +111,12 @@
 
 .workspace-theme-dark .toolbox-editor .el-table td,
 .workspace-theme-dark .toolbox-editor .el-table th.is-leaf {
-    border-bottom: 1px solid #404040;
+    border-bottom: 1px solid #717171;
 }
 
 .workspace-theme-dark .toolbox-editor .el-table--border th.el-table__cell,
 .workspace-theme-dark .toolbox-editor .el-table__fixed-right-patch {
-    border-bottom: 1px solid #404040;
+    border-bottom: 1px solid #717171;
 }
 
 .workspace-theme-dark .toolbox-editor .el-table__fixed,
@@ -132,16 +132,16 @@
 
 .workspace-theme-dark .toolbox-editor .el-table--border,
 .workspace-theme-dark .toolbox-editor .el-table--group {
-    border: 1px solid #404040;
+    border: 1px solid #717171;
 }
 
 .workspace-theme-dark .toolbox-editor .el-table--border .el-table__cell,
 .workspace-theme-dark .toolbox-editor .el-table__body-wrapper .el-table--border.is-scrolling-left~.el-table__fixed {
-    border-right: 1px solid #404040;
+    border-right: 1px solid #717171;
 }
 
 .workspace-theme-dark .toolbox-editor .el-table--border th.el-table__cell.gutter:last-of-type {
-    border-bottom: 1px solid #404040;
+    border-bottom: 1px solid #717171;
 }
 
 .workspace-theme-dark .toolbox-editor .el-table .el-switch .el-switch__core {

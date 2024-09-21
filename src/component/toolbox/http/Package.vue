@@ -2,19 +2,31 @@
   <div class="toolbox-thrift-services">
     <template v-if="ready">
       <tm-layout height="100%">
-        <tm-layout height="50px">
+        <tm-layout height="80px">
           <div class="pdlr-10 pdt-5">
             <div class="tm-btn tm-btn-xs bg-grey-6" @click="reload">刷新</div>
             <div class="tm-btn tm-btn-xs bg-grey-6" @click="expandAll">
-              展开所有
+              展开
             </div>
             <div class="tm-btn tm-btn-xs bg-grey-6" @click="collapseAll">
-              收起所有
+              收起
             </div>
-            <div class="tm-btn tm-btn-xs bg-green" @click="toInsert()">
-              新增
+            <div class="tm-btn tm-btn-xs bg-grey" @click="toConfig()">配置</div>
+          </div>
+          <div class="pdlr-10 pdt-5">
+            <div
+              class="tm-btn tm-btn-xs bg-green"
+              @click="toInsert({ isDir: true })"
+            >
+              新增目录
             </div>
-            <div class="color-orange ft-12 pdt-5">双击展开目录或打开调用</div>
+            <div
+              class="tm-btn tm-btn-xs bg-green"
+              @click="toInsert({ isDir: false })"
+            >
+              新增接口
+            </div>
+            <div class="color-orange ft-12 pdt-5">`双击`展开目录或打开调用</div>
           </div>
         </tm-layout>
         <tm-layout height="40px">
@@ -34,29 +46,43 @@
               @node-expand="nodeExpand"
               @node-collapse="nodeCollapse"
               :default-expanded-keys="expands"
+              @node-contextmenu="nodeContextmenu"
+              empty-text="暂无数据"
             >
-              <span
-                class="toolbox-editor-tree-span"
-                slot-scope="{ data }"
-                :title="data.searchText"
-              >
-                <span>{{ data.name }}</span>
-                <div class="toolbox-editor-tree-btn-group">
-                  <div
-                    class="tm-link color-blue ft-16 mgr-2"
-                    @click="toInsert({ isDir: false, parentId: data.id })"
-                    v-if="!data.leaf"
-                  >
-                    <i class="mdi mdi-plus"></i>
+              <span class="toolbox-editor-tree-span" slot-scope="{ data }">
+                <template v-if="data.isRename">
+                  <input
+                    class="toolbox-editor-tree-rename-input"
+                    v-model="data.newname"
+                    @blur="onRenameBlur(data, $event)"
+                    @keyup="onRenameKeyup(data, $event)"
+                  />
+                </template>
+                <template v-else>
+                  <span class="mgr-5 ft-15" style="">
+                    <i v-if="data.leaf" class="mdi mdi-file"></i>
+                    <i v-else class="mdi mdi-folder color-orange-3"></i>
+                  </span>
+                  <span>{{ data.name }}</span>
+                  <div class="toolbox-editor-tree-btn-group">
+                    <div
+                      class="tm-link color-blue ft-16 mgr-2"
+                      @click="
+                        toInsert({ isDir: false, parentId: data.id }, data)
+                      "
+                      v-if="!data.leaf"
+                    >
+                      <i class="mdi mdi-plus"></i>
+                    </div>
+                    <div
+                      v-if="data.children == null || data.children.length == 0"
+                      class="tm-link color-orange ft-15 mgr-2"
+                      @click="toDelete(data)"
+                    >
+                      <i class="mdi mdi-delete-outline"></i>
+                    </div>
                   </div>
-                  <div
-                    v-if="data.children == null || data.children.length == 0"
-                    class="tm-link color-orange ft-15 mgr-2"
-                    @click="toDelete(data)"
-                  >
-                    <i class="mdi mdi-delete-outline"></i>
-                  </div>
-                </div>
+                </template>
               </span>
             </el-tree>
           </div>
@@ -70,12 +96,12 @@
 <script>
 export default {
   components: {},
-  props: ["source", "toolboxWorker", "extend"],
+  props: ["source", "toolboxWorker", "extend", "config"],
   data() {
     return {
       ready: false,
       filterText: null,
-      packList: null,
+      packList: [],
       defaultProps: {
         children: "children",
         label: "name",
@@ -189,7 +215,7 @@ export default {
       });
     },
     nodeDbClick(node) {
-      if (!node.isLeaf) {
+      if (!node.data.leaf) {
         if (node.expanded) {
           node.expanded = false;
           this.nodeCollapse(node.data);
@@ -202,12 +228,149 @@ export default {
         this.toInvoke(node.data);
       }
     },
-    toInsert(data) {
-      this.toolboxWorker.showPackCreate(data, () => {
-        this.load();
+    nodeContextmenu(event, data, node, nodeView) {
+      let menus = [];
+
+      if (!data.leaf) {
+        menus.push({
+          text: "新增",
+          onClick: () => {
+            this.toInsert({ isDir: false, parentId: data.id }, data);
+          },
+        });
+      }
+      if (data.leaf) {
+        menus.push({
+          text: "打开",
+          onClick: () => {
+            this.toInvoke(data);
+          },
+        });
+      }
+      menus.push({
+        text: "重命名",
+        onClick: () => {
+          this.toRename(data);
+        },
+      });
+      if (data.leaf || data.children.length == 0) {
+        menus.push({
+          text: "删除",
+          onClick: () => {
+            this.toDelete(data);
+          },
+        });
+      }
+
+      if (menus.length > 0) {
+        this.tool.showContextmenu(menus);
+      }
+    },
+    toRename(data) {
+      this.lastRenameData = data;
+      data.isRename = true;
+      this.$nextTick(() => {
+        this.$el
+          .getElementsByClassName("toolbox-editor-tree-rename-input")[0]
+          .focus();
       });
     },
+    async doRename(data) {
+      if (this.tool.isEmpty(data.newname) && !data.id) {
+        this.$refs.tree.remove(this.$refs.tree.getNode(data));
+        return;
+      }
+      if (this.tool.isEmpty(data.newname) || data.name == data.newname) {
+        if (data.id) {
+          data.newname = data.name;
+          data.isRename = false;
+          return;
+        }
+      }
+      let res = null;
+      if (!data.id) {
+        res = await this.toolboxWorker.saveExtend({
+          name: data.newname,
+          extendType: "http-api",
+          extend: {
+            isDir: data.isDir,
+            parentId: data.parentId,
+          },
+        });
+      } else {
+        res = await this.toolboxWorker.saveExtend({
+          name: data.newname,
+          extendId: data.id,
+        });
+      }
+      if (res.data == null) {
+        this.toFocusFile(data);
+      } else {
+        data.id = res.data.extendId;
+        data.name = data.newname;
+        data.isRename = false;
+        let node = this.$refs.tree.getNode(data);
+        if (node.parent) {
+          node.parent.childNodes.sort((a, b) =>
+            a.data.name.localeCompare(b.data.name)
+          );
+        }
+      }
+    },
+    toBlurData(data) {
+      this.$nextTick(() => {
+        if (
+          this.$el.getElementsByClassName("toolbox-editor-tree-rename-input")[0]
+        ) {
+          this.$el
+            .getElementsByClassName("toolbox-editor-tree-rename-input")[0]
+            .blur();
+        }
+      });
+    },
+    onRenameBlur(data, event) {
+      this.doRename(data);
+    },
+    onRenameKeyup(data, event) {
+      event = event || window.event;
+      if (event.keyCode == 13 || event.keyCode == 27) {
+        this.toBlurData(data);
+      }
+    },
+    toInsert(data, parent) {
+      if (parent) {
+        this.$refs.tree.getNode(parent).expanded = true;
+      }
+      data.leaf = !data.isDir;
+      data.name = "";
+      data.newname = "default";
+      data.isRename = false;
+      data.key = this.tool.getNumber();
+      data.children = [];
+      let node = this.$refs.tree.root;
+      if (parent) {
+        data.parentId = parent.id;
+        node = this.$refs.tree.getNode(parent);
+      }
+      this.$refs.tree.append(data, node);
+      this.$nextTick(() => {
+        this.toRename(data);
+      });
+      // this.$refs.tree.remove(this.$refs.tree.getNode(data));
+    },
+    toConfig() {
+      let extend = {
+        name: "配置",
+        title: "配置",
+        type: "config",
+        onlyOpenOneKey: "config",
+      };
+      this.toolboxWorker.openTabByExtend(extend);
+    },
     toInvoke(data) {
+      if (data == null || data.id == null) {
+        return;
+      }
       let extend = {
         name: data.name,
         title: data.name,
@@ -230,9 +393,9 @@ export default {
       let dataList = res.data || [];
       let packList = [];
       let childrenCache = {};
+      dataList.sort((a, b) => a.name.localeCompare(b.name));
       dataList.forEach((one) => {
         one.extend = one.extend || {};
-        console.log(one);
         let parentChildren = null;
         childrenCache[one.extendId] = childrenCache[one.extendId] || [];
         if (this.tool.isNotEmpty(one.extend.parentId)) {
@@ -247,6 +410,8 @@ export default {
           parentId: one.extend.parentId,
           children: childrenCache[one.extendId],
           leaf: !one.extend.isDir,
+          isRename: false,
+          newname: one.name,
         };
         if (parentChildren) {
           parentChildren.push(data);
@@ -275,7 +440,7 @@ export default {
       if (res.code != 0) {
         this.tool.error(res.msg);
       } else {
-        this.load();
+        this.$refs.tree.remove(this.$refs.tree.getNode(data));
       }
     },
   },

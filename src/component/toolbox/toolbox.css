@@ -98,9 +98,9 @@
     font-size: 13px;
 }
 
-.toolbox-editor .el-tree__empty-block {
+/* .toolbox-editor .el-tree__empty-block {
     display: none;
-}
+} */
 
 .toolbox-editor .el-tree-node__children {
     overflow: visible !important;
