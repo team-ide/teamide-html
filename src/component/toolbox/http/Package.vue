@@ -70,7 +70,7 @@
                       @click="
                         toInsert({ isDir: false, parentId: data.id }, data)
                       "
-                      v-if="!data.leaf"
+                      v-if="!data.leaf && !data.isHistory"
                     >
                       <i class="mdi mdi-plus"></i>
                     </div>
@@ -231,7 +231,7 @@ export default {
     nodeContextmenu(event, data, node, nodeView) {
       let menus = [];
 
-      if (!data.leaf) {
+      if (!data.leaf && !data.isHistory) {
         menus.push({
           text: "新增",
           onClick: () => {
@@ -247,12 +247,14 @@ export default {
           },
         });
       }
-      menus.push({
-        text: "重命名",
-        onClick: () => {
-          this.toRename(data);
-        },
-      });
+      if (!data.isHistory) {
+        menus.push({
+          text: "重命名",
+          onClick: () => {
+            this.toRename(data);
+          },
+        });
+      }
       if (data.leaf || data.children.length == 0) {
         menus.push({
           text: "删除",
@@ -368,30 +370,72 @@ export default {
       this.toolboxWorker.openTabByExtend(extend);
     },
     toInvoke(data) {
-      if (data == null || data.id == null) {
+      if (data == null) {
         return;
       }
-      let extend = {
-        name: data.name,
-        title: data.name,
-        type: "invoke",
-        extendId: data.id,
-        parentId: data.parentId,
-      };
-      this.toolboxWorker.openTabByExtend(extend);
+      if (data.executeId) {
+        let extend = {
+          name: data.name,
+          title: data.name,
+          type: "invoke",
+          extendId: data.extendId,
+          executeId: data.executeId,
+        };
+        this.toolboxWorker.openTabByExtend(extend);
+        return;
+      }
+      if (data.id) {
+        let extend = {
+          name: data.name,
+          title: data.name,
+          type: "invoke",
+          extendId: data.id,
+        };
+        this.toolboxWorker.openTabByExtend(extend);
+        return;
+      }
     },
 
     async load() {
       this.dataListLoading = true;
+      let packList = [];
+      let res = await this.server.http.history(
+        this.toolboxWorker.getWorkParam({})
+      );
+      if (res.code != 0) {
+        this.tool.error(res.msg);
+      }
+      let history = {
+        key: "0",
+        name: "历史执行记录",
+        children: [],
+        isHistory: true,
+      };
+      packList.push(history);
+      if (res.data) {
+        res.data.forEach((one) => {
+          if (one.request == null) {
+            return;
+          }
+          let data = {
+            extendId: one.request.extendId,
+            executeId: one.request.executeId,
+            key: one.request.executeId,
+            name: one.request.name,
+            isHistory: true,
+            leaf: true,
+          };
+          history.children.push(data);
+        });
+      }
       let param = this.toolboxWorker.getWorkParam({
         extendType: "http-api",
       });
-      let res = await this.server.toolbox.extend.query(param);
+      res = await this.server.toolbox.extend.query(param);
       if (res.code != 0) {
         this.tool.error(res.msg);
       }
       let dataList = res.data || [];
-      let packList = [];
       let childrenCache = {};
       dataList.sort((a, b) => a.name.localeCompare(b.name));
       dataList.forEach((one) => {
@@ -433,6 +477,18 @@ export default {
         .catch((e) => {});
     },
     async doDelete(data) {
+      if (data.executeId) {
+        let param = this.toolboxWorker.getWorkParam({
+          executeId: data.executeId,
+        });
+        let res = await this.server.http.deleteExecute(param);
+        if (res.code != 0) {
+          this.tool.error(res.msg);
+        } else {
+          this.$refs.tree.remove(this.$refs.tree.getNode(data));
+        }
+        return;
+      }
       let param = this.toolboxWorker.getWorkParam({
         extendId: data.id,
       });

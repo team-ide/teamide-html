@@ -172,30 +172,83 @@
         <tm-layout-bar bottom></tm-layout-bar>
         <tm-layout height="auto">
           <div class="toolbox-http-invoke-tabs-box" v-if="result != null">
-            <el-tabs v-model="resultActiveName">
-              <el-tab-pane label="请求" name="request">
-                <div style="height: 100%">
-                  <Editor
-                    ref="editor-text"
-                    :source="source"
-                    :value="result.request.body"
-                    language="json"
-                  >
-                  </Editor>
-                </div>
-              </el-tab-pane>
-              <el-tab-pane label="响应" name="response">
-                <div style="height: 100%">
-                  <Editor
-                    ref="editor-text"
-                    :source="source"
-                    :value="result.response.body"
-                    language="json"
-                  >
-                  </Editor>
-                </div>
-              </el-tab-pane>
-            </el-tabs>
+            <div class="ft-12 pd-10">
+              <template v-if="result.requestTime">
+                请求时间：
+                <span class="color-green mgr-10">
+                  {{ tool.formatDate(new Date(result.requestTime),'yyyy-MM-dd HH:mm:ss.S') }}
+                </span>
+              </template>
+              <template v-if="result.responseTime">
+                响应时间：
+                <span class="color-green mgr-10">
+                  {{ tool.formatDate(new Date(result.responseTime),'yyyy-MM-dd HH:mm:ss.S') }}
+                </span>
+                耗时：
+                <span class="color-green mgr-10">
+                  {{ result.responseTime - result.requestTime }}ms
+                </span>
+              </template>
+              <template v-if="result.response.status">
+                Status：
+                <span class="color-green mgr-10">
+                  {{ result.response.status }}
+                </span>
+              </template>
+              <template v-if="result.response.statusCode">
+                Status-Code：
+                <span class="color-green mgr-10">
+                  {{ result.response.statusCode }}
+                </span>
+              </template>
+              <template v-if="result.response.contentType">
+                Content-Type：
+                <span class="color-green mgr-10">
+                  {{ result.response.contentType }}
+                </span>
+              </template>
+              <template v-if="result.response.contentLength">
+                Content-Length：
+                <span class="color-green mgr-10">
+                  {{ result.response.contentLength }}
+                </span>
+              </template>
+              <template v-if="result.response.fileName">
+                下载文件：
+                <span class="color-green mgr-10">
+                  {{ result.response.fileName }}
+                </span>
+              </template>
+            </div>
+            <div style="height: calc(100% - 60px)">
+              <el-tabs v-model="resultActiveName">
+                <el-tab-pane :label="'Header'" name="header">
+                  <div style="height: 100%">
+                    <KeyValue
+                      :source="source"
+                      :toolboxWorker="toolboxWorker"
+                      :data="result.response.header"
+                    >
+                    </KeyValue>
+                  </div>
+                </el-tab-pane>
+                <el-tab-pane
+                  label="Body"
+                  name="body"
+                  v-if="result.response.body != null"
+                >
+                  <div style="height: 100%">
+                    <Editor
+                      ref="editor-text"
+                      :source="source"
+                      :value="result.response.body"
+                      language="json"
+                    >
+                    </Editor>
+                  </div>
+                </el-tab-pane>
+              </el-tabs>
+            </div>
           </div>
         </tm-layout>
       </tm-layout>
@@ -206,9 +259,10 @@
 
 <script>
 import DataTable from "./DataTable";
+import KeyValue from "./KeyValue";
 
 export default {
-  components: { DataTable },
+  components: { DataTable, KeyValue },
   props: ["source", "toolboxWorker", "tabId", "extend", "config"],
   data() {
     return {
@@ -247,7 +301,7 @@ export default {
       formData: [],
       headers: [],
       uploadReady: true,
-      resultActiveName: "response",
+      resultActiveName: "body",
       result: null,
       extendId: null,
       parentId: null,
@@ -267,6 +321,27 @@ export default {
           for (let k in find.extend) {
             this[k] = find.extend[k];
           }
+        }
+      }
+      if (extend.executeId != null) {
+        let find = await this.server.http.getExecute(
+          this.toolboxWorker.getWorkParam({
+            executeId: extend.executeId,
+          })
+        );
+        if (find && find.data && find.data.request) {
+          let request = find.data.request;
+          this.method = request.method;
+          this.path = request.path;
+          this.formData = request.formData || [];
+          this.headers = request.headers || [];
+          this.params = request.params || [];
+          this.files = request.files || [];
+          this.bodyType = request.bodyType || [];
+          if (request.bodyType == "text") {
+            this.text[request.textType] = request.text;
+          }
+          this.result = find.data;
         }
       }
       this.ready = true;
@@ -311,7 +386,6 @@ export default {
       request.text = this.text;
       request.files = this.files;
       request.formData = this.formData;
-      request.result = this.result;
       return request;
     },
     async toSave() {
@@ -350,7 +424,9 @@ export default {
       if (request.bodyType == "text") {
         request.text = this.text[request.textType];
       }
+      request.name = this.name;
       let param = this.toolboxWorker.getWorkParam(request);
+      param.extendId = this.extendId;
       let res = await this.server.http.execute(param);
       if (res.code != 0) {
         this.tool.error(res.msg);

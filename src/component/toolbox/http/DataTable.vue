@@ -184,39 +184,4 @@ export default {
 </script>
 
 <style>
-.toolbox-http-invoke {
-  width: 100%;
-  height: 100%;
-}
-
-.toolbox-http-invoke-tabs-box {
-  width: 100%;
-  height: 100%;
-}
-.toolbox-http-invoke-tabs-box .el-tabs {
-  height: 100%;
-}
-.toolbox-http-invoke-tabs-box .el-tabs__content {
-  height: calc(100% - 55px);
-}
-.toolbox-http-invoke-tabs-box .el-tab-pane {
-  height: 100%;
-}
-.toolbox-http-invoke-tabs-box .el-tabs__item {
-  color: darkgrey;
-  padding-left: 20px !important;
-}
-.toolbox-http-invoke-tabs-box .el-tabs__item.is-active {
-  color: inherit;
-}
-.toolbox-http-invoke-tabs-box .el-tabs__active-bar {
-  background-color: #ffffff;
-}
-.toolbox-http-invoke-tabs-box .el-tabs__nav-wrap::after {
-  background-color: transparent;
-}
-
-.toolbox-http-invoke-tabs-box .el-radio__label {
-  padding-left: 5px;
-}
 </style>

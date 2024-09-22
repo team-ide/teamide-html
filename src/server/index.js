@@ -128,6 +128,15 @@ let server = {
         execute(param) {
             return http.post('api/http/execute', param || {},);
         },
+        history(param) {
+            return http.post('api/http/history', param || {},);
+        },
+        getExecute(param) {
+            return http.post('api/http/getExecute', param || {},);
+        },
+        deleteExecute(param) {
+            return http.post('api/http/deleteExecute', param || {},);
+        },
         close(param) {
             return http.post('api/http/close', param || {},);
         },
