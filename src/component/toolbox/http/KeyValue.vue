@@ -42,7 +42,6 @@ export default {
       this.ready = true;
     },
     initDataList(data) {
-      console.log(data);
       data = data || {};
       let dataList = [];
       for (let key in data) {
