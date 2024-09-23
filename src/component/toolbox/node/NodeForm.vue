@@ -204,7 +204,7 @@ export default {
       let option = this.tool.getOptionJSON(node.option);
       option.x = position.x;
       option.y = position.y;
-      let optionStr = JSON.stringify(option);
+      let optionStr = this.tool.JSONbig.stringify(option);
       if (this.nodeContext.nodeList) {
         this.nodeContext.nodeList.forEach((one) => {
           if (one && one.nodeId == node.nodeId) {

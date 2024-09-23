@@ -2,9 +2,9 @@
   <div class="toolbox-http-invoke">
     <template v-if="ready">
       <tm-layout height="100%">
-        <tm-layout height="100px">
+        <tm-layout height="60px">
           <el-form class="pdt-10 pdlr-10" inline>
-            <el-form-item label="">
+            <el-form-item label="" class="mgb-0">
               <el-select v-model="method" style="width: 100px">
                 <el-option
                   v-for="(one, index) in methods"
@@ -16,10 +16,10 @@
                 </el-option>
               </el-select>
             </el-form-item>
-            <el-form-item label="" class="mgb-5">
+            <el-form-item label="" class="mgb-0">
               <el-input v-model="path" style="width: 400px" />
             </el-form-item>
-            <el-form-item label="" class="mgb-5">
+            <el-form-item label="" class="mgb-0">
               <div class="tm-btn tm-btn-smx bg-green-6" @click="toInvoke()">
                 请求
               </div>
@@ -29,7 +29,7 @@
             </el-form-item>
           </el-form>
         </tm-layout>
-        <tm-layout height="400px">
+        <tm-layout height="360px">
           <div class="toolbox-http-invoke-tabs-box">
             <el-tabs v-model="requestActiveName">
               <el-tab-pane
@@ -95,7 +95,7 @@
                       </el-form-item>
                     </el-form>
                   </div>
-                  <div style="height: calc(100% - 30px)">
+                  <div style="height: calc(100% - 28px)">
                     <template v-if="bodyType == 'form'">
                       <DataTable
                         :source="source"
@@ -174,15 +174,25 @@
           <div class="toolbox-http-invoke-tabs-box" v-if="result != null">
             <div class="ft-12 pd-10">
               <template v-if="result.requestTime">
-                请求时间：
+                请求：
                 <span class="color-green mgr-10">
-                  {{ tool.formatDate(new Date(result.requestTime),'yyyy-MM-dd HH:mm:ss.S') }}
+                  {{
+                    tool.formatDate(
+                      new Date(result.requestTime),
+                      "yyyy-MM-dd HH:mm:ss.S"
+                    )
+                  }}
                 </span>
               </template>
               <template v-if="result.responseTime">
-                响应时间：
+                响应：
                 <span class="color-green mgr-10">
-                  {{ tool.formatDate(new Date(result.responseTime),'yyyy-MM-dd HH:mm:ss.S') }}
+                  {{
+                    tool.formatDate(
+                      new Date(result.responseTime),
+                      "yyyy-MM-dd HH:mm:ss.S"
+                    )
+                  }}
                 </span>
                 耗时：
                 <span class="color-green mgr-10">
@@ -207,16 +217,16 @@
                   {{ result.response.contentType }}
                 </span>
               </template>
-              <template v-if="result.response.contentLength">
+              <template v-if="result.response.contentLength > 0">
                 Content-Length：
                 <span class="color-green mgr-10">
                   {{ result.response.contentLength }}
                 </span>
               </template>
-              <template v-if="result.response.fileName">
-                下载文件：
-                <span class="color-green mgr-10">
-                  {{ result.response.fileName }}
+              <template v-if="result.error">
+                Error：
+                <span class="color-red mgr-10">
+                  {{ result.response.error }}
                 </span>
               </template>
             </div>
@@ -232,20 +242,70 @@
                     </KeyValue>
                   </div>
                 </el-tab-pane>
-                <el-tab-pane
-                  label="Body"
-                  name="body"
-                  v-if="result.response.body != null"
-                >
-                  <div style="height: 100%">
-                    <Editor
-                      ref="editor-text"
-                      :source="source"
-                      :value="result.response.body"
-                      language="json"
+                <el-tab-pane label="Body" name="body">
+                  <template
+                    v-if="result.response.isFile && result.response.fileName"
+                  >
+                    <div
+                      class="mgtb-50 text-center"
+                      v-if="result.response.isImage"
                     >
-                    </Editor>
-                  </div>
+                      <div
+                        class="tm-link color-green"
+                        @click="downloadFile(result)"
+                      >
+                        下载文件：{{ result.response.fileName }}
+                      </div>
+                    </div>
+                    <div class="mgtb-50 text-center" v-else>
+                      <div
+                        class="tm-link color-green"
+                        @click="downloadFile(result)"
+                      >
+                        下载文件：{{ result.response.fileName }}
+                      </div>
+                    </div>
+                  </template>
+                  <template v-else>
+                    <div class="pdlr-10">
+                      <el-form class="mg-0 pd-0" size="mini" inline>
+                        <el-form-item label="" class="mg-0 pd-0">
+                          <el-radio-group
+                            v-model="responseBodyType"
+                            v-remove-aria-hidden
+                          >
+                            <el-radio label="text" class="mgr-20">
+                              文本
+                            </el-radio>
+                            <el-radio
+                              label="format"
+                              class="mgr-20"
+                              :disabled="!result.response.isJson"
+                            >
+                              格式化
+                            </el-radio>
+                          </el-radio-group>
+                        </el-form-item>
+                      </el-form>
+                    </div>
+                    <div style="height: calc(100% - 28px)">
+                      <Editor
+                        v-show="responseBodyType == 'text'"
+                        :source="source"
+                        :value="result.response.body"
+                        :language="getResponseLanguage(result.response)"
+                      >
+                      </Editor>
+                      <Editor
+                        v-show="responseBodyType == 'format'"
+                        :source="source"
+                        :value="result.response.body"
+                        :language="getResponseLanguage(result.response)"
+                        :format="true"
+                      >
+                      </Editor>
+                    </div>
+                  </template>
                 </el-tab-pane>
               </el-tabs>
             </div>
@@ -296,6 +356,7 @@ export default {
         json: "",
         xml: "",
       },
+      responseBodyType: "text",
       files: [],
       params: [],
       formData: [],
@@ -341,10 +402,53 @@ export default {
           if (request.bodyType == "text") {
             this.text[request.textType] = request.text;
           }
+          this.initResult(find.data);
           this.result = find.data;
         }
       }
       this.ready = true;
+    },
+    initResult(result) {
+      if (result.response.isJson) {
+        this.responseBodyType = "format";
+      }
+      if (result.response.isXml) {
+        this.responseBodyType = "format";
+      }
+    },
+    getResponseLanguage(response) {
+      response = response || {};
+      if (response.isJson) {
+        return "json";
+      }
+      if (response.isXml) {
+        return "xml";
+      }
+      if (response.isCss) {
+        return "css";
+      }
+      if (response.isHtml) {
+        return "html";
+      }
+      if (response.isJavascript) {
+        return "javascript";
+      }
+      return "";
+    },
+    downloadFile(data) {
+      let url = this.source.api + "http/getExecuteFile?";
+      url = this.tool.appendUrlBaseParam(url);
+      url += "&toolboxId=" + encodeURIComponent(this.toolboxWorker.toolboxId);
+      url += "&executeId=" + encodeURIComponent(data.request.executeId);
+      url += "&isDownload=1";
+      window.location.href = url;
+    },
+    getFileUrl(data) {
+      let url = this.source.api + "http/getExecuteFile?";
+      url = this.tool.appendUrlBaseParam(url);
+      url += "&toolboxId=" + encodeURIComponent(this.toolboxWorker.toolboxId);
+      url += "&executeId=" + encodeURIComponent(data.request.executeId);
+      return url;
     },
     removeOne(list, one) {
       let index = list.indexOf(one);
@@ -432,6 +536,7 @@ export default {
         this.tool.error(res.msg);
       } else {
         let result = res.data;
+        this.initResult(result);
         this.result = null;
         this.$nextTick(() => {
           this.result = result;

@@ -12,6 +12,7 @@ export default {
     "change",
     "onContextMenu",
     "lineNumbers",
+    "format",
   ],
   components: {},
   data() {
@@ -138,6 +139,12 @@ export default {
         if (value == null) {
           value = "";
         }
+      }
+      if (this.format) {
+        try {
+          let json = this.tool.JSONbig.parse(value);
+          value = this.tool.JSONbig.stringify(json, null, "    ");
+        } catch (e) {}
       }
       this.monacoInstance = monaco.editor.create(this.$refs.editor, {
         theme: this.getTheme(), //官方自带三种主题vs, hc-black, or vs-dark

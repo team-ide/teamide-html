@@ -445,7 +445,7 @@ export default {
         }
       }
       let param = {
-        extend: JSON.stringify(extend || {}),
+        extend: this.tool.JSONbig.stringify(extend || {}),
       };
       if (options.toolboxId) {
         param.toolboxId = options.toolboxId;

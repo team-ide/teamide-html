@@ -177,7 +177,10 @@ export default {
       if (newExtent == null || oldExtent == null) {
         return;
       }
-      if (JSON.stringify(newExtent) == JSON.stringify(oldExtent)) {
+      if (
+        this.tool.JSONbig.stringify(newExtent) ==
+        this.tool.JSONbig.stringify(oldExtent)
+      ) {
         return;
       }
       this.toolboxWorker.updateOpenExtend(this.extend);

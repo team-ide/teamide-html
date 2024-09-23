@@ -234,7 +234,7 @@ export default {
       let list = await this.loadIndexes();
       this.indexList = [];
       list.forEach((one) => {
-        let oldData = JSON.parse(JSON.stringify(one));
+        let oldData = this.tool.JSONbig.parse(this.tool.JSONbig.stringify(one));
         one.keys = [];
         if (one.key) {
           Object.keys(one.key).forEach((k) => {

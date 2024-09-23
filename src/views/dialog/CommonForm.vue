@@ -76,7 +76,7 @@ export default {
         toolboxData.toolboxToTest = "1";
         toolboxData.toolboxType = toolboxType.name;
 
-        toolboxData.option = JSON.stringify(dataList[1]);
+        toolboxData.option = this.tool.JSONbig.stringify(dataList[1]);
         let res = { code: -1, msg: "暂不支持该工具测试" };
         if (toolboxData.toolboxType == "database") {
           res = await this.server.database.check(toolboxData);
@@ -251,7 +251,7 @@ export default {
             toolboxData.groupId = this.options.groupId;
           }
         }
-        toolboxData.option = JSON.stringify(optionJSON);
+        toolboxData.option = this.tool.JSONbig.stringify(optionJSON);
         if (this.options.toolboxId) {
           toolboxData.toolboxId = this.options.toolboxId;
           res = await this.server.toolbox.update(toolboxData);

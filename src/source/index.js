@@ -242,7 +242,7 @@ source.initSession = (data) => {
     if (tool.isNotEmpty(data)) {
         try {
             data = tool.aesDecrypt(data);
-            data = JSON.parse(data)
+            data = tool.JSONbig.parse(data)
         } catch (error) {
             data = null;
         }
@@ -262,7 +262,7 @@ source.initSession = (data) => {
             delete newUser.createTime;
             delete newUser.updateTime;
             delete newUser.deleteTime;
-            if (JSON.stringify(oldUser) != JSON.stringify(newUser)) {
+            if (tool.JSONbig.stringify(oldUser) != tool.JSONbig.stringify(newUser)) {
                 source.login.user = data.user;
             }
         }

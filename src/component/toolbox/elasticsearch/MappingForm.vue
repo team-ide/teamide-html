@@ -69,7 +69,7 @@ export default {
         try {
           let data = null;
           try {
-            data = JSON.parse(value);
+            data = this.tool.JSONbig.parse(value);
           } catch (error) {
             try {
               data = eval("(" + value + ")");
@@ -77,7 +77,7 @@ export default {
               throw error;
             }
           }
-          this.mappingJSON = JSON.stringify(data, null, "    ");
+          this.mappingJSON = this.tool.JSONbig.stringify(data, null, "    ");
         } catch (e) {
           this.mappingJSON = e.toString();
         }
@@ -90,7 +90,11 @@ export default {
 
       this.indexName = data.indexName;
       this.mapping = data.mapping || {};
-      this.mappingValue = JSON.stringify(this.mapping, null, "    ");
+      this.mappingValue = this.tool.JSONbig.stringify(
+        this.mapping,
+        null,
+        "    "
+      );
 
       this.callback = callback;
       this.showDialog = true;
@@ -101,7 +105,7 @@ export default {
     async doSave() {
       let mapping = null;
       try {
-        mapping = JSON.parse(this.mappingValue);
+        mapping = this.tool.JSONbig.parse(this.mappingValue);
       } catch (e) {
         try {
           mapping = eval("(" + this.mappingValue + ")");

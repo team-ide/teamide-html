@@ -270,9 +270,6 @@
 
 
 <script>
-var JSONbig = require("json-bigint");
-var JSONbigString = JSONbig({ storeAsString: true });
-
 export default {
   components: {},
   props: ["source", "indexName", "toolboxWorker"],
@@ -586,7 +583,7 @@ export default {
     formatSourceJSON(_source) {
       let sourceJSON = {};
       try {
-        sourceJSON = JSONbigString.parse(_source);
+        sourceJSON = this.tool.JSONbig.parse(_source);
       } catch (error) {}
       return sourceJSON;
     },

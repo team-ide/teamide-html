@@ -321,7 +321,7 @@ export default {
         }
         let files = this.fileWorker.getSelectFiles();
 
-        e.dataTransfer.setData("files", JSON.stringify(files));
+        e.dataTransfer.setData("files", this.tool.JSONbig.stringify(files));
       } else {
         e.dataTransfer.setData("files", "");
       }
@@ -364,7 +364,7 @@ export default {
           return;
         }
         let files = e.dataTransfer.getData("files");
-        files = JSON.parse(files);
+        files = this.tool.JSONbig.parse(files);
         if (!putDir.endsWith("/")) {
           putDir += "/";
         }

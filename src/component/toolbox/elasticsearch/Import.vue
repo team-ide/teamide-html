@@ -489,12 +489,12 @@ export default {
       }
       this.autoSaveSqlIng = true;
       let keyValueMap = {};
-      let columnListStr = JSON.stringify(this.columnList);
+      let columnListStr = this.tool.JSONbig.stringify(this.columnList);
       if (this.columnListStr != columnListStr) {
         this.columnListStr = columnListStr;
         keyValueMap.columnList = this.columnList;
       }
-      let formDataStr = JSON.stringify(this.formData);
+      let formDataStr = this.tool.JSONbig.stringify(this.formData);
       if (this.formDataStr != formDataStr) {
         this.formDataStr = formDataStr;
         keyValueMap.formData = this.formData;

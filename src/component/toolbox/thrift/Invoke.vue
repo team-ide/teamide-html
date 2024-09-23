@@ -429,7 +429,7 @@ export default {
       this.result.isTest = param.isTest;
       if (this.$refs.resultEditor) {
         if (typeof result.result == "object") {
-          result.result = JSON.stringify(result.result);
+          result.result = this.tool.JSONbig.stringify(result.result);
         }
         this.$refs.resultEditor.setValue(result.result);
       }

@@ -166,9 +166,6 @@
 
 
 <script>
-var JSONbig = require("json-bigint");
-var JSONbigString = JSONbig({});
-
 export default {
   components: {},
   props: ["source", "topic", "toolboxWorker"],
@@ -341,9 +338,9 @@ export default {
         let value = one.value;
         if (this.tool.isJSONString(value)) {
           try {
-            let data = JSONbigString.parse(value);
-            let jsonStr = JSON.stringify(data, null, "    ");
-            jsonValue = JSON.parse(jsonStr);
+            let data = this.tool.JSONbig.parse(value);
+            let jsonStr = this.tool.JSONbig.stringify(data, null, "    ");
+            jsonValue = this.tool.JSONbig.parse(jsonStr);
           } catch (e) {
             this.form.valueJson = e.toString();
           }

@@ -245,9 +245,6 @@
 
 
 <script>
-var JSONbig = require("json-bigint");
-var JSONbigString = JSONbig({});
-
 export default {
   components: {},
   props: ["source", "formBuild", "formData", "checkShowPlaintextBtn"],
@@ -287,7 +284,7 @@ export default {
           let jsonString = null;
           if (json != null) {
             if (typeof json == "object") {
-              jsonString = JSON.stringify(json, null, "  ");
+              jsonString = this.tool.JSONbig.stringify(json, null, "  ");
             }
           }
           jsonStringMap[name] = {
@@ -301,7 +298,7 @@ export default {
           let jsonString = null;
           if (json != null) {
             if (typeof json == "object") {
-              jsonString = JSON.stringify(json, null, "  ");
+              jsonString = this.tool.JSONbig.stringify(json, null, "  ");
             }
           }
           jsonViewMap[one.bindName] = {
@@ -416,7 +413,7 @@ export default {
           try {
             let json = null;
             try {
-              json = JSONbigString.parse(value);
+              json = this.tool.JSONbig.parse(value);
             } catch (error) {
               try {
                 json = eval("(" + value + ")");
@@ -424,7 +421,7 @@ export default {
                 throw error;
               }
             }
-            jsonString = JSON.stringify(json, null, "  ");
+            jsonString = this.tool.JSONbig.stringify(json, null, "  ");
           } catch (e) {
             jsonString = e.toString();
           }

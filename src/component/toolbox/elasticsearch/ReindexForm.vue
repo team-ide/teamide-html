@@ -68,7 +68,7 @@ export default {
     async doSave() {
       let mapping = null;
       try {
-        mapping = JSON.parse(this.mappingValue);
+        mapping = this.tool.JSONbig.parse(this.mappingValue);
       } catch (e) {
         try {
           mapping = eval("(" + this.mappingValue + ")");

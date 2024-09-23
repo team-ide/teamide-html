@@ -40,7 +40,7 @@ export default {
         listenKey: listenKey,
       });
       if (res != null && res.data != null) {
-        onSave(JSON.parse(res.data));
+        onSave(this.tool.JSONbig.parse(res.data));
       }
     },
     async show(data, options) {

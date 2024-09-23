@@ -93,7 +93,7 @@ export default {
           }
           d[column.name] = null;
         });
-        doc = JSON.stringify(d, null, "  ");
+        doc = this.tool.JSONbig.stringify(d, null, "  ");
       }
 
       this.callback = callback;
@@ -108,7 +108,7 @@ export default {
     },
     async doSave() {
       try {
-        JSON.parse(this.docValue);
+        this.tool.JSONbig.parse(this.docValue);
       } catch (e) {
         this.tool.error("请输入有效JSON:" + e);
         return;

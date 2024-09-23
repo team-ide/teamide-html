@@ -89,7 +89,7 @@ const newToolboxWorker = function (workerOption) {
             }
             let param = {
                 tabId: tabId,
-                extend: JSON.stringify(extend),
+                extend: tool.JSONbig.stringify(extend),
             };
             let res = await server.toolbox.updateOpenTabExtend(param);
             if (res.code != 0) {
@@ -118,7 +118,7 @@ const newToolboxWorker = function (workerOption) {
             }
             let param = {
                 openId: worker.openId,
-                extend: JSON.stringify(worker.extend),
+                extend: tool.JSONbig.stringify(worker.extend),
             };
             let res = await server.toolbox.updateOpenExtend(param);
             if (res.code != 0) {
@@ -149,7 +149,7 @@ const newToolboxWorker = function (workerOption) {
             let param = {
                 openId: worker.openId,
                 toolboxId: worker.toolboxId,
-                extend: JSON.stringify(extend || {}),
+                extend: tool.JSONbig.stringify(extend || {}),
             };
             if (sequence) {
                 param.sequence = sequence;

@@ -178,7 +178,10 @@ export default {
       dataList.forEach((one) => {
         let paramStr = "";
         if (this.tool.isNotEmpty(one.param) && this.tool.isNotEmpty(one.data)) {
-          paramStr = JSON.stringify({ param: one.param, data: one.data });
+          paramStr = this.tool.JSONbig.stringify({
+            param: one.param,
+            data: one.data,
+          });
         } else if (this.tool.isNotEmpty(one.param)) {
           paramStr = one.param;
         } else if (this.tool.isNotEmpty(one.data)) {

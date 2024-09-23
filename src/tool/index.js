@@ -10,12 +10,15 @@ import keyCode from '@/tool/keyCode.js';
 import itemsWorker from './itemsWorker.js';
 import monaco from './monaco.js';
 
+var JSONbig = require("json-bigint");
+
 let tool = {};
 Object.assign(tool, tm);
 Object.assign(tool, keyCode.keyEvent);
 tool.newItemsWorker = itemsWorker.newItemsWorker;
 tool.md5 = md5;
 tool.jQuery = jQuery;
+tool.JSONbig = JSONbig;
 
 tool.addSqlName = monaco.addSqlName;
 tool.registerLanguages = monaco.registerLanguages;
@@ -323,19 +326,17 @@ tool.getCookie = function (cname) {
     }
     return "";
 }
-var JSONbig = require("json-bigint");
 tool.stringToJSON = function (value) {
-    var JSONbigString = JSONbig({});
     let data = null;
     if (tool.isNotEmpty(value)) {
         try {
-            data = JSONbigString.parse(value);
+            data = tool.JSONbig.parse(value);
             return data
         } catch (e) {
 
         }
         try {
-            data = JSON.parse(value);
+            data = tool.JSONbig.parse(value);
         } catch (error) {
             try {
                 data = eval("(" + value + ")");
@@ -536,7 +537,7 @@ tool.getStringValue = function (v) {
         return v;
     }
     if (typeof (v) === 'object') {
-        return JSON.stringify(v)
+        return tool.JSONbig.stringify(v)
     }
     return v;
 };
@@ -965,7 +966,7 @@ tool.initInputWidth = (event, options) => {
 tool.getOptionJSON = (option) => {
     let json = {};
     if (tool.isNotEmpty(option)) {
-        json = JSON.parse(option);
+        json = tool.JSONbig.parse(option);
     }
     return json;
 };

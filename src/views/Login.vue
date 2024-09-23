@@ -50,7 +50,7 @@
             <el-checkbox v-model="rememberPassword">记住密码 </el-checkbox>
             <el-checkbox v-model="autoLogin">自动登录 </el-checkbox>
           </div>
-          <div class="pdtb-10  col-12">
+          <div class="pdtb-10 col-12">
             <div
               v-if="source.hasPower('login')"
               class="tm-btn bg-teal-8 ft-18 pdtb-5 tm-btn-block"
@@ -203,7 +203,9 @@ export default {
                   this.tool.setCache("rememberPassword", "1");
                   this.tool.setCache(
                     "loginData",
-                    this.tool.aesEncrypt(JSON.stringify(this.loginData))
+                    this.tool.aesEncrypt(
+                      this.tool.JSONbig.stringify(this.loginData)
+                    )
                   );
                 } else {
                   this.tool.removeCache("rememberPassword");
@@ -235,7 +237,9 @@ export default {
         let loginDataValue = this.tool.getCache("loginData");
         if (this.tool.isNotEmpty(loginDataValue)) {
           try {
-            let json = JSON.parse(this.tool.aesDecrypt(loginDataValue));
+            let json = this.tool.JSONbig.parse(
+              this.tool.aesDecrypt(loginDataValue)
+            );
             for (let key in loginData) {
               if (json[key]) {
                 loginData[key] = json[key];

@@ -1,3 +1,5 @@
+import tool from "@/tool/index.js";
+
 let cloneForm = function (form) {
     form = form || [];
     let res = {};
@@ -164,7 +166,7 @@ let validateField = async function (data, field) {
         let jsonValue = null;
         if (field.jsonStringValue != "") {
             try {
-                jsonValue = JSON.parse(field.jsonStringValue);
+                jsonValue = tool.JSONbig.parse(field.jsonStringValue);
             } catch (error) {
                 try {
                     jsonValue = eval("(" + field.jsonStringValue + ")");

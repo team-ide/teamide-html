@@ -254,14 +254,24 @@ export default {
             this.toRename(data);
           },
         });
-      }
-      if (data.leaf || data.children.length == 0) {
-        menus.push({
-          text: "删除",
-          onClick: () => {
-            this.toDelete(data);
-          },
-        });
+
+        if (data.leaf || data.children.length == 0) {
+          menus.push({
+            text: "删除",
+            onClick: () => {
+              this.toDelete(data);
+            },
+          });
+        }
+      } else {
+        if (data.leaf) {
+          menus.push({
+            text: "删除",
+            onClick: () => {
+              this.toDelete(data);
+            },
+          });
+        }
       }
 
       if (menus.length > 0) {
@@ -313,8 +323,11 @@ export default {
         data.isRename = false;
         let node = this.$refs.tree.getNode(data);
         if (node.parent) {
-          node.parent.childNodes.sort((a, b) =>
-            a.data.name.localeCompare(b.data.name)
+          node.parent.childNodes.sort(
+            (a, b) =>
+              !a.data.isEmpty &&
+              a.data.name &&
+              a.data.name.localeCompare(b.data.name)
           );
         }
       }
@@ -437,7 +450,7 @@ export default {
       }
       let dataList = res.data || [];
       let childrenCache = {};
-      dataList.sort((a, b) => a.name.localeCompare(b.name));
+      dataList.sort((a, b) => a.name && a.name.localeCompare(b.name));
       dataList.forEach((one) => {
         one.extend = one.extend || {};
         let parentChildren = null;

@@ -95,7 +95,7 @@ export default {
       }
       if (this.$route.query.listenKeys) {
         // console.log(this.$route.query.listenKeys);
-        this.listenKeys = JSON.parse(this.$route.query.listenKeys);
+        this.listenKeys = this.tool.JSONbig.parse(this.$route.query.listenKeys);
       }
       if (this.listenKeys && this.listenKeys.length > 0) {
         this.onSave = async (data) => {

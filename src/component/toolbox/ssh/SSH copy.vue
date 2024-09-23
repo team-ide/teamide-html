@@ -331,7 +331,7 @@ export default {
       data.rows = this.rows;
       data.width = 0;
       data.height = 0;
-      this.writeEvent("shell start" + JSON.stringify(data));
+      this.writeEvent("shell start" + this.tool.JSONbig.stringify(data));
     },
     changeSize() {
       if (this.term == null) {
@@ -342,7 +342,7 @@ export default {
       data.rows = this.rows;
       data.width = 0;
       data.height = 0;
-      this.writeEvent("change size" + JSON.stringify(data));
+      this.writeEvent("change size" + this.tool.JSONbig.stringify(data));
     },
     initAttachAddon() {
       if (this.initAttachAddoned) {

@@ -85,7 +85,7 @@ export default {
         param.quickCommandId = Number(param.quickCommandId);
       }
       param.quickCommandType = Number(param.quickCommandType);
-      param.option = JSON.stringify(param.option);
+      param.option = this.tool.JSONbig.stringify(param.option);
       let res = await this.server.toolbox.quickCommand.insert(param);
       if (res.code != 0) {
         this.tool.error(res.msg);
@@ -100,7 +100,7 @@ export default {
       Object.assign(param, data);
       param.quickCommandId = Number(param.quickCommandId);
       param.quickCommandType = Number(param.quickCommandType);
-      param.option = JSON.stringify(param.option);
+      param.option = this.tool.JSONbig.stringify(param.option);
       let res = await this.server.toolbox.quickCommand.update(param);
       if (res.code != 0) {
         this.tool.error(res.msg);

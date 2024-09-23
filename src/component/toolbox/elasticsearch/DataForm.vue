@@ -78,9 +78,6 @@
 </template>
 
 <script>
-var JSONbig = require("json-bigint");
-var JSONbigString = JSONbig({});
-
 export default {
   components: {},
   props: ["source", "toolboxWorker"],
@@ -104,7 +101,7 @@ export default {
         try {
           let data = null;
           try {
-            data = JSON.parse(value);
+            data = this.tool.JSONbig.parse(value);
           } catch (error) {
             try {
               data = eval("(" + value + ")");
@@ -112,7 +109,7 @@ export default {
               throw error;
             }
           }
-          this.docJSON = JSONbigString.stringify(data, null, "  ");
+          this.docJSON = this.tool.JSONbig.stringify(data, null, "  ");
         } catch (e) {
           this.docJSON = e.toString();
         }
@@ -154,7 +151,7 @@ export default {
       this.callback = callback;
       this.showDialog = true;
       this.$nextTick(() => {
-        this.docValue = JSONbigString.stringify(doc, null, "  ");
+        this.docValue = this.tool.JSONbig.stringify(doc, null, "  ");
         this.$refs.docValue.setValue(this.docValue);
       });
     },
@@ -164,7 +161,7 @@ export default {
     async doSave() {
       let doc = null;
       try {
-        doc = JSON.parse(this.docValue);
+        doc = this.tool.JSONbig.parse(this.docValue);
       } catch (e) {
         try {
           doc = eval("(" + this.docValue + ")");

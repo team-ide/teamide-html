@@ -15,9 +15,6 @@
 </template>
 
 <script>
-var JSONbig = require("json-bigint");
-var JSONbigString = JSONbig({});
-
 export default {
   components: {},
   props: ["source", "data", "onSave"],
@@ -42,14 +39,14 @@ export default {
             if (typeof data == "string") {
               if (data != "") {
                 try {
-                  let json = JSONbigString.parse(data);
-                  text = JSONbigString.stringify(json, null, "    ");
+                  let json = this.tool.JSONbig.parse(data);
+                  text = this.tool.JSONbig.stringify(json, null, "    ");
                 } catch (e) {
                   text = data;
                 }
               }
             } else {
-              text = JSONbigString.stringify(data, null, "    ");
+              text = this.tool.JSONbig.stringify(data, null, "    ");
             }
           } catch (e) {
             text = e.toString();
@@ -64,7 +61,7 @@ export default {
       var jsonData = null;
       var jsonError = null;
       try {
-        jsonData = JSONbigString.parse(text);
+        jsonData = this.tool.JSONbig.parse(text);
       } catch (e) {
         jsonError = e.toString();
       }

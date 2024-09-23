@@ -150,7 +150,7 @@ export default {
           if (fromType == "json") {
             let json = null;
             try {
-              json = JSON.parse(value);
+              json = this.tool.JSONbig.parse(value);
             } catch (error) {
               try {
                 json = eval("(" + value + ")");
@@ -179,7 +179,7 @@ export default {
 
       try {
         if (toType == "json") {
-          value = JSON.stringify(fromData, null, "  ");
+          value = this.tool.JSONbig.stringify(fromData, null, "  ");
         } else if (toType == "yaml") {
           value = jsYaml.dump(fromData);
         }

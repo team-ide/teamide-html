@@ -180,9 +180,6 @@
 <script>
 import ShowInfo from "./ShowInfo.vue";
 
-var JSONbig = require("json-bigint");
-var JSONbigString = JSONbig({});
-
 export default {
   components: { ShowInfo },
   props: ["source", "toolboxWorker", "extend"],
@@ -232,8 +229,12 @@ export default {
         } catch (e) {}
         if (this.tool.isJSONString(value)) {
           try {
-            let data = JSONbigString.parse(value);
-            this.form.nameFormat = JSON.stringify(data, null, "    ");
+            let data = this.tool.JSONbig.parse(value);
+            this.form.nameFormat = this.tool.JSONbig.stringify(
+              data,
+              null,
+              "    "
+            );
           } catch (e) {}
         }
       }

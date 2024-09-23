@@ -24,7 +24,7 @@ export default {
     },
     async fullModel(model) {
       let data = await this.$refs.Flowchart.getData();
-      model.content = JSON.stringify(data || {});
+      model.content = this.tool.JSONbig.stringify(data || {});
     },
   },
   created() {},
