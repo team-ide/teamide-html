@@ -9,6 +9,7 @@
               :key="index"
               :label="one.value"
               class="mgr-10"
+              v-remove-aria-hidden
             >
               {{ one.text }}
             </el-radio>
@@ -22,6 +23,7 @@
               :label="one.value"
               :disabled="one.disabled"
               class="mgr-10"
+              v-remove-aria-hidden
             >
               {{ one.text }}
             </el-radio>
@@ -35,6 +37,7 @@
               :label="one.value"
               :disabled="one.disabled"
               class="mgr-10"
+              v-remove-aria-hidden
             >
               {{ one.text }}
             </el-radio>
@@ -79,6 +82,14 @@
         </el-form-item>
         <el-form-item v-if="info != null" label="工具">
           <el-input v-model="info.toolboxSize" readonly style="width: 300px">
+          </el-input>
+        </el-form-item>
+        <el-form-item v-if="info != null" label="工具扩展">
+          <el-input
+            v-model="info.toolboxExtendSize"
+            readonly
+            style="width: 300px"
+          >
           </el-input>
         </el-form-item>
       </el-form>

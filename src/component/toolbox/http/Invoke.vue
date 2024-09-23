@@ -537,6 +537,7 @@ export default {
       let param = this.toolboxWorker.getWorkParam(request);
       param.extendId = this.extendId;
       this.executeIng = true;
+      this.result = null;
       try {
         let res = await this.server.http.execute(param);
         if (res.code != 0) {
@@ -544,7 +545,6 @@ export default {
         } else {
           let result = res.data;
           this.initResult(result);
-          this.result = null;
           this.$nextTick(() => {
             this.toolboxWorker.addHistory(result);
             this.result = result;

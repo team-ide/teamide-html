@@ -2,14 +2,21 @@
   <div class="toolbox-http-config">
     <template v-if="ready">
       <tm-layout height="100%">
-        <tm-layout height="60px">
-          <el-form class="pdt-10 pdlr-10" inline>
-            <el-form-item label="" class="mgb-5">
-              <div class="tm-btn tm-btn-smx bg-grey-6" @click="toSave()">
-                保存
-              </div>
+        <tm-layout height="120px">
+          <el-form class="pdt-10 pdlr-10" inline size="mini">
+            <el-form-item label="根地址" class="mgb-5">
+              <el-input v-model="rootUrl" style="width: 300px" />
+            </el-form-item>
+            <el-form-item label="超时时间（秒）" class="mgb-5">
+              <el-input v-model="timeout" style="width: 100px" />
+            </el-form-item>
+            <el-form-item label="不校验 SSL/TLS 证书" class="mgb-5">
+              <el-switch v-model="insecureSkipVerify" />
             </el-form-item>
           </el-form>
+          <div class="tm-btn tm-btn-sm bg-green mgl-10" @click="toSave()">
+            保存
+          </div>
         </tm-layout>
         <tm-layout height="400px">
           <div class="toolbox-http-config-tabs-box">
@@ -65,6 +72,9 @@ export default {
       variables: [],
       secrets: [],
       extendId: null,
+      insecureSkipVerify: true,
+      timeout: 30,
+      rootUrl: "",
     };
   },
   computed: {},
@@ -74,12 +84,24 @@ export default {
       let extend = this.config.extend || {};
       this.variables = extend.variables || [];
       this.secrets = extend.secrets || [];
+      if (extend.insecureSkipVerify != undefined) {
+        this.insecureSkipVerify = extend.insecureSkipVerify;
+      }
+      if (extend.timeout != undefined) {
+        this.timeout = extend.timeout;
+      }
+      if (extend.rootUrl != undefined) {
+        this.rootUrl = extend.rootUrl;
+      }
       this.ready = true;
     },
     async toSave() {
       let extend = {};
       extend.variables = this.variables;
       extend.secrets = this.secrets;
+      extend.rootUrl = this.rootUrl;
+      extend.timeout = Number(this.timeout);
+      extend.insecureSkipVerify = this.insecureSkipVerify;
       await this.toolboxWorker.saveExtend({
         extendId: this.config.extendId,
         extendType: "http-config",
