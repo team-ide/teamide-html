@@ -408,6 +408,26 @@ export default {
         return;
       }
     },
+    addHistory(one) {
+      if (one.request == null) {
+        return;
+      }
+      let data = {
+        extendId: one.request.extendId,
+        executeId: one.request.executeId,
+        key: one.request.executeId,
+        name: one.request.name,
+        isHistory: true,
+        leaf: true,
+      };
+      if (one.requestTime > 0) {
+        data.name +=
+          "（" +
+          this.tool.formatDate(new Date(one.requestTime), "MM-dd HH:mm") +
+          "）";
+      }
+      this.history.children.splice(0, 0, data);
+    },
 
     async load() {
       this.dataListLoading = true;
@@ -424,21 +444,12 @@ export default {
         children: [],
         isHistory: true,
       };
+      this.history = history;
       packList.push(history);
       if (res.data) {
+        res.data.sort((a, b) => a.requestTime - b.requestTime);
         res.data.forEach((one) => {
-          if (one.request == null) {
-            return;
-          }
-          let data = {
-            extendId: one.request.extendId,
-            executeId: one.request.executeId,
-            key: one.request.executeId,
-            name: one.request.name,
-            isHistory: true,
-            leaf: true,
-          };
-          history.children.push(data);
+          this.addHistory(one);
         });
       }
       let param = this.toolboxWorker.getWorkParam({

@@ -48,6 +48,9 @@ export default {
     async init() {
       this.config = await this.load();
       this.ready = true;
+      this.$nextTick(() => {
+        this.toolboxWorker.addHistory = this.$refs.Package.addHistory;
+      });
     },
     refresh() {
       this.$refs.Package.refresh();

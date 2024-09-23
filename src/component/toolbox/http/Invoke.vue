@@ -20,7 +20,11 @@
               <el-input v-model="path" style="width: 400px" />
             </el-form-item>
             <el-form-item label="" class="mgb-0">
-              <div class="tm-btn tm-btn-smx bg-green-6" @click="toInvoke()">
+              <div
+                class="tm-btn tm-btn-smx bg-green-6"
+                @click="toInvoke()"
+                :class="{ 'tm-disabled': executeIng }"
+              >
                 请求
               </div>
               <div class="tm-btn tm-btn-smx bg-grey-6" @click="toSave()">
@@ -170,7 +174,7 @@
           </div>
         </tm-layout>
         <tm-layout-bar bottom></tm-layout-bar>
-        <tm-layout height="auto">
+        <tm-layout height="auto" v-loading="executeIng">
           <div class="toolbox-http-invoke-tabs-box" v-if="result != null">
             <div class="ft-12 pd-10">
               <template v-if="result.requestTime">
@@ -366,6 +370,7 @@ export default {
       result: null,
       extendId: null,
       parentId: null,
+      executeIng: false,
     };
   },
   computed: {},
@@ -531,17 +536,23 @@ export default {
       request.name = this.name;
       let param = this.toolboxWorker.getWorkParam(request);
       param.extendId = this.extendId;
-      let res = await this.server.http.execute(param);
-      if (res.code != 0) {
-        this.tool.error(res.msg);
-      } else {
-        let result = res.data;
-        this.initResult(result);
-        this.result = null;
-        this.$nextTick(() => {
-          this.result = result;
-        });
-        this.tool.success("执行成功");
+      this.executeIng = true;
+      try {
+        let res = await this.server.http.execute(param);
+        if (res.code != 0) {
+          this.tool.error(res.msg);
+        } else {
+          let result = res.data;
+          this.initResult(result);
+          this.result = null;
+          this.$nextTick(() => {
+            this.toolboxWorker.addHistory(result);
+            this.result = result;
+          });
+          this.tool.success("执行成功");
+        }
+      } finally {
+        this.executeIng = false;
       }
     },
   },
