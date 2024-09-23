@@ -95,18 +95,34 @@ if (window.electron && window.electron.ipcRenderer) {
             tool.electronDo(param);
         });
     }
-    tool.electronSetCache = (key, value) => {
-        return tool.electronDo({
+    tool.electronSetCache = async (key, v) => {
+        let value = {};
+        value.isString = typeof (v) == 'string'
+        value.value = v;
+        if (!value.isString) {
+            value.value = tool.JSONbig.stringify(v);
+        }
+        return await tool.electronDo({
             method: "set-cache",
             key: key,
             value: value,
         });
     }
-    tool.electronGetCache = (key) => {
-        return tool.electronDo({
+    tool.electronGetCache = async (key) => {
+        let value = await tool.electronDo({
             method: "get-cache",
             key: key,
-        });
+        })
+        if (typeof (value) == "string") {
+            return tool.JSONbig.parse(value);
+        }
+        if (value.value) {
+            if (value.isString) {
+                return value.value
+            }
+            return tool.JSONbig.parse(value.value);
+        }
+        return value
     }
     tool.electronRemoveCache = (key) => {
         return tool.electronDo({

@@ -170,6 +170,9 @@ export default {
         if (options.listenKeys) {
           options.url += "&listenKeys=" + JSON.stringify(options.listenKeys);
         }
+        if (options.cacheData) {
+          options.cacheData = this.tool.JSONbig.stringify(options.cacheData);
+        }
         return await this.tool.electronDo({
           method: "new-window",
           options: options,
@@ -177,6 +180,9 @@ export default {
       };
       this.tool.newWindow = async (options) => {
         options = options || {};
+        if (options.cacheData) {
+          options.cacheData = this.tool.JSONbig.stringify(options.cacheData);
+        }
         return await this.tool.electronDo({
           method: "new-window",
           options: options,

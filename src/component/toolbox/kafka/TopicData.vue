@@ -345,15 +345,17 @@ export default {
             this.form.valueJson = e.toString();
           }
         }
-        for (let key in jsonValue) {
-          if (columnNameList.indexOf(key) >= 0) {
-            continue;
+        if (jsonValue && !jsonValue.forEach) {
+          for (let key in jsonValue) {
+            if (columnNameList.indexOf(key) >= 0) {
+              continue;
+            }
+            columnNameList.push(key);
+            columnList.push({
+              name: key,
+              checked: true,
+            });
           }
-          columnNameList.push(key);
-          columnList.push({
-            name: key,
-            checked: true,
-          });
         }
         if (one.headers && one.headers.length > 0) {
           one.headers.forEach((data) => {

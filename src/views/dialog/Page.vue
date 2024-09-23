@@ -86,10 +86,7 @@ export default {
       }
 
       if (this.$route.query.cacheKey) {
-        let cacheData = await this.tool.electronDo({
-          method: "get-cache",
-          key: this.$route.query.cacheKey,
-        });
+        let cacheData = await this.tool.electronGetCache(this.$route.query.cacheKey);
         this.cacheData = cacheData;
         // console.log(this.cacheData);
       }

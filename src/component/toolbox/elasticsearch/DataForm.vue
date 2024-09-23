@@ -180,7 +180,7 @@ export default {
 
       let param = {
         indexName: this.indexName,
-        doc: doc,
+        doc: this.tool.JSONbig.stringify(doc),
         id: id,
       };
       let flag = await this.callback(param);
