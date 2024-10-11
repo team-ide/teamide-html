@@ -73,6 +73,15 @@
             >
             </Md5>
           </template>
+          <template v-else-if="item.extend.type == 'fileSearch'">
+            <FileSearch
+              :source="source"
+              :toolboxWorker="toolboxWorker"
+              :extend="item.extend"
+              :tabId="item.tabId"
+            >
+            </FileSearch>
+          </template>
           <template v-else-if="item.extend.type == 'filehash'">
             <Filehash
               :source="source"
@@ -147,6 +156,7 @@ import RandomString from "./RandomString";
 import GeneratePassword from "./GeneratePassword";
 import Javascript from "./Javascript";
 import QRCode from "./QRCode";
+import FileSearch from "./FileSearch";
 
 export default {
   components: {
@@ -162,6 +172,7 @@ export default {
     GeneratePassword,
     Javascript,
     QRCode,
+    FileSearch,
   },
   props: ["source", "toolboxWorker"],
   data() {

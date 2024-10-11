@@ -115,6 +115,9 @@ let server = {
         md5(param) {
             return http.post('api/tools/md5', param || {},);
         },
+        fileSearch(param) {
+            return http.post('api/tools/fileSearch', param || {},);
+        },
     },
     sync: {
         checkFile(param) {

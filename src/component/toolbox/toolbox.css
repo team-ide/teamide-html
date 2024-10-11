@@ -421,3 +421,10 @@
     flex: 1;
     padding: 3px 10px;
 }
+
+
+.toolbox-editor .el-input-group__append,
+.toolbox-editor .el-input-group__prepend {
+    background: transparent;
+    border-color: transparent;
+}
