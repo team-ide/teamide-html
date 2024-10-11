@@ -44,10 +44,7 @@ export default {
         { type: "base64", text: "Base64", disable: false },
         { type: "md5", text: "MD5", disable: false },
         { type: "fileSearch", text: "文件搜索", disable: false },
-        { type: "filehash", text: "文件hash", disable: true },
-        { type: "randomNumber", text: "随机数", disable: false },
         { type: "randomString", text: "随机字符串", disable: false },
-        { type: "generatePassword", text: "生成密码", disable: true },
       ],
     };
   },

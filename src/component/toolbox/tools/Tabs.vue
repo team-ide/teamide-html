@@ -82,24 +82,6 @@
             >
             </FileSearch>
           </template>
-          <template v-else-if="item.extend.type == 'filehash'">
-            <Filehash
-              :source="source"
-              :toolboxWorker="toolboxWorker"
-              :extend="item.extend"
-              :tabId="item.tabId"
-            >
-            </Filehash>
-          </template>
-          <template v-else-if="item.extend.type == 'randomNumber'">
-            <RandomNumber
-              :source="source"
-              :toolboxWorker="toolboxWorker"
-              :extend="item.extend"
-              :tabId="item.tabId"
-            >
-            </RandomNumber>
-          </template>
           <template v-else-if="item.extend.type == 'randomString'">
             <RandomString
               :source="source"
@@ -108,15 +90,6 @@
               :tabId="item.tabId"
             >
             </RandomString>
-          </template>
-          <template v-else-if="item.extend.type == 'generatePassword'">
-            <GeneratePassword
-              :source="source"
-              :toolboxWorker="toolboxWorker"
-              :extend="item.extend"
-              :tabId="item.tabId"
-            >
-            </GeneratePassword>
           </template>
           <template v-else-if="item.extend.type == 'javascript'">
             <Javascript
@@ -150,10 +123,7 @@ import Json from "./Json";
 import UrlEncode from "./UrlEncode";
 import Base64 from "./Base64";
 import Md5 from "./Md5";
-import Filehash from "./Filehash";
-import RandomNumber from "./RandomNumber";
 import RandomString from "./RandomString";
-import GeneratePassword from "./GeneratePassword";
 import Javascript from "./Javascript";
 import QRCode from "./QRCode";
 import FileSearch from "./FileSearch";
@@ -166,10 +136,7 @@ export default {
     UrlEncode,
     Base64,
     Md5,
-    Filehash,
-    RandomNumber,
     RandomString,
-    GeneratePassword,
     Javascript,
     QRCode,
     FileSearch,
