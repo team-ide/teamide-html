@@ -1,6 +1,6 @@
 <template>
   <div class="tools-timestamp-page">
-    <el-form class="pdt-10 pdlr-10" size="mini" @submit.native.prevent>
+    <el-form class="pdt-10 pdlr-10" size="" @submit.native.prevent>
       <div class="pd-10 color-grey-1">
         当前时间
         <div class="tm-link color-green" @click="initNowDate()">刷新</div>

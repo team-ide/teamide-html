@@ -2,7 +2,7 @@
   <div class="tools-timestamp-page">
     <el-form
       class="pdt-10 pdlr-10"
-      size="mini"
+      size=""
       @submit.native.prevent
       label-width="140px"
     >
@@ -42,7 +42,7 @@
     </el-form>
     <el-form
       class="pdlr-10"
-      size="mini"
+      size=""
       @submit.native.prevent
       label-width="140px"
       inline
@@ -64,7 +64,7 @@
         <el-input type="input" v-model="form.repeatGenNumber"> </el-input>
       </el-form-item>
     </el-form>
-    <el-form class="pdlr-10" size="mini" @submit.native.prevent>
+    <el-form class="pdlr-10" size="" @submit.native.prevent>
       <el-form-item label="" class="mgb-5 mglr-10">
         <div class="tm-btn tm-btn-smx bg-green-6" @click="toGen()">生成</div>
       </el-form-item>

@@ -2,7 +2,7 @@
   <div class="tools-file-search-page">
     <el-form
       class="pdt-10 pdlr-10"
-      size="mini"
+      size=""
       @submit.native.prevent
       label-width="140px"
     >
@@ -22,7 +22,7 @@
     </el-form>
     <el-form
       class="pdlr-10"
-      size="mini"
+      size=""
       @submit.native.prevent
       inline
       label-width="140px"
@@ -72,7 +72,7 @@
     <div
       v-if="result != null"
       class="data-list-box app-scroll-bar"
-      style="height: calc(100% - 300px); user-select: text"
+      style="height: calc(100% - 330px); user-select: text"
     >
       <template v-if="result.fileList.length == 0">
         <div class="data-list-one">

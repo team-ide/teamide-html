@@ -1,6 +1,6 @@
 <template>
   <div class="tools-url-encode-page">
-    <el-form class="pdt-10 pdlr-10" size="mini" @submit.native.prevent>
+    <el-form class="pdt-10 pdlr-10" size="" @submit.native.prevent>
       <div class="pd-10 ft-16">编码</div>
       <el-form-item label="输入值" class="mgb-5 mglr-10">
         <el-input

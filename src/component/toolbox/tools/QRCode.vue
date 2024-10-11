@@ -1,6 +1,6 @@
 <template>
   <div class="tools-qrcode-page">
-    <el-form class="pdt-10 pdlr-10" inline size="mini" @submit.native.prevent>
+    <el-form class="pdt-10 pdlr-10" inline size="" @submit.native.prevent>
       <div class="pd-10 ft-16">生成二维码</div>
       <el-form-item label="宽度" class="mgb-5">
         <el-input v-model="form.width"></el-input>
