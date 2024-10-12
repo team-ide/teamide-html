@@ -12,11 +12,25 @@ const newWorker = function (workerOption) {
         onSocketError: workerOption.onSocketError,
         onSocketData: workerOption.onSocketData,
         building: false,
+        inDataType: "text",
+        outDataType: "text",
+        appendNewline: false,
         init() {
             this.build()
         },
         refresh() {
             this.build()
+        },
+        async changeSetting() {
+
+            let param = worker.getParam();
+            param.inDataType = worker.inDataType;
+            param.outDataType = worker.outDataType;
+            let res = await server.connection.changeSetting(param);
+            if (res.code != 0) {
+                // tool.error(res.msg);
+            }
+            return res.data;
         },
         async build() {
             if (this.building) {
@@ -100,6 +114,8 @@ const newWorker = function (workerOption) {
         },
         async newKey() {
             let param = worker.getParam();
+            param.inDataType = worker.inDataType;
+            param.outDataType = worker.outDataType;
 
             worker.userAndDirReady = false;
             let res = await server.connection.key(param);

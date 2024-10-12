@@ -64,7 +64,7 @@
     <div style="height: 120px; overflow: hidden">
       <div
         style="
-          width: calc(100% - 80px);
+          width: calc(100% - 250px);
           overflow: hidden;
           display: inline-block;
         "
@@ -99,6 +99,44 @@
         <div class="tm-btn tm-btn-sm bg-grey mgl-0 mgt-5" @click="termClean()">
           清屏
         </div>
+      </div>
+      <div
+        class="pdt-10 text-center"
+        style="
+          width: 170px;
+          overflow: hidden;
+          display: inline-block;
+          float: right;
+        "
+      >
+        <el-form
+          class="pdl-10"
+          size=""
+          @submit.native.prevent
+          label-width="70px"
+        >
+          <el-form-item label="追加换行" class="mgb-5" size="mini">
+            <el-switch v-model="worker.appendNewline"> </el-switch>
+          </el-form-item>
+          <el-form-item label="输入" class="mgb-5" size="mini">
+            <el-select
+              v-model="worker.inDataType"
+              @change="worker.changeSetting()"
+            >
+              <el-option value="text" label="文本"></el-option>
+              <el-option value="hex" label="16进制"></el-option>
+            </el-select>
+          </el-form-item>
+          <el-form-item label="输出" class="mgb-5" size="mini">
+            <el-select
+              v-model="worker.outDataType"
+              @change="worker.changeSetting()"
+            >
+              <el-option value="text" label="文本"></el-option>
+              <el-option value="hex" label="16进制"></el-option>
+            </el-select>
+          </el-form-item>
+        </el-form>
       </div>
     </div>
   </div>
@@ -278,9 +316,11 @@ export default {
     },
     sendCommand() {
       let commandText = this.commandText || "";
-      commandText += "\n";
       this.commandText = "";
-      this.term.write(commandText);
+      this.term.write(commandText + "\n");
+      if (this.worker.appendNewline) {
+        commandText += "\n";
+      }
       if (this.worker.socket == null) {
         this.term.write("\n终端会话关闭，请重新连接\n");
       } else {
@@ -293,6 +333,7 @@ export default {
       } else {
         this.term.write(new Uint8Array(data));
       }
+      this.term.write("\n");
     },
     getTheme() {
       let theme = {

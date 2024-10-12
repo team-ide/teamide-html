@@ -154,6 +154,9 @@ let server = {
         check(param) {
             return http.post('api/serial/check', param);
         },
+        changeSetting(param) {
+            return http.post('api/serial/changeSetting', param);
+        },
     },
 };
 var listenStartInt = false

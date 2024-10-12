@@ -10,6 +10,9 @@ let connection = {
     check(param) {
         return http.post('api/connection/check', param);
     },
+    changeSetting(param) {
+        return http.post('api/connection/changeSetting', param);
+    },
 };
 
 
