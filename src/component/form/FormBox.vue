@@ -19,7 +19,7 @@
         </div>
       </template>
     </div>
-    <div class="tm-row">
+    <div class="tm-row" style="clear: both">
       <div>
         <div
           v-if="onSave != null"
