@@ -82,7 +82,7 @@
         </div>
       </template>
       <template v-for="(one, index) in result.fileList">
-        <div :key="index" class="data-list-one">
+        <div :key="index" class="data-list-one" style="cursor: text">
           <div class="data-list-one-text ft-12">
             <div>{{ one.path }}</div>
             <div>{{ one.sizeText }}</div>

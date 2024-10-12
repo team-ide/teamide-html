@@ -1,7 +1,7 @@
 <template>
   <div class="tools-javascript-page">
     <tm-layout height="100%">
-      <tm-layout height="500px">
+      <tm-layout height="400px">
         <Editor ref="javascriptEditor" :source="source" language="javascript">
         </Editor>
       </tm-layout>

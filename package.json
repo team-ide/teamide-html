@@ -65,5 +65,7 @@
   ],
   "devDependencies": {
     "@babel/plugin-proposal-optional-chaining": "^7.21.0"
+  },
+  "resolutions": {
   }
 }

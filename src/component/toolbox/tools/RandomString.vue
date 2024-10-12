@@ -6,20 +6,35 @@
       @submit.native.prevent
       label-width="140px"
     >
-      <el-form-item label="自定义" class="mgb-5 mglr-10">
+      <el-form-item label="自定义" class="mgb-5 mglr-10" size="mini">
         <el-switch v-model="form.custom"></el-switch>
       </el-form-item>
-      <el-form-item label="使用 0-9" class="mgb-5 mglr-10" v-if="!form.custom">
+      <el-form-item
+        label="使用 0-9"
+        class="mgb-5 mglr-10"
+        v-if="!form.custom"
+        size="mini"
+      >
         <el-checkbox v-model="form.use_0_9">
           <span>{{ n_0_9 }}</span>
         </el-checkbox>
       </el-form-item>
-      <el-form-item label="使用 a-z" class="mgb-5 mglr-10" v-if="!form.custom">
+      <el-form-item
+        label="使用 a-z"
+        class="mgb-5 mglr-10"
+        v-if="!form.custom"
+        size="mini"
+      >
         <el-checkbox v-model="form.use_a_z">
           <span>{{ a_z }}</span>
         </el-checkbox>
       </el-form-item>
-      <el-form-item label="使用 A-Z" class="mgb-5 mglr-10" v-if="!form.custom">
+      <el-form-item
+        label="使用 A-Z"
+        class="mgb-5 mglr-10"
+        v-if="!form.custom"
+        size="mini"
+      >
         <el-checkbox v-model="form.use_A_Z">
           <span>{{ A_Z }}</span>
         </el-checkbox>
@@ -28,6 +43,7 @@
         label="使用 特殊符号"
         class="mgb-5 mglr-10"
         v-if="!form.custom"
+        size="mini"
       >
         <el-checkbox v-model="form.use_symbol">
           <span>{{ symbol }}</span>
@@ -68,10 +84,28 @@
       <el-form-item label="" class="mgb-5 mglr-10">
         <div class="tm-btn tm-btn-smx bg-green-6" @click="toGen()">生成</div>
       </el-form-item>
-      <el-form-item label="" class="mgb-5 mglr-10">
-        <el-input type="textarea" v-model="result" rows="20"></el-input>
-      </el-form-item>
     </el-form>
+
+    <div
+      v-if="result != null"
+      class="data-list-box app-scroll-bar"
+      style="height: calc(100% - 370px); user-select: text"
+    >
+      <template v-if="result.list.length == 0">
+        <div class="data-list-one">
+          <div class="data-list-one-text text-center ft-15 pd-20">
+            暂无匹配数据
+          </div>
+        </div>
+      </template>
+      <template v-for="(one, index) in result.list">
+        <div :key="index" class="data-list-one" style="cursor: text">
+          <div class="data-list-one-text ft-12">
+            <div>{{ one.value }}</div>
+          </div>
+        </div>
+      </template>
+    </div>
   </div>
 </template>
 
@@ -100,7 +134,7 @@ export default {
         repeat: 0,
         repeatGenNumber: 100,
       },
-      result: "",
+      result: null,
     };
   },
   computed: {},
@@ -134,12 +168,13 @@ export default {
         this.tool.warn("未配置生成字符");
         return;
       }
-      let result = "";
+      let result = {
+        list: [],
+      };
       for (let i = 0; i < this.form.size; i++) {
-        if (i > 0) {
-          result += "\n\n";
-        }
-        result += this.genStr(str, this.form.length);
+        let one = {};
+        one.value = this.genStr(str, this.form.length);
+        result.list.push(one);
       }
 
       this.result = result;

@@ -126,6 +126,14 @@
         >
         </HttpEditor>
       </template>
+      <template v-else-if="toolboxType == 'serial'">
+        <SerialEditor
+          :source="source"
+          :extend="extend"
+          :toolboxWorker="toolboxWorker"
+        >
+        </SerialEditor>
+      </template>
     </template>
   </div>
 </template>
@@ -141,6 +149,7 @@ import toolboxWorker_ from "./toolboxWorker.js";
 import ThriftEditor from "./thrift/Index.vue";
 import MongodbEditor from "./mongodb/Index.vue";
 import ConnectionEditor from "./connection/Index.vue";
+import SerialEditor from "./serial/Index.vue";
 import HttpEditor from "./http/Index.vue";
 import MakerEditor from "./maker/Index.vue";
 
@@ -153,6 +162,7 @@ export default {
     ThriftEditor,
     MongodbEditor,
     ConnectionEditor,
+    SerialEditor,
     HttpEditor,
     MakerEditor,
   },

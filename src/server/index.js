@@ -144,6 +144,17 @@ let server = {
             return http.post('api/http/close', param || {},);
         },
     },
+    serial: {
+        close(param) {
+            return http.post('api/serial/close', param);
+        },
+        key(param) {
+            return http.post('api/serial/key', param);
+        },
+        check(param) {
+            return http.post('api/serial/check', param);
+        },
+    },
 };
 var listenStartInt = false
 const listenStart = async (errorCount) => {

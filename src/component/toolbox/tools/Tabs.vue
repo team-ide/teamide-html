@@ -1,10 +1,10 @@
 <template>
-  <div class="toolbox-kafka-tabs">
+  <div class="toolbox-tools-tabs">
     <div class="default-tabs-container">
       <WorkspaceTabs :source="source" :itemsWorker="toolboxWorker.itemsWorker">
       </WorkspaceTabs>
     </div>
-    <div class="default-spans-container">
+    <div class="default-spans-container toolbox-tools-container">
       <WorkspaceSpans :source="source" :itemsWorker="toolboxWorker.itemsWorker">
         <template v-slot:span="{ item }">
           <template v-if="item.extend == null"> </template>
@@ -158,9 +158,12 @@ export default {
 </script>
 
 <style>
-.toolbox-kafka-tabs {
+.toolbox-tools-tabs {
   width: 100%;
   height: 100%;
   position: relative;
+}
+.toolbox-tools-container {
+  overflow: hidden;
 }
 </style>

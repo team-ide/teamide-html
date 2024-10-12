@@ -1,5 +1,5 @@
 <template>
-  <div class="toolbox-terminal-box toolbox-connection-box">
+  <div class="toolbox-terminal-box toolbox-serial-box">
     <div style="height: calc(100% - 120px); display: flex">
       <div style="height: 100%; flex: 1; overflow: hidden">
         <div v-show="showSearch" class="terminal-search-box">
@@ -659,7 +659,7 @@ export default {
 </script>
 
 <style>
-.toolbox-connection-box .xterm-helpers .xterm-helper-textarea {
+.toolbox-serial-box .xterm-helpers .xterm-helper-textarea {
   display: none;
 }
 </style>
