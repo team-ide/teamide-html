@@ -41,7 +41,7 @@
             slot="dropdown"
             class="workspace-header-dropdown-menu"
           >
-            <MenuBox class="menu-mini">
+            <MenuBox class="menu-mini header-group-menu-box">
               <template
                 v-if="source.showTabGroups && source.showTabGroups.length > 0"
               >
@@ -425,4 +425,8 @@ export default {
 </script>
 
 <style>
+.header-group-menu-box {
+  max-height: 548px;
+  overflow-y: auto;
+}
 </style>

@@ -2,7 +2,7 @@
   <div class="toolbox-redis-editor">
     <template v-if="ready">
       <tm-layout height="100%">
-        <tm-layout width="500px" class="">
+        <tm-layout width="450px" class="">
           <Keys
             ref="Keys"
             :source="source"

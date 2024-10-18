@@ -13,6 +13,9 @@ let redis = {
     keys(param) {
         return http.post('api/redis/keys', param);
     },
+    scan(param) {
+        return http.post('api/redis/scan', param);
+    },
     set(param) {
         return http.post('api/redis/set', param);
     },

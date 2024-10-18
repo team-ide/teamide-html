@@ -217,6 +217,13 @@ let toolbox = {
                 rules: [
                 ],
             },
+            {
+                label: "父级",
+                name: "parentId",
+                col: 8,
+                type: "select",
+                options: toolboxGroupOptions,
+            },
         ],
     },
 };

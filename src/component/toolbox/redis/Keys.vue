@@ -1,81 +1,106 @@
 <template>
-  <div class="toolbox-redis-topic">
+  <div class="toolbox-redis-keys">
     <template v-if="ready">
       <tm-layout height="100%">
-        <tm-layout height="90px">
-          <el-form class="pdt-10 pdlr-10" size="mini" inline>
-            <el-form-item label="Database" class="mgb-5">
+        <tm-layout height="100px">
+          <el-form class="pdt-5 pdlr-10" size="mini" inline>
+            <el-form-item label="Database" class="mgb-5" label-width="75px">
               <el-input v-model="searchForm.database" style="width: 80px" />
             </el-form-item>
-            <el-form-item label="搜索" class="mgb-5">
-              <el-input v-model="searchForm.pattern" style="width: 160px" />
+            <el-form-item
+              label="匹配数量"
+              class="mgb-5"
+              title="查询到一定数量后停止查询"
+            >
+              <el-input v-model="searchForm.size" style="width: 70px" />
             </el-form-item>
-            <el-form-item label="数量" class="mgb-5">
-              <el-input v-model="searchForm.size" style="width: 55px" />
-            </el-form-item>
-            <el-form-item label="" class="mgb-5">
-              <div class="tm-btn tm-btn-xs bg-teal-8" @click="toSearch">
-                搜索
-              </div>
-              <div class="tm-btn tm-btn-xs bg-green" @click="toInsert">
-                新增
-              </div>
-              <div class="tm-btn tm-btn-xs bg-grey" @click="toImport()">
-                导入
-              </div>
-              <div class="tm-btn tm-btn-xs bg-grey" @click="toExport()">
-                导出
-              </div>
-              <div
-                class="tm-btn tm-btn-xs bg-grey"
-                @click="toolboxWorker.showInfo()"
-              >
-                信息
-              </div>
-              <div
-                class="tm-btn tm-btn-xs bg-orange"
-                @click="
-                  toDeletePattern(searchForm.database, searchForm.pattern)
-                "
-              >
-                删除
-              </div>
+            <el-form-item label="" class="mgb-5" title="Scan 轮询 每次查询数量">
+              <el-input v-model="searchForm.count" style="width: 70px" />
             </el-form-item>
           </el-form>
+          <el-form class="pdlr-10" size="mini" label-width="75px">
+            <el-form-item label="模糊搜索" class="mgb-5">
+              <el-input v-model="searchForm.pattern">
+                <div
+                  slot="append"
+                  class="tm-btn tm-btn-sm bg-teal-8"
+                  @click="toSearch"
+                >
+                  搜索
+                </div>
+              </el-input>
+            </el-form-item>
+          </el-form>
+          <div class="pdlr-10">
+            <div class="tm-btn tm-btn-xs bg-green" @click="toInsert">新增</div>
+            <div class="tm-btn tm-btn-xs bg-grey" @click="toImport()">导入</div>
+            <div class="tm-btn tm-btn-xs bg-grey" @click="toExport()">导出</div>
+            <div
+              class="tm-btn tm-btn-xs bg-grey"
+              @click="toolboxWorker.showInfo()"
+            >
+              信息
+            </div>
+            <div
+              class="tm-btn tm-btn-xs bg-orange"
+              @click="toDeletePattern(searchForm.database, searchForm.pattern)"
+            >
+              删除
+            </div>
+          </div>
         </tm-layout>
         <tm-layout height="auto">
           <template v-if="searchResult == null">
             <div class="text-center ft-13 pdtb-10">数据加载中，请稍后!</div>
           </template>
           <template v-else>
-            <div class="text-center ft-12 pdtb-10" style="height: 40px">
-              共
+            <div class="text-center ft-12 pdtb-8">
+              查询
               <span class="color-green-2 pdlr-3">
                 {{ searchResult.count }}</span
               >
-              Keys
-              <span class="pdlr-2"></span>
-              加载
-              <span class="color-green pdlr-3">
-                {{ searchResult.keyList.length }}
-              </span>
-              个
+              个 Keys
               <el-radio-group v-model="viewModel">
-                <el-radio label="list" class="mglr-0 mgl-10">列表</el-radio>
-                <el-radio label="tree" class="mglr-0 mgl-10">
-                  树形(分割符号'{{ splitChars.join("','") }}')
+                <el-radio
+                  label="list"
+                  class="mglr-0 mgl-10"
+                  v-remove-aria-hidden
+                  >列表</el-radio
+                >
+                <el-radio
+                  label="tree"
+                  class="mglr-0 mgl-10"
+                  v-remove-aria-hidden
+                >
+                  树形 ( 分割符号 )
                 </el-radio>
               </el-radio-group>
             </div>
-            <div>
-              <el-input placeholder="输入关键字进行过滤" v-model="filterText">
-              </el-input>
-            </div>
+
+            <el-form class="pdlr-10" size="mini" inline>
+              <el-form-item label="分割符号" class="mgb-5">
+                <el-input
+                  v-model="splitChars"
+                  @change="initData()"
+                  style="letter-spacing: 2px; width: 100px"
+                >
+                </el-input>
+              </el-form-item>
+              <el-form-item label="过滤" class="mgb-5 mgr-0">
+                <el-input
+                  placeholder="输入关键字进行过滤"
+                  v-model="filterText"
+                  style="width: 210px"
+                >
+                </el-input>
+              </el-form-item>
+            </el-form>
+
             <div
               class="app-scroll-bar"
-              style="height: calc(100% - 80px); user-select: text"
+              style="height: calc(100% - 70px); overflow: auto"
             >
-              <div class="pd-10">
+              <div class="pdlr-10">
                 <el-tree
                   ref="tree"
                   :props="defaultProps"
@@ -90,12 +115,22 @@
                   @node-click="nodeClick"
                   @node-contextmenu="nodeContextmenu"
                   empty-text="暂无匹配数据"
+                  style="user-select: text"
                 >
                   <span
                     class="toolbox-editor-tree-span"
                     slot-scope="{ node, data }"
                   >
-                    <span>{{ node.label }}</span>
+                    <span>
+                      {{ node.label }}
+                      <span v-if="data.splits" class="color-grey pdlr-10">
+                        (
+                        <span class="pdlr-2">{{
+                          data.splits.join(" , ")
+                        }}</span>
+                        )
+                      </span>
+                    </span>
                     <template v-if="data.isData">
                       <div class="toolbox-editor-tree-btn-group">
                         <div
@@ -135,8 +170,9 @@ export default {
         database: 0,
         pattern: "xx*",
         size: 200,
+        count: 10000,
       },
-      splitChars: [":", "-", "/"],
+      splitChars: ": - / _ #",
       searchResult: null,
       viewModel: "list",
       filterText: "",
@@ -150,11 +186,26 @@ export default {
   computed: {},
   watch: {
     filterText(val) {
-      this.$refs.tree && this.$refs.tree.filter(val);
+      if (this.$refs.tree == null) {
+        return;
+      }
+      this.$refs.tree.filter(val);
+      if (this.tool.isEmpty(this.filterText)) {
+        this.$nextTick(() => {
+          let root = this.$refs.tree.root;
+          root.childNodes.forEach((one) => {
+            one.expanded = false;
+          });
+        });
+      }
     },
     viewModel() {
+      if (this.$refs.tree == null) {
+        return;
+      }
+      this.initData();
       this.$nextTick(() => {
-        this.$refs.tree && this.$refs.tree.filter(this.filterText);
+        this.$refs.tree.filter(this.filterText);
       });
     },
   },
@@ -174,6 +225,18 @@ export default {
         if (this.extend.search.database >= 0) {
           this.searchForm.database = this.extend.search.database;
         }
+        if (this.extend.search.size >= 0) {
+          this.searchForm.size = this.extend.search.size;
+        }
+        if (this.extend.search.count >= 0) {
+          this.searchForm.count = this.extend.search.count;
+        }
+        if (this.tool.isNotEmpty(this.extend.search.viewModel)) {
+          this.viewModel = this.extend.search.viewModel;
+        }
+        if (this.tool.isNotEmpty(this.extend.search.filterText)) {
+          this.filterText = this.extend.search.filterText;
+        }
       }
       this.toolboxWorker.loadKeys = this.loadKeys;
       this.loadKeys();
@@ -187,8 +250,20 @@ export default {
         search: {
           pattern: this.searchForm.pattern,
           database: Number(this.searchForm.database),
+          size: Number(this.searchForm.size),
+          count: Number(this.searchForm.count),
+          viewModel: this.viewModel,
+          filterText: this.filterText,
         },
       });
+    },
+    initData() {
+      if (this.searchResult == null) {
+        return;
+      }
+      if (this.viewModel == "tree") {
+        this.initTreeData(this.searchResult);
+      }
     },
     async loadKeys() {
       this.searchResult = null;
@@ -202,10 +277,15 @@ export default {
         param.size = 50;
       }
       param.size = Number(param.size);
+      if (this.tool.isEmpty(param.count)) {
+        param.count = 10000;
+      }
+      param.count = Number(param.count);
       if (this.tool.isEmpty(param.pattern)) {
         this.tool.warn("请输入“*”或“user*”等关键字模糊搜索");
+        return;
       }
-      let res = await this.server.redis.keys(param);
+      let res = await this.server.redis.scan(param);
       if (res.code == 0) {
         let keysData = res.data || {};
         this.formatData(keysData);
@@ -215,13 +295,26 @@ export default {
       }
     },
     formatData(keysData) {
-      keysData = keysData || {};
       keysData.keyList = keysData.keyList || [];
-      keysData.treeDatas = [];
-      var treeDataCache = {};
+
       keysData.keyList.forEach((data) => {
+        data.database = keysData.database;
         data.isData = true;
         data.name = data.key;
+      });
+      keysData.treeDatas = [];
+      if (this.viewModel == "tree") {
+        this.initTreeData(keysData);
+      }
+    },
+    initTreeData(keysData) {
+      keysData.treeDatas = [];
+      var treeDataCache = {};
+      let splitChars = [];
+      if (this.tool.isNotEmpty(this.splitChars)) {
+        splitChars = this.splitChars.split(" ");
+      }
+      keysData.keyList.forEach((data) => {
         let treeData = {
           database: data.database,
           key: data.key,
@@ -230,45 +323,61 @@ export default {
           children: [],
         };
         let lastFind = null;
-        let splitChar = null;
-        this.splitChars.forEach((one) => {
-          if (splitChar == null) {
-            if (data.key.indexOf(one) >= 0) {
-              splitChar = one;
+        let dataKey = data.key;
+        var ss = [dataKey];
+        var spSS = [""];
+        splitChars.forEach((splitChar) => {
+          let newSS = [];
+          let newSpSS = [];
+          ss.forEach((s, i) => {
+            if (s.indexOf(splitChar) >= 0) {
+              let ss_ = s.split(splitChar);
+              ss_.forEach((s_) => {
+                newSS.push(s_);
+                newSpSS.push(splitChar);
+              });
+            } else {
+              newSS.push(s);
+              newSpSS.push(spSS[i]);
+            }
+          });
+          ss = newSS;
+          spSS = newSpSS;
+        });
+        let lastK = "";
+        ss.forEach((s, i) => {
+          treeData.name = s;
+          if (i >= ss.length - 1) {
+            return;
+          }
+          // if (i > 0) {
+          lastK += spSS[i];
+          // }
+          lastK += s;
+          let find = treeDataCache[lastK];
+          if (find == null) {
+            find = {
+              database: data.database,
+              key: lastK,
+              name: s,
+              splits: [spSS[i]],
+              isData: false,
+              children: [],
+            };
+            treeDataCache[lastK] = find;
+            if (lastFind != null) {
+              lastFind.children.push(find);
+            } else {
+              keysData.treeDatas.push(find);
+            }
+          } else {
+            if (find.splits.indexOf(spSS[i]) < 0) {
+              find.splits.push(spSS[i]);
             }
           }
+          lastFind = find;
         });
-        if (data.key.indexOf(splitChar) >= 0) {
-          let ss = data.key.split(splitChar);
-          let lastK = "";
-          ss.forEach((s, i) => {
-            treeData.name = s;
-            if (i >= ss.length - 1) {
-              return;
-            }
-            if (i > 0) {
-              lastK += splitChar;
-            }
-            lastK += s;
-            let find = treeDataCache[lastK];
-            if (find == null) {
-              find = {
-                database: data.database,
-                key: lastK,
-                name: s,
-                isData: false,
-                children: [],
-              };
-              treeDataCache[lastK] = find;
-              if (lastFind != null) {
-                lastFind.children.push(find);
-              } else {
-                keysData.treeDatas.push(find);
-              }
-            }
-            lastFind = find;
-          });
-        }
+
         if (lastFind != null) {
           lastFind.children.push(treeData);
         } else {
@@ -466,7 +575,7 @@ export default {
 </script>
 
 <style>
-.toolbox-redis-topic {
+.toolbox-redis-keys {
   width: 100%;
   height: 100%;
 }
