@@ -72,8 +72,6 @@
               :tableName="item.extend.tableName"
               :columnTypeInfoList="columnTypeInfoList"
               :indexTypeInfoList="indexTypeInfoList"
-              :extend="item.extend"
-              :tabId="item.tabId"
               :actived="
                 toolboxWorker.itemsWorker.activeItem &&
                 item.key == toolboxWorker.itemsWorker.activeItem.key

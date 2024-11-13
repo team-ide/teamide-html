@@ -297,7 +297,7 @@
 <script>
 export default {
   components: {},
-  props: ["source", "toolboxWorker", "extend", ""],
+  props: ["source", "toolboxWorker", "extend"],
   data() {
     return {
       ready: false,

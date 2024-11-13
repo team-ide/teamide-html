@@ -72,10 +72,6 @@ export default {
   ],
   data() {
     return {
-      characterSets: [
-        { value: "utf8", text: "utf8" },
-        { value: "utf8mb4", text: "utf8mb4" },
-      ],
       form: {
         ownerName: null,
         tableName: "TB_XXX",
