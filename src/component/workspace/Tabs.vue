@@ -89,7 +89,7 @@
 import draggable from "vuedraggable";
 export default {
   components: { draggable },
-  props: ["source", "itemsWorker", "onSequenceChange"],
+  props: ["source", "itemsWorker", "onSequenceChange", "formatContextmenu"],
   data() {
     return {
       mainTabs: [],
@@ -317,6 +317,9 @@ export default {
         },
       });
 
+      if (this.formatContextmenu != null) {
+        this.formatContextmenu(tab, menus);
+      }
       this.tool.showContextmenu(menus);
     },
     toSelectTab(tab) {

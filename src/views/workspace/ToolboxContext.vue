@@ -541,7 +541,13 @@ export default {
           },
         });
         menus.push({
-          text: "复制",
+          text: "复制配置信息",
+          onClick: () => {
+            this.toCopyInfo(toolboxData.toolboxId);
+          },
+        });
+        menus.push({
+          text: "复制新增",
           onClick: () => {
             this.toCopy(toolboxType, toolboxData);
           },
@@ -733,6 +739,50 @@ export default {
         });
       } else {
         this.tool.error(res.msg);
+      }
+    },
+    async toCopyInfo(toolboxId) {
+      let res = await this.server.toolbox.get({
+        toolboxId: toolboxId,
+      });
+      let data = res.data;
+      if (data == null) {
+        return;
+      }
+      let text = "";
+      text += data.name + "\n";
+      let option = {};
+      let hasPass = false;
+      if (this.tool.isNotEmpty(data.option)) {
+        option = this.tool.stringToJSON(data.option);
+        let d = {};
+        for (let k in option) {
+          let v = option[k];
+          if (
+            this.tool.isEmpty(option[k]) ||
+            option[k] == 0 ||
+            option[k] == false
+          ) {
+            continue;
+          }
+          if (k == "password" || k == "auth") {
+            let res = await this.server.showPlaintext({
+              text: v,
+            });
+            if (res.data) {
+              hasPass = true;
+              v = res.data;
+            }
+          }
+          d[k] = v;
+        }
+        text += this.tool.JSONbig.stringify(d, null, "  ");
+      }
+      this.tool.clipboardWrite(text);
+      if (hasPass) {
+        this.tool.success("复制成功，包含的密文已解密复制！");
+      } else {
+        this.tool.success("复制成功！");
       }
     },
     async toCopy(toolboxType, copy) {

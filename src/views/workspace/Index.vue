@@ -20,6 +20,7 @@
           :source="source"
           :itemsWorker="mainItemsWorker"
           :onSequenceChange="onSequenceChange"
+          :formatContextmenu="formatContextmenu"
         >
         </WorkspaceTabs>
       </div>
@@ -42,6 +43,7 @@
       </div>
     </div>
     <ToolboxContext
+      ref="ToolboxContext"
       :source="source"
       :openByOption="openByOption"
     ></ToolboxContext>
@@ -409,6 +411,16 @@ export default {
         options.toolboxId = item.toolboxId;
       }
       this.openByOption(options);
+    },
+    formatContextmenu(tab, menus) {
+      if (tab && tab.toolboxId) {
+        menus.splice(1, 0, {
+          text: "复制配置信息",
+          onClick: async () => {
+            this.$refs.ToolboxContext.toCopyInfo(tab.toolboxId);
+          },
+        });
+      }
     },
     async openByOption(options) {
       options = options || {};
