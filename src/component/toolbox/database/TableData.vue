@@ -1046,16 +1046,28 @@ export default {
         this.tool.error(res.msg);
         return;
       }
-      let task = res.data || {};
-      let info = "保存成功，";
-      info +=
-        "成功记录数（" +
-        task.saveSuccess +
-        "）条，耗时（" +
-        task.useTime +
-        "）毫秒！";
-      this.tool.success(info);
+      let d = res.data || {};
+      this.alertSuccess(d);
       this.doSearch();
+    },
+    alertSuccess(d) {
+      let info = "保存成功，";
+      if (d.insertCount > 0) {
+        info += "新增（" + d.insertCount + "）条SQL，";
+      }
+      if (d.updateCount > 0) {
+        info += "修改（" + d.updateCount + "）条SQL，";
+      }
+      if (d.deleteCount > 0) {
+        info += "删除（" + d.deleteCount + "）条SQL，";
+      }
+      if (d.success > 0) {
+        info += "成功（" + d.success + "）条记录，";
+      }
+      if (d.use > 0) {
+        info += "耗时（" + d.use + "）毫秒！";
+      }
+      this.tool.success(info);
     },
     async doDelete(deleteList) {
       let data = {};
@@ -1070,15 +1082,8 @@ export default {
         this.tool.error(res.msg);
         return;
       }
-      let task = res.data || {};
-      let info = "删除成功，";
-      info +=
-        "成功记录数（" +
-        task.saveSuccess +
-        "）条，耗时（" +
-        task.useTime +
-        "）毫秒！";
-      this.tool.success(info);
+      let d = res.data || {};
+      this.alertSuccess(d);
       this.doSearch();
     },
     removeInsert(data) {
