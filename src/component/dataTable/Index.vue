@@ -50,6 +50,7 @@
                     type="date"
                     placeholder="选择日期"
                     value-format="timestamp"
+                    @change="inputValueChange(scope.row, column, $event)"
                   >
                   </el-date-picker>
                 </template>
@@ -59,6 +60,7 @@
                     type="datetime"
                     placeholder="选择时间"
                     value-format="timestamp"
+                    @change="inputValueChange(scope.row, column, $event)"
                   >
                   </el-date-picker>
                 </template>
@@ -68,6 +70,7 @@
                     type="date"
                     placeholder="选择日期"
                     value-format="timestamp"
+                    @change="inputValueChange(scope.row, column, $event)"
                   >
                   </el-date-picker>
                 </template>
@@ -77,6 +80,8 @@
                     type="datetime"
                     placeholder="选择时间"
                     value-format="timestamp"
+                    :name="column.name"
+                    @change="inputValueChange(scope.row, column, $event)"
                   >
                   </el-date-picker>
                 </template>
