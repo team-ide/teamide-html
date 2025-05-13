@@ -557,6 +557,21 @@ tool.getStringValue = function (v) {
     }
     return v;
 };
+
+tool.bytesHuman = function (bytes, precision) {
+    if (!/^([-+])?|(\.\d+)(\d+(\.\d+)?|(\d+\.)|Infinity)$/.test(bytes)) {
+        return "-";
+    }
+    if (bytes === 0) return "0";
+    if (typeof precision === "undefined") precision = 2;
+    const units = ["B", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB", "BB"];
+    const num = Math.floor(Math.log(bytes) / Math.log(1024));
+    const value = (bytes / Math.pow(1024, Math.floor(num))).toFixed(
+        precision
+    );
+    let res = `${value} ${units[num]}`;
+    return res;
+};
 tool.clipboardWrite = async function (text) {
 
     return new Promise(function (resolve, reject) {
@@ -928,6 +943,9 @@ tool.isNotTrimEmpty = function (arg) {
 
 tool.initTreeWidth = function (tree, treeBox) {
 
+    if (tree == null) {
+        return;
+    }
     if (tree.initWidthIng) {
         return;
     }

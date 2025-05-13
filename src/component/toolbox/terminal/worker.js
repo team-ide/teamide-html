@@ -198,6 +198,80 @@ const newWorker = function (workerOption) {
             // }
             return res.data;
         },
+        getFileProgress(opts) {
+            let startTime = new Date().getTime();
+            let lastTime = startTime;
+            let total = opts.total;
+            let lastOffset = 0;
+            let lastStrLen = 0;
+            let getProgressStr = (offset) => {
+                let nowTime = new Date().getTime();
+                let allUserTime = nowTime - startTime;
+                let useTime = 0;
+                useTime = nowTime - lastTime;
+                lastTime = nowTime;
+                let useTimeSize = 0;
+                if (lastOffset > 0) {
+                    useTimeSize = offset - lastOffset;
+                } else {
+                    useTimeSize = offset;
+                }
+                lastOffset = offset;
+                if (useTime == 0 && useTimeSize > 0) {
+                    useTime = 1;
+                }
+                let sleep = 0;
+                if (useTime > 0 && useTimeSize > 0) {
+                    sleep = Number(((useTimeSize * 1000) / useTime).toFixed(2));
+                }
+                let percent;
+                let overS = total - offset;
+                if (total === 0 || overS <= 0) {
+                    percent = 100;
+                } else {
+                    percent = Number((offset / total * 100).toFixed(2));
+                }
+
+                let overT = -1;
+                if (percent < 100 && overS > 0 && sleep > 0) {
+                    overT = Number((overS * 1000 / sleep).toFixed(2));
+                }
+                let ss = []
+                ss.push(tool.bytesHuman(total))
+                ss.push(tool.bytesHuman(offset))
+                ss.push("" + percent + "%")
+
+
+                if (allUserTime > 0) {
+                    ss.push("用时:" + tool.formatTimeStr(allUserTime))
+                }
+                if (sleep > 0) {
+                    ss.push("速度:" + tool.bytesHuman(sleep) + "/s")
+                }
+                if (percent < 100 && overT > 0) {
+                    ss.push("预计:" + tool.formatTimeStr(overT))
+                }
+                let str = '';
+                ss.forEach((s) => {
+                    s = " " + s;
+                    let fSize = 10 - s.length;
+                    for (let i = 0; i < fSize; i++) {
+                        s = " " + s;
+                    }
+                    str += s;
+                });
+
+                let sL = lastStrLen - str.length
+                for (let i = 0; i < sL; i++) {
+                    str = str + " ";
+                }
+                lastStrLen = str.length
+                str = str + "  ";
+                return str
+            };
+
+            return getProgressStr
+        },
     };
 
 

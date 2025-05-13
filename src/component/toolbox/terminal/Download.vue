@@ -5,7 +5,7 @@
 <script>
 export default {
   components: {},
-  props: ["source", "toolboxWorker"],
+  props: ["source", "toolboxWorker", "worker"],
   data() {
     return {};
   },
@@ -34,20 +34,42 @@ export default {
       this.zsession.on("offer", (xfer) => {
         try {
           this.last_xfer = xfer;
+          let detail = xfer.get_details();
+          let total = detail.size;
+          let fileProgress = this.worker.getFileProgress({
+            total: total,
+          });
           // console.log("zsession on offer", xfer);
           // if (xfer.get_details().size > 20 * 1024 * 1024 * 1024) {
           //   xfer.skip();
           //   that.tool.warn(`${xfer.get_details().name} 超过 20 G, 无法下载`);
           //   return;
           // }
-          xfer.startTime = new Date().getTime();
           let FILE_BUFFER = [];
           xfer.on("input", (payload) => {
-            // console.log("xfer on input", payload);
-            this.updateProgress(xfer);
+            if (xfer.isSaved) {
+              return;
+            }
+            // console.log("xfer on input", payload.length);
+            let offset = xfer.get_offset();
+            this.updateProgress(fileProgress, detail, offset);
             FILE_BUFFER.push(new Uint8Array(payload));
+            if (total == 0 || total <= offset) {
+              window.setTimeout(() => {
+                if (xfer.isSaved) {
+                  return;
+                }
+                this.saveFile(xfer, FILE_BUFFER);
+                xfer.skip();
+              }, 500);
+            }
           });
           xfer.on("complete", (arg) => {
+            if (xfer.isSaved) {
+              return;
+            }
+            let offset = xfer.get_offset();
+            this.updateProgress(fileProgress, detail, offset);
             // console.log("xfer on complete", arg);
           });
 
@@ -56,12 +78,13 @@ export default {
             .then(
               (arg) => {
                 // console.log("xfer.accept then 1:", arg);
-                this.last_xfer = null;
+                if (xfer.isSaved) {
+                  return;
+                }
                 this.saveFile(xfer, FILE_BUFFER);
-                this.term.write("\r\n");
               },
               (arg) => {
-                // console.log("xfer.accept then 2:", arg);
+                console.log("xfer.accept then 2:", arg);
               }
             )
             .catch((err) => {
@@ -76,75 +99,18 @@ export default {
       });
       this.zsession.start();
     },
-    bytesHuman(bytes, precision) {
-      if (!/^([-+])?|(\.\d+)(\d+(\.\d+)?|(\d+\.)|Infinity)$/.test(bytes)) {
-        return "-";
-      }
-      if (bytes === 0) return "0";
-      if (typeof precision === "undefined") precision = 2;
-      const units = ["B", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB", "BB"];
-      const num = Math.floor(Math.log(bytes) / Math.log(1024));
-      const value = (bytes / Math.pow(1024, Math.floor(num))).toFixed(
-        precision
-      );
-      let res = `${value} ${units[num]}`;
-      let fSize = 10 - res.length;
-      for (let i = 0; i < fSize; i++) {
-        res = " " + res;
-      }
-      return res;
-    },
-    updateProgress(xfer) {
-      let detail = xfer.get_details();
+    updateProgress(fileProgress, detail, offset) {
       let name = detail.name;
-      let total = detail.size;
-      let offset = xfer.get_offset();
-      let percent;
-      if (total === 0 || total === offset) {
-        percent = 100;
-      } else {
-        percent = ((offset / total) * 100).toFixed(2);
-      }
-      let percentStr = "" + percent;
-      let fSize = 10 - percentStr.length;
-      for (let i = 0; i < fSize; i++) {
-        percentStr = " " + percentStr;
-      }
-
-      let sleep = 0;
-      let nowTime = new Date().getTime();
-      let startTime = xfer.startTime;
-      let useTime = nowTime - startTime;
-      if (useTime > 0) {
-        sleep = ((offset * 1000) / useTime).toFixed(2);
-      }
-      let overS = total - offset;
-      let overT = -1;
-      if (overS > 0 && sleep > 0) {
-        overT = (overS / sleep).toFixed(2);
-      }
-      let str =
-        "下载文件" +
-        name +
-        " " +
-        this.bytesHuman(total) +
-        " " +
-        this.bytesHuman(offset) +
-        " " +
-        this.bytesHuman(sleep) +
-        "/s " +
-        percentStr +
-        "%";
-
-      if (useTime > 0) {
-        str += "   用时:" + this.tool.formatTimeStr(useTime);
-      }
-      if (overT > 0) {
-        str += "   预计:" + this.tool.formatTimeStr(overT * 1000);
-      }
+      let ss = fileProgress(offset);
+      let str = "下载文件 " + name + ss;
       this.term.write("\r" + str);
     },
     saveFile(xfer, buffer) {
+      if (xfer.isSaved) {
+        return;
+      }
+      xfer.isSaved = true;
+      this.last_xfer = null;
       let name = xfer.get_details().name;
       let href = null;
       try {
@@ -161,6 +127,7 @@ export default {
         window.URL.revokeObjectURL(href); //释放blob对象
       }
       this.callback && this.callback();
+      this.term.write("\r\n");
     },
   },
   created() {},

@@ -548,20 +548,17 @@ Zmodem.Session.Receive = class ZmodemReceiveSession extends Zmodem.Session {
         if (this._got_ZFIN) {
             if (this._input_buffer.length < 2) return;
 
-            //if it’s OO, then set this._bytes_after_OO
-            if (Zmodem.ZMLIB.find_subarray(this._input_buffer, OVER_AND_OUT) === 0) {
-
-                //This doubles as an indication that the session has ended.
-                //We need to set this right away so that handlers like
-                //"session_end" will have access to it.
-                this._bytes_after_OO = _trim_OO(this._bytes_being_consumed.slice(0));
-                this._on_session_end();
-
-                return;
+            //if it’s OO, then set this._bytes_after_OO   2025-5-12添加 允许missing_OO
+            if (Zmodem.ZMLIB.find_subarray(this._input_buffer, OVER_AND_OUT) !== 0) {
+                console.warn("PROTOCOL: Only thing after ZFIN should be “OO” (79,79), not: " + this._input_buffer.join());
             }
-            else {
-                throw ("PROTOCOL: Only thing after ZFIN should be “OO” (79,79), not: " + this._input_buffer.join());
-            }
+            //This doubles as an indication that the session has ended.
+            //We need to set this right away so that handlers like
+            //"session_end" will have access to it.
+            this._bytes_after_OO = _trim_OO(this._bytes_being_consumed.slice(0));
+            this._on_session_end();
+
+            return;
         }
 
         var parsed;

@@ -142,6 +142,13 @@ export default {
         },
         on_progress: (obj, xfer) => {
           try {
+            if (xfer.fileProgress == null) {
+              let detail = xfer.get_details();
+              let total = detail.size;
+              xfer.fileProgress = this.worker.getFileProgress({
+                total: total,
+              });
+            }
             this.updateProgress(xfer);
           } catch (error) {}
         },
@@ -236,56 +243,15 @@ export default {
         );
       }
     },
-    bytesHuman(bytes, precision) {
-      if (!/^([-+])?|(\.\d+)(\d+(\.\d+)?|(\d+\.)|Infinity)$/.test(bytes)) {
-        return "-";
-      }
-      if (bytes === 0) return "0";
-      if (typeof precision === "undefined") precision = 2;
-      const units = ["B", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB", "BB"];
-      const num = Math.floor(Math.log(bytes) / Math.log(1024));
-      const value = (bytes / Math.pow(1024, Math.floor(num))).toFixed(
-        precision
-      );
-      let res = `${value} ${units[num]}`;
-      let fSize = 10 - res.length;
-      for (let i = 0; i < fSize; i++) {
-        res = " " + res;
-      }
-      return res;
-    },
     updateProgress(xfer) {
       if (this.callStopped) {
         return;
       }
       let detail = xfer.get_details();
       let name = detail.name;
-      let total = detail.size;
       let offset = xfer.get_offset();
-      let percent;
+      let ss = xfer.fileProgress(offset);
 
-      if (total === 0 || total <= offset) {
-        percent = 100;
-      } else {
-        percent = ((offset / total) * 100).toFixed(2);
-      }
-      let percentStr = "" + percent;
-      let fSize = 6 - percentStr.length;
-      for (let i = 0; i < fSize; i++) {
-        percentStr = " " + percentStr;
-      }
-      let sleep = 0;
-      let nowTime = new Date().getTime();
-      let startTime = xfer._file_info.startTime;
-      let useTime = nowTime - startTime;
-      if (useTime > 0) {
-        sleep = ((offset * 1000) / useTime).toFixed(2);
-      }
-      let overS = total - offset;
-      let overT = -1;
-      if (overS > 0 && sleep > 0) {
-        overT = (overS / sleep).toFixed(2);
-      }
       let str =
         "上传文件(" +
         detail.obj.upload_number +
@@ -293,21 +259,7 @@ export default {
         detail.obj.upload_file_count +
         ") " +
         name +
-        " " +
-        this.bytesHuman(total) +
-        " " +
-        this.bytesHuman(offset) +
-        " " +
-        this.bytesHuman(sleep) +
-        "/s " +
-        percentStr +
-        "%";
-      if (useTime > 0) {
-        str += "   用时:" + this.tool.formatTimeStr(useTime);
-      }
-      if (overT > 0) {
-        str += "   预计:" + this.tool.formatTimeStr(overT * 1000);
-      }
+        ss;
       this.term.write("\r" + str);
     },
     send_block_files(session, files, options) {

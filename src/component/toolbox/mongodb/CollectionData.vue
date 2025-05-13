@@ -317,7 +317,7 @@ export default {
     toExportData() {
       let dataList = [];
       this.dataList.forEach((one) => {
-        dataList.push(one._source);
+        dataList.push(one.data);
       });
       let options = {
         title: "数据导出",

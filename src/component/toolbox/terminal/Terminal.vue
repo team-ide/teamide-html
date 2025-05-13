@@ -298,6 +298,7 @@
       ref="Download"
       :source="source"
       :toolboxWorker="toolboxWorker"
+      :worker="worker"
     ></Download>
     <Upload
       ref="Upload"
